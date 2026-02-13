@@ -322,15 +322,47 @@ class AccountMove(models.Model):
         )
         self.fp_response_xml_attachment_id = attachment
 
+    def _fp_get_document_code(self):
+        self.ensure_one()
+        document_map = {
+            "FE": "01",
+            "NC": "03",
+            "ND": "02",
+            "TE": "04",
+        }
+        return document_map.get(self.fp_document_type, "99")
+
+    def _fp_get_company_consecutive(self):
+        self.ensure_one()
+        company = self.company_id
+        field_by_type = {
+            "FE": company.fp_consecutive_fe,
+            "NC": company.fp_consecutive_nc,
+            "ND": company.fp_consecutive_nd,
+            "TE": company.fp_consecutive_te,
+        }
+        raw_value = field_by_type.get(self.fp_document_type) or company.fp_consecutive_others
+        return self._fp_sanitize_consecutive(raw_value)
+
+    def _fp_sanitize_consecutive(self, value):
+        digits = "".join(ch for ch in (value or "") if ch.isdigit())
+        if not digits:
+            document_code = self._fp_get_document_code()
+            digits = f"00100001{document_code}000000001"
+        return digits.zfill(20)[-20:]
+
     def _fp_build_clave(self):
         self.ensure_one()
         if self.fp_external_id:
             return self.fp_external_id
+
+        consecutive = self._fp_get_company_consecutive()
         if self.ref and len(self.ref) >= 50:
-            return self.ref[:50]
-        seed = "".join(ch for ch in (self.name or "") if ch.isdigit())
-        seed = (seed or str(self.id)).zfill(50)
-        return seed[-50:]
+            base = self.ref[:50]
+        else:
+            seed = "".join(ch for ch in (self.name or "") if ch.isdigit())
+            base = (seed or str(self.id)).zfill(50)[-50:]
+        return f"{base[:21]}{consecutive}{base[41:]}"
 
     def _fp_call_api(self, endpoint, payload, timeout, token, base_url, method="POST"):
         url = f"{base_url.rstrip('/')}{endpoint}"

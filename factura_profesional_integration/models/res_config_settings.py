@@ -28,3 +28,10 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.fp_auto_consult_after_send",
         readonly=False,
     )
+
+    fp_consecutive_fe = fields.Char(related="company_id.fp_consecutive_fe", readonly=False)
+    fp_consecutive_te = fields.Char(related="company_id.fp_consecutive_te", readonly=False)
+    fp_consecutive_fec = fields.Char(related="company_id.fp_consecutive_fec", readonly=False)
+    fp_consecutive_nc = fields.Char(related="company_id.fp_consecutive_nc", readonly=False)
+    fp_consecutive_nd = fields.Char(related="company_id.fp_consecutive_nd", readonly=False)
+    fp_consecutive_others = fields.Char(related="company_id.fp_consecutive_others", readonly=False)
