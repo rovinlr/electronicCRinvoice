@@ -8,6 +8,8 @@
             <xpath expr="//field[@name='amount']" position="after">
                 <label for="fp_tax_type"/>
                 <field name="fp_tax_type"/>
+                <label for="fp_tax_rate_code_iva"/>
+                <field name="fp_tax_rate_code_iva"/>
                 <label for="fp_tax_code"/>
                 <field name="fp_tax_code"/>
                 <label for="fp_tax_rate"/>
