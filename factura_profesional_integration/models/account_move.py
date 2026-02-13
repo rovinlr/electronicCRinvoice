@@ -10,6 +10,21 @@ from odoo.exceptions import UserError
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    fp_document_type = fields.Selection(
+        [
+            ("FE", "Factura Electrónica"),
+            ("NC", "Nota de Crédito Electrónica"),
+            ("ND", "Nota de Débito Electrónica"),
+            ("TE", "Tiquete Electrónico"),
+        ],
+        string="Tipo de documento (FE)",
+        default="FE",
+    )
+    fp_economic_activity_code = fields.Char(
+        string="Actividad económica (FE)",
+        help="Código de actividad económica para facturación electrónica.",
+    )
+
     fp_external_id = fields.Char(string="Factura API ID", copy=False)
     fp_xml_attachment_id = fields.Many2one("ir.attachment", string="Factura XML", copy=False)
     fp_api_state = fields.Selection(
@@ -68,7 +83,14 @@ class AccountMove(models.Model):
                     "qty": line.quantity,
                     "unit_price": line.price_unit,
                     "discount": line.discount,
-                    "taxes": [tax.amount for tax in line.tax_ids],
+                    "taxes": [
+                    {
+                        "name": tax.name,
+                        "code": tax.fp_tax_code,
+                        "rate": tax.fp_tax_rate or tax.amount,
+                    }
+                    for tax in line.tax_ids
+                ],
                     "subtotal": line.price_subtotal,
                     "total": line.price_total,
                 }
@@ -78,9 +100,12 @@ class AccountMove(models.Model):
             "number": self.name,
             "date": str(self.invoice_date),
             "currency": self.currency_id.name,
+            "document_type": self.fp_document_type,
+            "economic_activity_code": self.fp_economic_activity_code or self.company_id.fp_economic_activity_code,
             "customer": {
                 "name": self.partner_id.name,
                 "vat": self.partner_id.vat,
+                "identification_type": self.partner_id.fp_identification_type,
                 "email": self.partner_id.email,
             },
             "lines": lines,

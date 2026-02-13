@@ -7,6 +7,9 @@
     "depends": ["account"],
     "data": [
         "views/res_config_settings_views.xml",
+        "views/res_partner_views.xml",
+        "views/account_move_views.xml",
+        "views/account_tax_views.xml",
     ],
     "installable": True,
     "application": True,

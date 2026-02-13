@@ -17,6 +17,9 @@
                         <setting string="Timeout">
                             <field name="fp_api_timeout"/>
                         </setting>
+                        <setting string="Actividad económica por defecto">
+                            <field name="fp_economic_activity_code"/>
+                        </setting>
                     </block>
                 </app>
             </xpath>
