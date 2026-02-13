@@ -2,10 +2,34 @@ import requests
 
 from odoo import _, fields, models
 from odoo.exceptions import UserError
+from odoo.tools.sql import column_exists
 
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
+
+    def _auto_init(self):
+        """Ensure FE columns exist before normal ORM reads on broken schemas.
+
+        Some hosted databases can end up with a partial custom schema (for
+        example `fp_identification_type` existing while `fp_canton_code` is
+        missing). During module install/upgrade Odoo reads `res.partner` early,
+        which crashes before migrations run.
+        """
+        result = super()._auto_init()
+
+        missing_columns = {
+            "fp_identification_type": "varchar",
+            "fp_canton_code": "varchar",
+            "fp_district_code": "varchar",
+            "fp_neighborhood_code": "varchar",
+        }
+        for column_name, sql_type in missing_columns.items():
+            if not column_exists(self.env.cr, self._table, column_name):
+                self.env.cr.execute(
+                    f"ALTER TABLE {self._table} ADD COLUMN {column_name} {sql_type}"
+                )
+        return result
 
     fp_identification_type = fields.Selection(
         [
