@@ -23,7 +23,7 @@ class ResCompany(models.Model):
     fp_hacienda_username = fields.Char(string="Hacienda Username", company_dependent=True)
     fp_hacienda_password = fields.Char(string="Hacienda Password", company_dependent=True)
     fp_api_timeout = fields.Integer(
-        string="Hacienda API Timeout (s)", company_dependent=True, default=30
+        string="Hacienda API Timeout (s)", default=30
     )
     fp_economic_activity_code = fields.Char(
         string="Actividad económica por defecto (FE)", company_dependent=True
