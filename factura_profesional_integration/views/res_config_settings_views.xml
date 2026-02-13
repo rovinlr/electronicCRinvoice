@@ -30,7 +30,8 @@
                             <field name="fp_economic_activity_code"/>
                         </setting>
                         <setting string="Certificado FE (.p12/.pfx)">
-                            <field name="fp_signing_certificate_id" options="{'no_create': True}"/>
+                            <field name="fp_signing_certificate_file" filename="fp_signing_certificate_filename" widget="binary"/>
+                            <field name="fp_signing_certificate_filename" invisible="1"/>
                         </setting>
                         <setting string="Contraseña certificado FE">
                             <field name="fp_signing_certificate_password" password="True"/>

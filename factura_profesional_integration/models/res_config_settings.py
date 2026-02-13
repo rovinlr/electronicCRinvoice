@@ -12,8 +12,12 @@ class ResConfigSettings(models.TransientModel):
     fp_api_timeout = fields.Integer(related="company_id.fp_api_timeout", readonly=False)
 
     fp_economic_activity_code = fields.Char(related="company_id.fp_economic_activity_code", readonly=False)
-    fp_signing_certificate_id = fields.Many2one(
-        related="company_id.fp_signing_certificate_id",
+    fp_signing_certificate_file = fields.Binary(
+        related="company_id.fp_signing_certificate_file",
+        readonly=False,
+    )
+    fp_signing_certificate_filename = fields.Char(
+        related="company_id.fp_signing_certificate_filename",
         readonly=False,
     )
     fp_signing_certificate_password = fields.Char(
