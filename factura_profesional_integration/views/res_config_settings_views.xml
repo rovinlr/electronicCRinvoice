@@ -29,6 +29,15 @@
                         <setting string="Actividad económica por defecto">
                             <field name="fp_economic_activity_code"/>
                         </setting>
+                        <setting string="Certificado FE (.p12/.pfx)">
+                            <field name="fp_signing_certificate_id" options="{'no_create': True}"/>
+                        </setting>
+                        <setting string="Contraseña certificado FE">
+                            <field name="fp_signing_certificate_password" password="True"/>
+                        </setting>
+                        <setting string="Consultar automáticamente después de enviar">
+                            <field name="fp_auto_consult_after_send"/>
+                        </setting>
                     </block>
                 </app>
             </xpath>
