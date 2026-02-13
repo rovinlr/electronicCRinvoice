@@ -16,6 +16,18 @@ from odoo.exceptions import UserError
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    def action_post(self):
+        moves = super().action_post()
+        electronic_moves = self.filtered(
+            lambda move: move.fp_is_electronic_invoice
+            and move.move_type in ("out_invoice", "out_refund")
+            and move.state == "posted"
+            and not move.fp_xml_attachment_id
+        )
+        for move in electronic_moves:
+            move._fp_generate_and_sign_xml_attachment()
+        return moves
+
     @api.model
     def _default_fp_economic_activity_id(self):
         """Safely resolve company default even during module bootstrap.
