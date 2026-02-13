@@ -2,6 +2,7 @@ import base64
 import hashlib
 import json
 from datetime import datetime
+import random
 from xml.etree import ElementTree as ET
 
 import requests
@@ -194,7 +195,7 @@ class AccountMove(models.Model):
             self._fp_generate_and_sign_xml_attachment()
 
         clave = self._fp_build_clave()
-        consecutivo = clave[21:41] if len(clave) >= 41 else clave[-20:]
+        consecutivo = self._fp_extract_consecutive_from_clave(clave)
         partner_vat = "".join(ch for ch in (self.partner_id.vat or "") if ch.isdigit())
 
         payload = {
@@ -235,16 +236,18 @@ class AccountMove(models.Model):
         clave = self._fp_build_clave()
         root = ET.Element("FacturaElectronica")
         ET.SubElement(root, "Clave").text = clave
-        ET.SubElement(root, "NumeroConsecutivo").text = clave[21:41] if len(clave) >= 41 else clave[-20:]
+        ET.SubElement(root, "NumeroConsecutivo").text = self._fp_extract_consecutive_from_clave(clave)
         ET.SubElement(root, "FechaEmision").text = datetime.now().astimezone().isoformat()
 
         emisor = ET.SubElement(root, "Emisor")
         ET.SubElement(emisor, "Nombre").text = self.company_id.name or ""
-        ET.SubElement(emisor, "Identificacion").text = "".join(ch for ch in (self.company_id.vat or "") if ch.isdigit())
+        self._fp_append_identification_nodes(emisor, self.company_id.partner_id, self.company_id.vat)
+        self._fp_append_location_nodes(emisor, self.company_id.partner_id)
 
         receptor = ET.SubElement(root, "Receptor")
         ET.SubElement(receptor, "Nombre").text = self.partner_id.name or ""
-        ET.SubElement(receptor, "Identificacion").text = "".join(ch for ch in (self.partner_id.vat or "") if ch.isdigit())
+        self._fp_append_identification_nodes(receptor, self.partner_id, self.partner_id.vat)
+        self._fp_append_location_nodes(receptor, self.partner_id)
 
         resumen = ET.SubElement(root, "ResumenFactura")
         ET.SubElement(resumen, "CodigoMoneda").text = self.currency_id.name or "CRC"
@@ -260,6 +263,30 @@ class AccountMove(models.Model):
             ET.SubElement(detail, "MontoTotal").text = f"{line.price_subtotal:.5f}"
 
         return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
+
+
+    def _fp_append_identification_nodes(self, parent_node, partner, vat_source):
+        identification_node = ET.SubElement(parent_node, "Identificacion")
+        ET.SubElement(identification_node, "Tipo").text = (partner.fp_identification_type or "02").strip()
+        ET.SubElement(identification_node, "Numero").text = "".join(ch for ch in (vat_source or "") if ch.isdigit())
+
+    def _fp_append_location_nodes(self, parent_node, partner):
+        province = partner.state_id.code if partner.state_id and partner.state_id.code else "1"
+        canton = self._fp_pad_numeric_code(partner.fp_canton_code, 2, "01")
+        district = self._fp_pad_numeric_code(partner.fp_district_code, 2, "01")
+        neighborhood = self._fp_pad_numeric_code(partner.fp_neighborhood_code, 2, "01")
+
+        location_node = ET.SubElement(parent_node, "Ubicacion")
+        ET.SubElement(location_node, "Provincia").text = self._fp_pad_numeric_code(province, 1, "1")
+        ET.SubElement(location_node, "Canton").text = canton
+        ET.SubElement(location_node, "Distrito").text = district
+        ET.SubElement(location_node, "Barrio").text = neighborhood
+
+    def _fp_pad_numeric_code(self, value, length, default):
+        digits = "".join(ch for ch in (value or "") if ch.isdigit())
+        if not digits:
+            digits = default
+        return digits.zfill(length)[-length:]
 
     def _fp_sign_xml(self, xml_text):
         self.ensure_one()
@@ -351,18 +378,25 @@ class AccountMove(models.Model):
             digits = f"00100001{document_code}000000001"
         return digits.zfill(20)[-20:]
 
+    def _fp_extract_consecutive_from_clave(self, clave):
+        if len(clave or "") >= 43:
+            return clave[23:43]
+        return (clave or "").zfill(20)[-20:]
+
     def _fp_build_clave(self):
         self.ensure_one()
         if self.fp_external_id:
             return self.fp_external_id
 
+        country_code = "506"
+        invoice_date = fields.Date.context_today(self)
+        date_token = invoice_date.strftime("%d%m%y")
+        company_vat = "".join(ch for ch in (self.company_id.vat or "") if ch.isdigit()).zfill(12)[-12:]
+        document_code = self._fp_get_document_code()
         consecutive = self._fp_get_company_consecutive()
-        if self.ref and len(self.ref) >= 50:
-            base = self.ref[:50]
-        else:
-            seed = "".join(ch for ch in (self.name or "") if ch.isdigit())
-            base = (seed or str(self.id)).zfill(50)[-50:]
-        return f"{base[:21]}{consecutive}{base[41:]}"
+        situation = "1"
+        security_code = f"{random.SystemRandom().randrange(0, 100000000):08d}"
+        return f"{country_code}{date_token}{company_vat}{document_code}{consecutive}{situation}{security_code}"
 
     def _fp_call_api(self, endpoint, payload, timeout, token, base_url, method="POST"):
         url = f"{base_url.rstrip('/')}{endpoint}"
