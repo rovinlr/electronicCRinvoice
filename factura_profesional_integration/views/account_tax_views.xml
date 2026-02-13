@@ -6,7 +6,11 @@
         <field name="inherit_id" ref="account.view_tax_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='amount']" position="after">
+                <label for="fp_tax_type"/>
+                <field name="fp_tax_type"/>
+                <label for="fp_tax_code"/>
                 <field name="fp_tax_code"/>
+                <label for="fp_tax_rate"/>
                 <field name="fp_tax_rate"/>
             </xpath>
         </field>
