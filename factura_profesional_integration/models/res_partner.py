@@ -17,6 +17,21 @@ class ResPartner(models.Model):
         string="Tipo de identificación (FE)",
         help="Catálogo de tipo de identificación para facturación electrónica.",
     )
+    fp_canton_code = fields.Char(
+        string="Cantón (FE)",
+        size=2,
+        help="Código de cantón según Anexos y Estructuras v4.4 (2 dígitos).",
+    )
+    fp_district_code = fields.Char(
+        string="Distrito (FE)",
+        size=2,
+        help="Código de distrito según Anexos y Estructuras v4.4 (2 dígitos).",
+    )
+    fp_neighborhood_code = fields.Char(
+        string="Barrio (FE)",
+        size=2,
+        help="Código de barrio según Anexos y Estructuras v4.4 (2 dígitos).",
+    )
 
     def action_fp_fetch_hacienda_data(self):
         for partner in self:
