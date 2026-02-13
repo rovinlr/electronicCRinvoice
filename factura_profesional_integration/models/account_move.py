@@ -14,6 +14,10 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
+FE_XML_NS = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
+DS_XML_NS = "http://www.w3.org/2000/09/xmldsig#"
+
+
 class AccountMove(models.Model):
     _inherit = "account.move"
 
@@ -237,8 +241,8 @@ class AccountMove(models.Model):
         root = ET.Element(
             "FacturaElectronica",
             {
-                "xmlns": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica",
-                "xmlns:ds": "http://www.w3.org/2000/09/xmldsig#",
+                "xmlns": FE_XML_NS,
+                "xmlns:ds": DS_XML_NS,
                 "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                 "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
                 "xsi:schemaLocation": (
@@ -289,6 +293,8 @@ class AccountMove(models.Model):
         ET.SubElement(medio_pago, "TipoMedioPago").text = "01"
         ET.SubElement(resumen, "TotalComprobante").text = self._fp_format_decimal(detalle_vals["total_comprobante"])
 
+        ET.register_namespace("", FE_XML_NS)
+        ET.register_namespace("ds", DS_XML_NS)
         return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
 
     def _fp_build_detail_lines(self, lines_node):
@@ -320,7 +326,8 @@ class AccountMove(models.Model):
 
             quantity = line.quantity or 0.0
             ET.SubElement(detail, "Cantidad").text = self._fp_format_decimal(quantity)
-            ET.SubElement(detail, "UnidadMedida").text = (line.product_uom_id and line.product_uom_id.name[:3]) or "Unid"
+            unit_code = (line.product_uom_id.fp_unit_code or "").strip() if line.product_uom_id else ""
+            ET.SubElement(detail, "UnidadMedida").text = unit_code or "Unid"
             ET.SubElement(detail, "Detalle").text = line.name or ""
             ET.SubElement(detail, "PrecioUnitario").text = self._fp_format_decimal(line.price_unit)
 
@@ -341,7 +348,8 @@ class AccountMove(models.Model):
                 ET.SubElement(impuesto, "Monto").text = self._fp_format_decimal(total_impuesto_linea)
             ET.SubElement(detail, "MontoTotalLinea").text = self._fp_format_decimal(monto_total_linea)
 
-            is_service = bool(line.product_id and line.product_id.type == "service")
+            product_type = line.product_id.product_tmpl_id.type if line.product_id else False
+            is_service = product_type == "service"
             if total_impuesto_linea > 0:
                 if is_service:
                     totals["total_serv_gravados"] += subtotal
@@ -416,20 +424,54 @@ class AccountMove(models.Model):
         if not private_key or not certificate:
             raise UserError(_("El certificado FE no contiene llave privada o certificado válido."))
 
-        digest = hashlib.sha256(xml_text.encode("utf-8")).digest()
-        signature = private_key.sign(
-            digest,
-            padding.PKCS1v15(),
-            hashes.SHA256(),
+        root = ET.fromstring(xml_text.encode("utf-8"))
+        root_digest = hashlib.sha256(xml_text.encode("utf-8")).digest()
+
+        signature_node = ET.SubElement(root, ET.QName(DS_XML_NS, "Signature"))
+        signed_info = ET.SubElement(signature_node, ET.QName(DS_XML_NS, "SignedInfo"))
+        ET.SubElement(
+            signed_info,
+            ET.QName(DS_XML_NS, "CanonicalizationMethod"),
+            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
+        )
+        ET.SubElement(
+            signed_info,
+            ET.QName(DS_XML_NS, "SignatureMethod"),
+            {"Algorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"},
+        )
+        reference = ET.SubElement(signed_info, ET.QName(DS_XML_NS, "Reference"), {"URI": ""})
+        transforms = ET.SubElement(reference, ET.QName(DS_XML_NS, "Transforms"))
+        ET.SubElement(
+            transforms,
+            ET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/2000/09/xmldsig#enveloped-signature"},
+        )
+        ET.SubElement(
+            transforms,
+            ET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
+        )
+        ET.SubElement(
+            reference,
+            ET.QName(DS_XML_NS, "DigestMethod"),
+            {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
+        )
+        ET.SubElement(reference, ET.QName(DS_XML_NS, "DigestValue")).text = base64.b64encode(root_digest).decode("utf-8")
+
+        signed_info_xml = ET.tostring(signed_info, encoding="utf-8")
+        signature = private_key.sign(signed_info_xml, padding.PKCS1v15(), hashes.SHA256())
+        ET.SubElement(signature_node, ET.QName(DS_XML_NS, "SignatureValue")).text = base64.b64encode(signature).decode(
+            "utf-8"
         )
 
-        root = ET.fromstring(xml_text.encode("utf-8"))
-        signature_node = ET.SubElement(root, "Firma")
-        ET.SubElement(signature_node, "Metodo").text = "RSA-SHA256"
-        ET.SubElement(signature_node, "ValorFirma").text = base64.b64encode(signature).decode("utf-8")
-        ET.SubElement(signature_node, "Certificado").text = base64.b64encode(
+        key_info = ET.SubElement(signature_node, ET.QName(DS_XML_NS, "KeyInfo"))
+        x509_data = ET.SubElement(key_info, ET.QName(DS_XML_NS, "X509Data"))
+        ET.SubElement(x509_data, ET.QName(DS_XML_NS, "X509Certificate")).text = base64.b64encode(
             certificate.public_bytes(serialization.Encoding.DER)
         ).decode("utf-8")
+
+        ET.register_namespace("", FE_XML_NS)
+        ET.register_namespace("ds", DS_XML_NS)
         return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
 
     def _fp_store_hacienda_response_xml(self, response_data):

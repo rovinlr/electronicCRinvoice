@@ -29,9 +29,22 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
     )
 
+    fp_certificate_subject = fields.Char(related="company_id.fp_certificate_subject", readonly=True)
+    fp_certificate_serial_subject = fields.Char(related="company_id.fp_certificate_serial_subject", readonly=True)
+    fp_certificate_issue_date = fields.Date(related="company_id.fp_certificate_issue_date", readonly=True)
+    fp_certificate_expiration_date = fields.Date(related="company_id.fp_certificate_expiration_date", readonly=True)
+    fp_certificate_issuer = fields.Char(related="company_id.fp_certificate_issuer", readonly=True)
+    fp_certificate_serial_number = fields.Char(related="company_id.fp_certificate_serial_number", readonly=True)
+    fp_certificate_version = fields.Char(related="company_id.fp_certificate_version", readonly=True)
+
     fp_consecutive_fe = fields.Char(related="company_id.fp_consecutive_fe", readonly=False)
     fp_consecutive_te = fields.Char(related="company_id.fp_consecutive_te", readonly=False)
     fp_consecutive_fec = fields.Char(related="company_id.fp_consecutive_fec", readonly=False)
     fp_consecutive_nc = fields.Char(related="company_id.fp_consecutive_nc", readonly=False)
     fp_consecutive_nd = fields.Char(related="company_id.fp_consecutive_nd", readonly=False)
     fp_consecutive_others = fields.Char(related="company_id.fp_consecutive_others", readonly=False)
+
+
+    def action_fp_refresh_certificate_info(self):
+        self.ensure_one()
+        self.company_id.action_fp_refresh_certificate_info()
