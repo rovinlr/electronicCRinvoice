@@ -306,11 +306,13 @@ class AccountMove(models.Model):
             "total_comprobante": 0.0,
         }
 
-        detail_lines = self.invoice_line_ids.filtered(lambda l: not l.display_type)
+        detail_lines = self.invoice_line_ids.filtered(
+            lambda l: not l.display_type or l.display_type == "product"
+        )
         if not detail_lines:
             raise UserError(_("La factura debe tener al menos una línea de detalle para generar XML FE v4.4."))
 
-        for idx, line in enumerate(self.invoice_line_ids.filtered(lambda l: not l.display_type), start=1):
+        for idx, line in enumerate(detail_lines, start=1):
             detail = ET.SubElement(lines_node, "LineaDetalle")
             ET.SubElement(detail, "NumeroLinea").text = str(idx)
             if line.product_id and line.product_id.fp_cabys_code:
