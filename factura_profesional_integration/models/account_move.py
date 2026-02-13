@@ -82,6 +82,44 @@ class AccountMove(models.Model):
         store=True,
         readonly=True,
     )
+    fp_sale_condition = fields.Selection(
+        [
+            ("01", "01 - Contado"),
+            ("02", "02 - Crédito"),
+            ("03", "03 - Consignación"),
+            ("04", "04 - Apartado"),
+            ("05", "05 - Arrendamiento con opción de compra"),
+            ("06", "06 - Arrendamiento en función financiera"),
+            ("07", "07 - Cobro a favor de un tercero"),
+            ("08", "08 - Servicios prestados al Estado"),
+            ("09", "09 - Pago de servicios prestados al Estado"),
+            ("10", "10 - Venta a crédito en IVA hasta 90 días"),
+            ("11", "11 - Pago de venta a crédito en IVA hasta 90 días"),
+            ("12", "12 - Venta mercancía no nacionalizada"),
+            ("13", "13 - Venta bienes usados no contribuyente"),
+            ("14", "14 - Arrendamiento operativo"),
+            ("15", "15 - Arrendamiento financiero"),
+            ("99", "99 - Otros"),
+        ],
+        string="Condición de venta (FE)",
+        default="01",
+        help="Condición de venta según nota 5 de Anexos y Estructuras v4.4.",
+    )
+    fp_payment_method = fields.Selection(
+        [
+            ("01", "01 - Efectivo"),
+            ("02", "02 - Tarjeta"),
+            ("03", "03 - Cheque"),
+            ("04", "04 - Transferencia / depósito bancario"),
+            ("05", "05 - Recaudado por terceros"),
+            ("06", "06 - SINPE Móvil"),
+            ("07", "07 - Plataforma Digital"),
+            ("99", "99 - Otros"),
+        ],
+        string="Medio de pago (FE)",
+        default="01",
+        help="Medio de pago según nota 6 de Anexos y Estructuras v4.4.",
+    )
     fp_external_id = fields.Char(string="Clave Hacienda", copy=False)
     fp_xml_attachment_id = fields.Many2one("ir.attachment", string="Factura XML", copy=False)
     fp_response_xml_attachment_id = fields.Many2one("ir.attachment", string="XML Respuesta Hacienda", copy=False)
@@ -271,7 +309,7 @@ class AccountMove(models.Model):
         self._fp_append_location_nodes(receptor, self.partner_id)
         self._fp_append_contact_nodes(receptor, self.partner_id)
 
-        ET.SubElement(root, "CondicionVenta").text = "01"
+        ET.SubElement(root, "CondicionVenta").text = self.fp_sale_condition or "01"
 
         lines = ET.SubElement(root, "DetalleServicio")
         detalle_vals = self._fp_build_detail_lines(lines)
@@ -290,7 +328,7 @@ class AccountMove(models.Model):
         ET.SubElement(resumen, "TotalVentaNeta").text = self._fp_format_decimal(detalle_vals["total_venta_neta"])
         ET.SubElement(resumen, "TotalImpuesto").text = self._fp_format_decimal(detalle_vals["total_impuesto"])
         medio_pago = ET.SubElement(resumen, "MedioPago")
-        ET.SubElement(medio_pago, "TipoMedioPago").text = "01"
+        ET.SubElement(medio_pago, "TipoMedioPago").text = self.fp_payment_method or "01"
         ET.SubElement(resumen, "TotalComprobante").text = self._fp_format_decimal(detalle_vals["total_comprobante"])
 
         ET.register_namespace("", FE_XML_NS)
@@ -343,7 +381,7 @@ class AccountMove(models.Model):
                 impuesto = ET.SubElement(detail, "Impuesto")
                 tax = line.tax_ids[:1]
                 ET.SubElement(impuesto, "Codigo").text = (tax.fp_tax_type or tax.fp_tax_code or "01") if tax else "01"
-                ET.SubElement(impuesto, "CodigoTarifaIVA").text = "08"
+                ET.SubElement(impuesto, "CodigoTarifaIVA").text = (tax.fp_tax_rate_code_iva or "08") if tax else "08"
                 ET.SubElement(impuesto, "Tarifa").text = self._fp_format_decimal((tax.amount if tax else 13.0))
                 ET.SubElement(impuesto, "Monto").text = self._fp_format_decimal(total_impuesto_linea)
             ET.SubElement(detail, "MontoTotalLinea").text = self._fp_format_decimal(monto_total_linea)
