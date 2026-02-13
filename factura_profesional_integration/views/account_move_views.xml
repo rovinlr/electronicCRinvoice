@@ -13,6 +13,8 @@
                 <field name="fp_is_electronic_invoice" invisible="1"/>
                 <field name="fp_document_type" invisible="not fp_is_electronic_invoice"/>
                 <field name="fp_economic_activity_code" invisible="not fp_is_electronic_invoice"/>
+                <field name="fp_xml_attachment_id" invisible="not fp_is_electronic_invoice"/>
+                <field name="fp_response_xml_attachment_id" readonly="1" invisible="not fp_is_electronic_invoice"/>
                 <field name="fp_invoice_status" readonly="1" invisible="not fp_is_electronic_invoice"/>
             </xpath>
         </field>

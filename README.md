@@ -5,10 +5,11 @@ Conector para integrar **Odoo 19** con **Hacienda Costa Rica** de forma directa 
 ## Flujo implementado
 
 1. La factura en Odoo debe estar publicada.
-2. Debe existir un XML firmado adjunto en la factura (`Factura XML`).
-3. El módulo obtiene token OAuth desde Hacienda.
-4. Envía el comprobante directamente a `recepcion/v1/recepcion`.
-5. Consulta estado en Hacienda con la clave (`aceptado` / `rechazado`).
+2. El módulo genera automáticamente un XML de comprobante por factura.
+3. Firma el XML usando certificado `.p12/.pfx` configurado por compañía.
+4. Obtiene token OAuth desde Hacienda.
+5. Envía el comprobante directamente a `recepcion/v1/recepcion`.
+6. Consulta estado automáticamente y también de forma manual (`aceptado` / `rechazado`).
 
 ## Campos de configuración por compañía
 
@@ -21,6 +22,9 @@ En **Ajustes > Contabilidad**:
 - Contraseña Hacienda
 - Timeout
 - Actividad económica por defecto
+- Certificado FE (.p12/.pfx)
+- Contraseña del certificado
+- Opción de consulta automática después de enviar
 
 ## Campos funcionales agregados en Odoo
 
@@ -41,9 +45,11 @@ En **Ajustes > Contabilidad**:
 - **Enviar a Hacienda**: envía el XML firmado al endpoint de recepción.
 - **Consultar Hacienda**: consulta estado por clave.
 
+Además, el módulo ejecuta un `cron` cada 5 minutos para consultar facturas enviadas pendientes de respuesta.
+
 ## Importante para producción
 
-Este módulo **no firma XML**. Debes tener integrado el firmado previo (HSM/certificado) y adjuntar el XML firmado antes de enviar.
+La firma XML se genera dentro de Odoo a partir del certificado configurado por compañía.
 
 Además, valida los catálogos y estructuras vigentes según la documentación oficial:
 
