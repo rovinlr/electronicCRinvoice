@@ -6,8 +6,8 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_fp_send_to_api" string="Enviar al API" type="object" class="oe_highlight" invisible="not fp_is_electronic_invoice"/>
-                <button name="action_fp_consult_api_document" string="Consultar documento" type="object" invisible="not fp_is_electronic_invoice"/>
+                <button name="action_fp_send_to_api" string="Enviar a Hacienda" type="object" class="oe_highlight" invisible="not fp_is_electronic_invoice"/>
+                <button name="action_fp_consult_api_document" string="Consultar Hacienda" type="object" invisible="not fp_is_electronic_invoice"/>
             </xpath>
             <xpath expr="//field[@name='invoice_date']" position="after">
                 <field name="fp_is_electronic_invoice" invisible="1"/>
