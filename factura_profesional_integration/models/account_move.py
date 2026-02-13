@@ -223,11 +223,11 @@ class AccountMove(models.Model):
     def _fp_sign_xml(self, xml_text):
         self.ensure_one()
         company = self.company_id
-        cert_attachment = company.fp_signing_certificate_id
-        if not cert_attachment or not cert_attachment.datas:
+        cert_file = company.fp_signing_certificate_file
+        if not cert_file:
             raise UserError(_("Configure el certificado FE (.p12/.pfx) para firmar XML en Ajustes > Contabilidad."))
 
-        cert_bytes = base64.b64decode(cert_attachment.datas)
+        cert_bytes = base64.b64decode(cert_file)
         password = (company.fp_signing_certificate_password or "").encode("utf-8") or None
 
         try:

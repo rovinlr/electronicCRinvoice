@@ -28,11 +28,13 @@ class ResCompany(models.Model):
     fp_economic_activity_code = fields.Char(
         string="Actividad económica por defecto (FE)", company_dependent=True
     )
-    fp_signing_certificate_id = fields.Many2one(
-        "ir.attachment",
+    fp_signing_certificate_file = fields.Binary(
         string="Certificado FE (.p12/.pfx)",
-        company_dependent=True,
+        attachment=True,
         help="Certificado con llave privada para firmar XML desde Odoo.",
+    )
+    fp_signing_certificate_filename = fields.Char(
+        string="Nombre del certificado FE",
     )
     fp_signing_certificate_password = fields.Char(
         string="Contraseña certificado FE",
