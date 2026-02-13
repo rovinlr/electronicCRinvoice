@@ -172,7 +172,7 @@ class AccountMove(models.Model):
     def _fp_call_api(self, endpoint, payload, timeout, token, base_url, method="POST"):
         url = f"{base_url.rstrip('/')}{endpoint}"
         headers = {
-            "Authorization": f"Bearer {token}",
+            "Authorization": self._fp_build_authorization_header(token),
             "Content-Type": "application/json",
         }
         if method == "GET":
@@ -183,6 +183,16 @@ class AccountMove(models.Model):
             self.fp_api_state = "error"
             raise UserError(_("Error API (%s): %s") % (response.status_code, response.text))
         return response.json()
+
+    def _fp_build_authorization_header(self, token):
+        token = (token or "").strip()
+        lower_token = token.lower()
+        known_schemes = ("bearer ", "basic ", "token ", "apikey ", "aws4-hmac-sha256 ", "digest ")
+        if lower_token.startswith(known_schemes):
+            return token
+        if any(symbol in token for symbol in ("=", ",")):
+            return token
+        return f"Bearer {token}"
 
     def _fp_create_xml_attachment(self, xml_string):
         self.ensure_one()
