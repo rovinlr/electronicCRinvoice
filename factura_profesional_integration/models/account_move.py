@@ -16,6 +16,27 @@ from odoo.exceptions import UserError
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    @models.model
+    def _default_fp_economic_activity_id(self):
+        """Safely resolve company default even during module bootstrap.
+
+        During install/upgrade, ``account.move`` may be initialized before the
+        ``res_company.fp_economic_activity_id`` column exists in the database.
+        Accessing ``env.company.fp_economic_activity_id`` too early raises a
+        database error and aborts module loading.
+        """
+        self.env.cr.execute(
+            """
+            SELECT 1
+              FROM information_schema.columns
+             WHERE table_name = 'res_company'
+               AND column_name = 'fp_economic_activity_id'
+            """
+        )
+        if not self.env.cr.fetchone():
+            return False
+        return self.env.company.fp_economic_activity_id
+
     fp_is_electronic_invoice = fields.Boolean(
         related="journal_id.fp_is_electronic_invoice",
         string="Factura electrónica",
@@ -35,7 +56,7 @@ class AccountMove(models.Model):
     fp_economic_activity_id = fields.Many2one(
         "fp.economic.activity",
         string="Actividad económica (FE)",
-        default=lambda self: self.env.company.fp_economic_activity_id,
+        default=_default_fp_economic_activity_id,
         help="Código de actividad económica para facturación electrónica.",
     )
     fp_economic_activity_code = fields.Char(
