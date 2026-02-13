@@ -190,8 +190,6 @@ class AccountMove(models.Model):
         known_schemes = ("bearer ", "basic ", "token ", "apikey ", "aws4-hmac-sha256 ", "digest ")
         if lower_token.startswith(known_schemes):
             return token
-        if any(symbol in token for symbol in ("=", ",")):
-            return token
         return f"Bearer {token}"
 
     def _fp_create_xml_attachment(self, xml_string):
