@@ -3,7 +3,7 @@
     <record id="view_uom_uom_form_fp" model="ir.ui.view">
         <field name="name">uom.uom.form.fp</field>
         <field name="model">uom.uom</field>
-        <field name="inherit_id" ref="uom.view_uom_form"/>
+        <field name="inherit_id" ref="uom.uom_uom_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
                 <field name="fp_unit_code"/>
