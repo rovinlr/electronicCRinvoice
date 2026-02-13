@@ -36,6 +36,18 @@
                         <setting string="Contraseña certificado FE">
                             <field name="fp_signing_certificate_password" password="True"/>
                         </setting>
+                        <setting string="Información del certificado (.p12/.pfx)">
+                            <button string="Actualizar info del certificado" name="action_fp_refresh_certificate_info" type="object" class="btn-secondary"/>
+                            <group col="2">
+                                <field name="fp_certificate_issue_date" readonly="1"/>
+                                <field name="fp_certificate_subject" readonly="1"/>
+                                <field name="fp_certificate_serial_subject" readonly="1"/>
+                                <field name="fp_certificate_expiration_date" readonly="1"/>
+                                <field name="fp_certificate_issuer" readonly="1"/>
+                                <field name="fp_certificate_serial_number" readonly="1"/>
+                                <field name="fp_certificate_version" readonly="1"/>
+                            </group>
+                        </setting>
                         <setting string="Consultar automáticamente después de enviar">
                             <field name="fp_auto_consult_after_send"/>
                         </setting>

@@ -1,4 +1,8 @@
+import base64
+
+from cryptography.hazmat.primitives.serialization import pkcs12
 from odoo import fields, models
+
 
 
 class ResCompany(models.Model):
@@ -87,3 +91,74 @@ class ResCompany(models.Model):
         company_dependent=True,
         help="Consecutivo de 20 dígitos para otros comprobantes electrónicos según Hacienda 4.4.",
     )
+
+    fp_certificate_subject = fields.Char(
+        string="Organización (Asunto)",
+        compute="_compute_fp_certificate_info",
+    )
+    fp_certificate_serial_subject = fields.Char(
+        string="Número de Serie (Sujeto)",
+        compute="_compute_fp_certificate_info",
+    )
+    fp_certificate_issue_date = fields.Date(
+        string="Fecha emisión",
+        compute="_compute_fp_certificate_info",
+    )
+    fp_certificate_expiration_date = fields.Date(
+        string="Fecha expiración",
+        compute="_compute_fp_certificate_info",
+    )
+    fp_certificate_issuer = fields.Char(
+        string="Organización (Emisor)",
+        compute="_compute_fp_certificate_info",
+    )
+    fp_certificate_serial_number = fields.Char(
+        string="Número de Serie (Certificado)",
+        compute="_compute_fp_certificate_info",
+    )
+    fp_certificate_version = fields.Char(
+        string="Versión",
+        compute="_compute_fp_certificate_info",
+    )
+
+    def action_fp_refresh_certificate_info(self):
+        for company in self:
+            company._compute_fp_certificate_info()
+
+    def _extract_name_attribute(self, x509_name, key):
+        attrs = [attr.value for attr in x509_name if attr.oid._name == key]
+        return ", ".join(attrs) if attrs else ""
+
+    @fields.depends("fp_signing_certificate_file", "fp_signing_certificate_password")
+    def _compute_fp_certificate_info(self):
+        for company in self:
+            company.fp_certificate_subject = False
+            company.fp_certificate_serial_subject = False
+            company.fp_certificate_issue_date = False
+            company.fp_certificate_expiration_date = False
+            company.fp_certificate_issuer = False
+            company.fp_certificate_serial_number = False
+            company.fp_certificate_version = False
+
+            cert_file = company.fp_signing_certificate_file
+            if not cert_file:
+                continue
+
+            cert_bytes = base64.b64decode(cert_file)
+            password = (company.fp_signing_certificate_password or "").encode("utf-8") or None
+            try:
+                _private_key, certificate, _additional_certs = pkcs12.load_key_and_certificates(cert_bytes, password)
+            except Exception:
+                continue
+
+            if not certificate:
+                continue
+
+            company.fp_certificate_subject = company._extract_name_attribute(certificate.subject, "organizationName") or str(certificate.subject.rfc4514_string())
+            company.fp_certificate_serial_subject = company._extract_name_attribute(certificate.subject, "serialNumber")
+            company.fp_certificate_issue_date = certificate.not_valid_before_utc.date()
+            company.fp_certificate_expiration_date = certificate.not_valid_after_utc.date()
+            company.fp_certificate_issuer = company._extract_name_attribute(certificate.issuer, "commonName") or str(certificate.issuer.rfc4514_string())
+            company.fp_certificate_serial_number = str(certificate.serial_number)
+            company.fp_certificate_version = f"Version.v{certificate.version.value}"
+
