@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fp_cabys_code_tree" model="ir.ui.view">
+        <field name="name">fp.cabys.code.tree</field>
+        <field name="model">fp.cabys.code</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_cabys_code_form" model="ir.ui.view">
+        <field name="name">fp.cabys.code.form</field>
+        <field name="model">fp.cabys.code</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_cabys_code" model="ir.actions.act_window">
+        <field name="name">Códigos CABYS</field>
+        <field name="res_model">fp.cabys.code</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_fp_economic_activity_tree" model="ir.ui.view">
+        <field name="name">fp.economic.activity.tree</field>
+        <field name="model">fp.economic.activity</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_economic_activity_form" model="ir.ui.view">
+        <field name="name">fp.economic.activity.form</field>
+        <field name="model">fp.economic.activity</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_economic_activity" model="ir.actions.act_window">
+        <field name="name">Actividades económicas</field>
+        <field name="res_model">fp.economic.activity</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="menu_fp_catalog_root"
+        name="Catálogos FE"
+        parent="account.menu_finance_configuration"
+        sequence="90"
+        groups="account.group_account_manager"
+    />
+
+    <menuitem
+        id="menu_fp_cabys_code"
+        name="Códigos CABYS"
+        parent="menu_fp_catalog_root"
+        action="action_fp_cabys_code"
+        sequence="10"
+        groups="account.group_account_manager"
+    />
+
+    <menuitem
+        id="menu_fp_economic_activity"
+        name="Actividades económicas"
+        parent="menu_fp_catalog_root"
+        action="action_fp_economic_activity"
+        sequence="20"
+        groups="account.group_account_manager"
+    />
+</odoo>

@@ -25,8 +25,15 @@ class ResCompany(models.Model):
     fp_api_timeout = fields.Integer(
         string="Hacienda API Timeout (s)", default=30
     )
+    fp_economic_activity_id = fields.Many2one(
+        "fp.economic.activity",
+        string="Actividad económica por defecto (FE)",
+    )
     fp_economic_activity_code = fields.Char(
-        string="Actividad económica por defecto (FE)", company_dependent=True
+        related="fp_economic_activity_id.code",
+        string="Código actividad económica por defecto (FE)",
+        store=True,
+        readonly=True,
     )
     fp_signing_certificate_file = fields.Binary(
         string="Certificado FE (.p12/.pfx)",

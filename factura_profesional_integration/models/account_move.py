@@ -32,9 +32,17 @@ class AccountMove(models.Model):
         string="Tipo de documento (FE)",
         default="FE",
     )
-    fp_economic_activity_code = fields.Char(
+    fp_economic_activity_id = fields.Many2one(
+        "fp.economic.activity",
         string="Actividad económica (FE)",
+        default=lambda self: self.env.company.fp_economic_activity_id,
         help="Código de actividad económica para facturación electrónica.",
+    )
+    fp_economic_activity_code = fields.Char(
+        related="fp_economic_activity_id.code",
+        string="Código actividad económica (FE)",
+        store=True,
+        readonly=True,
     )
     fp_external_id = fields.Char(string="Clave Hacienda", copy=False)
     fp_xml_attachment_id = fields.Many2one("ir.attachment", string="Factura XML", copy=False)
