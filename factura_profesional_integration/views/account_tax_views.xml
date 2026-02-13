@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tax_form_fp_fields" model="ir.ui.view">
+        <field name="name">account.tax.form.fp.fields</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="account.view_tax_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet//group" position="inside">
+                <group string="Factura Electrónica">
+                    <field name="fp_tax_code"/>
+                    <field name="fp_tax_rate"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
