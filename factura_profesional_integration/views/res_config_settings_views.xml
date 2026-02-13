@@ -27,7 +27,7 @@
                             <field name="fp_api_timeout"/>
                         </setting>
                         <setting string="Actividad económica por defecto">
-                            <field name="fp_economic_activity_code"/>
+                            <field name="fp_economic_activity_id"/>
                         </setting>
                         <setting string="Certificado FE (.p12/.pfx)">
                             <field name="fp_signing_certificate_file" filename="fp_signing_certificate_filename" widget="binary"/>
