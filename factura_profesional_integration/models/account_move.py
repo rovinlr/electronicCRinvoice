@@ -234,8 +234,24 @@ class AccountMove(models.Model):
     def _fp_generate_invoice_xml(self):
         self.ensure_one()
         clave = self._fp_build_clave()
-        root = ET.Element("FacturaElectronica")
+        root = ET.Element(
+            "FacturaElectronica",
+            {
+                "xmlns": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica",
+                "xmlns:ds": "http://www.w3.org/2000/09/xmldsig#",
+                "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
+                "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+                "xsi:schemaLocation": (
+                    "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica "
+                    "FacturaElectronica_V4.4.xsd"
+                ),
+            },
+        )
         ET.SubElement(root, "Clave").text = clave
+        if self.company_id.vat:
+            ET.SubElement(root, "ProveedorSistemas").text = "".join(ch for ch in self.company_id.vat if ch.isdigit())
+        if self.fp_economic_activity_code:
+            ET.SubElement(root, "CodigoActividadEmisor").text = self.fp_economic_activity_code
         ET.SubElement(root, "NumeroConsecutivo").text = self._fp_extract_consecutive_from_clave(clave)
         ET.SubElement(root, "FechaEmision").text = datetime.now().astimezone().isoformat()
 
@@ -243,26 +259,110 @@ class AccountMove(models.Model):
         ET.SubElement(emisor, "Nombre").text = self.company_id.name or ""
         self._fp_append_identification_nodes(emisor, self.company_id.partner_id, self.company_id.vat)
         self._fp_append_location_nodes(emisor, self.company_id.partner_id)
+        self._fp_append_contact_nodes(emisor, self.company_id.partner_id)
 
         receptor = ET.SubElement(root, "Receptor")
         ET.SubElement(receptor, "Nombre").text = self.partner_id.name or ""
         self._fp_append_identification_nodes(receptor, self.partner_id, self.partner_id.vat)
         self._fp_append_location_nodes(receptor, self.partner_id)
+        self._fp_append_contact_nodes(receptor, self.partner_id)
 
-        resumen = ET.SubElement(root, "ResumenFactura")
-        ET.SubElement(resumen, "CodigoMoneda").text = self.currency_id.name or "CRC"
-        ET.SubElement(resumen, "TotalComprobante").text = f"{self.amount_total:.2f}"
+        ET.SubElement(root, "CondicionVenta").text = "01"
 
         lines = ET.SubElement(root, "DetalleServicio")
-        for idx, line in enumerate(self.invoice_line_ids.filtered(lambda l: not l.display_type), start=1):
-            detail = ET.SubElement(lines, "LineaDetalle")
-            ET.SubElement(detail, "NumeroLinea").text = str(idx)
-            ET.SubElement(detail, "Cantidad").text = f"{line.quantity:.3f}"
-            ET.SubElement(detail, "Detalle").text = line.name or ""
-            ET.SubElement(detail, "PrecioUnitario").text = f"{line.price_unit:.5f}"
-            ET.SubElement(detail, "MontoTotal").text = f"{line.price_subtotal:.5f}"
+        detalle_vals = self._fp_build_detail_lines(lines)
+        resumen = ET.SubElement(root, "ResumenFactura")
+        currency_node = ET.SubElement(resumen, "CodigoTipoMoneda")
+        ET.SubElement(currency_node, "CodigoMoneda").text = self.currency_id.name or "CRC"
+        ET.SubElement(currency_node, "TipoCambio").text = f"{self.currency_id.rate or 1:.5f}"
+        ET.SubElement(resumen, "TotalServGravados").text = self._fp_format_decimal(detalle_vals["total_serv_gravados"])
+        ET.SubElement(resumen, "TotalServExentos").text = self._fp_format_decimal(detalle_vals["total_serv_exentos"])
+        ET.SubElement(resumen, "TotalMercanciasGravadas").text = self._fp_format_decimal(detalle_vals["total_mercancias_gravadas"])
+        ET.SubElement(resumen, "TotalMercanciasExentas").text = self._fp_format_decimal(detalle_vals["total_mercancias_exentas"])
+        ET.SubElement(resumen, "TotalGravado").text = self._fp_format_decimal(detalle_vals["total_gravado"])
+        ET.SubElement(resumen, "TotalExento").text = self._fp_format_decimal(detalle_vals["total_exento"])
+        ET.SubElement(resumen, "TotalVenta").text = self._fp_format_decimal(detalle_vals["total_venta"])
+        ET.SubElement(resumen, "TotalDescuentos").text = self._fp_format_decimal(detalle_vals["total_descuentos"])
+        ET.SubElement(resumen, "TotalVentaNeta").text = self._fp_format_decimal(detalle_vals["total_venta_neta"])
+        ET.SubElement(resumen, "TotalImpuesto").text = self._fp_format_decimal(detalle_vals["total_impuesto"])
+        medio_pago = ET.SubElement(resumen, "MedioPago")
+        ET.SubElement(medio_pago, "TipoMedioPago").text = "01"
+        ET.SubElement(resumen, "TotalComprobante").text = self._fp_format_decimal(detalle_vals["total_comprobante"])
 
         return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
+
+    def _fp_build_detail_lines(self, lines_node):
+        totals = {
+            "total_serv_gravados": 0.0,
+            "total_serv_exentos": 0.0,
+            "total_mercancias_gravadas": 0.0,
+            "total_mercancias_exentas": 0.0,
+            "total_gravado": 0.0,
+            "total_exento": 0.0,
+            "total_venta": 0.0,
+            "total_descuentos": 0.0,
+            "total_venta_neta": 0.0,
+            "total_impuesto": 0.0,
+            "total_comprobante": 0.0,
+        }
+
+        detail_lines = self.invoice_line_ids.filtered(lambda l: not l.display_type)
+        if not detail_lines:
+            raise UserError(_("La factura debe tener al menos una línea de detalle para generar XML FE v4.4."))
+
+        for idx, line in enumerate(self.invoice_line_ids.filtered(lambda l: not l.display_type), start=1):
+            detail = ET.SubElement(lines_node, "LineaDetalle")
+            ET.SubElement(detail, "NumeroLinea").text = str(idx)
+            if line.product_id and line.product_id.fp_cabys_code:
+                ET.SubElement(detail, "CodigoCABYS").text = line.product_id.fp_cabys_code
+
+            quantity = line.quantity or 0.0
+            ET.SubElement(detail, "Cantidad").text = self._fp_format_decimal(quantity)
+            ET.SubElement(detail, "UnidadMedida").text = (line.product_uom_id and line.product_uom_id.name[:3]) or "Unid"
+            ET.SubElement(detail, "Detalle").text = line.name or ""
+            ET.SubElement(detail, "PrecioUnitario").text = self._fp_format_decimal(line.price_unit)
+
+            monto_total = quantity * line.price_unit
+            subtotal = line.price_subtotal
+            discount_amount = max(monto_total - subtotal, 0.0)
+            total_impuesto_linea = max(line.price_total - line.price_subtotal, 0.0)
+            monto_total_linea = subtotal + total_impuesto_linea
+
+            ET.SubElement(detail, "MontoTotal").text = self._fp_format_decimal(monto_total)
+            ET.SubElement(detail, "SubTotal").text = self._fp_format_decimal(subtotal)
+            if total_impuesto_linea > 0:
+                impuesto = ET.SubElement(detail, "Impuesto")
+                tax = line.tax_ids[:1]
+                ET.SubElement(impuesto, "Codigo").text = (tax.fp_tax_type or tax.fp_tax_code or "01") if tax else "01"
+                ET.SubElement(impuesto, "CodigoTarifaIVA").text = "08"
+                ET.SubElement(impuesto, "Tarifa").text = self._fp_format_decimal((tax.amount if tax else 13.0))
+                ET.SubElement(impuesto, "Monto").text = self._fp_format_decimal(total_impuesto_linea)
+            ET.SubElement(detail, "MontoTotalLinea").text = self._fp_format_decimal(monto_total_linea)
+
+            is_service = bool(line.product_id and line.product_id.type == "service")
+            if total_impuesto_linea > 0:
+                if is_service:
+                    totals["total_serv_gravados"] += subtotal
+                else:
+                    totals["total_mercancias_gravadas"] += subtotal
+                totals["total_gravado"] += subtotal
+            else:
+                if is_service:
+                    totals["total_serv_exentos"] += subtotal
+                else:
+                    totals["total_mercancias_exentas"] += subtotal
+                totals["total_exento"] += subtotal
+
+            totals["total_venta"] += monto_total
+            totals["total_descuentos"] += discount_amount
+            totals["total_venta_neta"] += subtotal
+            totals["total_impuesto"] += total_impuesto_linea
+            totals["total_comprobante"] += monto_total_linea
+
+        return totals
+
+    def _fp_format_decimal(self, value):
+        return f"{(value or 0.0):.5f}"
 
 
     def _fp_append_identification_nodes(self, parent_node, partner, vat_source):
@@ -281,6 +381,14 @@ class AccountMove(models.Model):
         ET.SubElement(location_node, "Canton").text = canton
         ET.SubElement(location_node, "Distrito").text = district
         ET.SubElement(location_node, "Barrio").text = neighborhood
+
+    def _fp_append_contact_nodes(self, parent_node, partner):
+        if partner.phone:
+            phone_node = ET.SubElement(parent_node, "Telefono")
+            ET.SubElement(phone_node, "CodigoPais").text = "506"
+            ET.SubElement(phone_node, "NumTelefono").text = "".join(ch for ch in partner.phone if ch.isdigit())[:20]
+        if partner.email:
+            ET.SubElement(parent_node, "CorreoElectronico").text = partner.email
 
     def _fp_pad_numeric_code(self, value, length, default):
         digits = "".join(ch for ch in (value or "") if ch.isdigit())
