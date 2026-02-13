@@ -8,7 +8,7 @@ Conector base para integrar **Odoo 19** con un API externo de facturación elect
 
 ## Estructura
 
-- `factura_profesional_integration`: módulo inicial de integración.
+- `odoo_addons/factura_profesional_integration`: módulo inicial de integración.
 
 ## Flujo implementado
 
@@ -22,26 +22,9 @@ Conector base para integrar **Odoo 19** con un API externo de facturación elect
   - Invocar `POST /documents`
   - Guardar XML devuelto en `ir.attachment`
 
-## ¿Por qué no aparece en Aplicaciones?
-
-En Odoo los módulos **no se detectan** si el `addons_path` apunta a una carpeta equivocada.
-
-Checklist rápido:
-
-1. Verifica que la ruta configurada en `addons_path` sea exactamente la carpeta que contiene el módulo:
-   - ✅ Correcto: `/ruta/proyecto`
-   - ❌ Incorrecto: `/ruta/proyecto/factura_profesional_integration`
-2. Confirma que exista el archivo:
-   - `factura_profesional_integration/__manifest__.py`
-3. Reinicia Odoo después de ajustar `addons_path`.
-4. En **Aplicaciones**, quita el filtro "Aplicaciones" o busca por nombre técnico `factura_profesional_integration`.
-5. Haz clic en **Actualizar lista de aplicaciones**.
-
-> Este módulo ahora está marcado como `application=True`, por lo que también debería aparecer con el filtro de Aplicaciones activado.
-
 ## Instalación rápida
 
-1. Copiar `factura_profesional_integration` dentro de una carpeta incluida en `addons_path` de Odoo 19 (por ejemplo, el root de este repo).
+1. Copiar `odoo_addons/factura_profesional_integration` al `addons_path` de Odoo 19.
 2. Actualizar lista de apps e instalar **Factura Profesional API Connector**.
 3. Ir a **Ajustes > Contabilidad** y completar URL, token y timeout.
 
