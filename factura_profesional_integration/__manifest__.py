@@ -1,7 +1,7 @@
 {
-    "name": "Factura Profesional API Connector",
-    "summary": "Envía facturas de Odoo 19 a un API externo para generar XML",
-    "version": "19.0.2.1.0",
+    "name": "Factura Electrónica CR Hacienda Connector",
+    "summary": "Integra Odoo 19 con Hacienda Costa Rica (Recepción v4.4)",
+    "version": "19.0.3.0.0",
     "category": "Accounting",
     "license": "LGPL-3",
     "depends": ["account", "product", "uom"],
