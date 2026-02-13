@@ -9,14 +9,14 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.serialization import pkcs12
 
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    @models.model
+    @api.model
     def _default_fp_economic_activity_id(self):
         """Safely resolve company default even during module bootstrap.
 
