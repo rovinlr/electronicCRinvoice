@@ -1,4 +1,5 @@
 import base64
+import binascii
 
 from cryptography.hazmat.primitives.serialization import pkcs12
 from odoo import api, fields, models
@@ -144,7 +145,21 @@ class ResCompany(models.Model):
             if not cert_file:
                 continue
 
-            cert_bytes = base64.b64decode(cert_file)
+            try:
+                cert_bytes = base64.b64decode(cert_file, validate=True)
+            except (binascii.Error, ValueError):
+                # Cuando Odoo evalúa con contexto bin_size=True, los binarios pueden venir
+                # como una etiqueta de tamaño (ej: "2.5kb") en lugar del contenido base64.
+                cert_file = company.with_context(bin_size=False).read(["fp_signing_certificate_file"])[0].get(
+                    "fp_signing_certificate_file"
+                )
+                if not cert_file:
+                    continue
+                try:
+                    cert_bytes = base64.b64decode(cert_file, validate=True)
+                except (binascii.Error, ValueError):
+                    continue
+
             password = (company.fp_signing_certificate_password or "").encode("utf-8") or None
             try:
                 _private_key, certificate, _additional_certs = pkcs12.load_key_and_certificates(cert_bytes, password)
@@ -161,4 +176,3 @@ class ResCompany(models.Model):
             company.fp_certificate_issuer = company._extract_name_attribute(certificate.issuer, "commonName") or str(certificate.issuer.rfc4514_string())
             company.fp_certificate_serial_number = str(certificate.serial_number)
             company.fp_certificate_version = f"Version.v{certificate.version.value}"
-
