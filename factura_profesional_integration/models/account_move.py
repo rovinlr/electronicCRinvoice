@@ -124,6 +124,12 @@ class AccountMove(models.Model):
     fp_consecutive_number = fields.Char(string="Consecutivo Hacienda", copy=False, readonly=True)
     fp_xml_attachment_id = fields.Many2one("ir.attachment", string="Factura XML", copy=False)
     fp_response_xml_attachment_id = fields.Many2one("ir.attachment", string="XML Respuesta Hacienda", copy=False)
+    fp_xml_attachment_name = fields.Char(related="fp_xml_attachment_id.name", string="Nombre XML Factura", readonly=True)
+    fp_response_xml_attachment_name = fields.Char(
+        related="fp_response_xml_attachment_id.name",
+        string="Nombre XML Respuesta Hacienda",
+        readonly=True,
+    )
     fp_api_state = fields.Selection(
         [
             ("pending", "Pendiente"),
@@ -539,6 +545,27 @@ class AccountMove(models.Model):
             }
         )
         self.fp_response_xml_attachment_id = attachment
+
+
+    def action_fp_download_invoice_xml(self):
+        self.ensure_one()
+        if not self.fp_xml_attachment_id:
+            raise UserError(_("La factura no tiene XML adjunto."))
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/web/content/{self.fp_xml_attachment_id.id}?download=true",
+            "target": "self",
+        }
+
+    def action_fp_download_response_xml(self):
+        self.ensure_one()
+        if not self.fp_response_xml_attachment_id:
+            raise UserError(_("El documento no tiene XML de respuesta de Hacienda adjunto."))
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/web/content/{self.fp_response_xml_attachment_id.id}?download=true",
+            "target": "self",
+        }
 
     def _fp_get_document_code(self):
         self.ensure_one()

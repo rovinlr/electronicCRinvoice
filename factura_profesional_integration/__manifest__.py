@@ -10,6 +10,7 @@
         "views/res_config_settings_views.xml",
         "views/res_partner_views.xml",
         "views/account_move_views.xml",
+        "views/fp_electronic_document_views.xml",
         "views/account_tax_views.xml",
         "views/account_journal_views.xml",
         "views/product_template_views.xml",
