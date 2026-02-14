@@ -15,8 +15,10 @@
                 <field name="fp_economic_activity_id" invisible="not fp_is_electronic_invoice"/>
                 <field name="fp_sale_condition" invisible="not fp_is_electronic_invoice"/>
                 <field name="fp_payment_method" invisible="not fp_is_electronic_invoice"/>
-                <field name="fp_xml_attachment_id" invisible="not fp_is_electronic_invoice"/>
-                <field name="fp_response_xml_attachment_id" readonly="1" invisible="not fp_is_electronic_invoice"/>
+                <field name="fp_external_id" readonly="1" invisible="not fp_is_electronic_invoice"/>
+                <field name="fp_consecutive_number" readonly="1" invisible="not fp_is_electronic_invoice"/>
+                <field name="fp_xml_attachment_name" readonly="1" invisible="not fp_is_electronic_invoice"/>
+                <field name="fp_response_xml_attachment_name" readonly="1" invisible="not fp_is_electronic_invoice"/>
                 <field name="fp_invoice_status" readonly="1" invisible="not fp_is_electronic_invoice"/>
             </xpath>
         </field>

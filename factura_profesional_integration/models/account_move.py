@@ -121,8 +121,15 @@ class AccountMove(models.Model):
         help="Medio de pago según nota 6 de Anexos y Estructuras v4.4.",
     )
     fp_external_id = fields.Char(string="Clave Hacienda", copy=False)
+    fp_consecutive_number = fields.Char(string="Consecutivo Hacienda", copy=False, readonly=True)
     fp_xml_attachment_id = fields.Many2one("ir.attachment", string="Factura XML", copy=False)
     fp_response_xml_attachment_id = fields.Many2one("ir.attachment", string="XML Respuesta Hacienda", copy=False)
+    fp_xml_attachment_name = fields.Char(related="fp_xml_attachment_id.name", string="Nombre XML Factura", readonly=True)
+    fp_response_xml_attachment_name = fields.Char(
+        related="fp_response_xml_attachment_id.name",
+        string="Nombre XML Respuesta Hacienda",
+        readonly=True,
+    )
     fp_api_state = fields.Selection(
         [
             ("pending", "Pendiente"),
@@ -539,6 +546,27 @@ class AccountMove(models.Model):
         )
         self.fp_response_xml_attachment_id = attachment
 
+
+    def action_fp_download_invoice_xml(self):
+        self.ensure_one()
+        if not self.fp_xml_attachment_id:
+            raise UserError(_("La factura no tiene XML adjunto."))
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/web/content/{self.fp_xml_attachment_id.id}?download=true",
+            "target": "self",
+        }
+
+    def action_fp_download_response_xml(self):
+        self.ensure_one()
+        if not self.fp_response_xml_attachment_id:
+            raise UserError(_("El documento no tiene XML de respuesta de Hacienda adjunto."))
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/web/content/{self.fp_response_xml_attachment_id.id}?download=true",
+            "target": "self",
+        }
+
     def _fp_get_document_code(self):
         self.ensure_one()
         document_map = {
@@ -549,24 +577,42 @@ class AccountMove(models.Model):
         }
         return document_map.get(self.fp_document_type, "99")
 
-    def _fp_get_company_consecutive(self):
+    def _fp_get_company_consecutive_field_name(self):
+        self.ensure_one()
+        return {
+            "FE": "fp_consecutive_fe",
+            "NC": "fp_consecutive_nc",
+            "ND": "fp_consecutive_nd",
+            "TE": "fp_consecutive_te",
+        }.get(self.fp_document_type, "fp_consecutive_others")
+
+    def _fp_get_company_last_consecutive_sequence(self):
         self.ensure_one()
         company = self.company_id
-        field_by_type = {
-            "FE": company.fp_consecutive_fe,
-            "NC": company.fp_consecutive_nc,
-            "ND": company.fp_consecutive_nd,
-            "TE": company.fp_consecutive_te,
-        }
-        raw_value = field_by_type.get(self.fp_document_type) or company.fp_consecutive_others
-        return self._fp_sanitize_consecutive(raw_value)
-
-    def _fp_sanitize_consecutive(self, value):
-        digits = "".join(ch for ch in (value or "") if ch.isdigit())
+        field_name = self._fp_get_company_consecutive_field_name()
+        digits = "".join(ch for ch in (company[field_name] or "") if ch.isdigit())
         if not digits:
-            document_code = self._fp_get_document_code()
-            digits = f"00100001{document_code}000000001"
-        return digits.zfill(20)[-20:]
+            return 0
+        if len(digits) >= 20:
+            return int(digits[-10:])
+        return int(digits[-10:])
+
+    def _fp_get_company_consecutive(self):
+        self.ensure_one()
+        branch = "".join(ch for ch in (self.company_id.fp_branch_code or "") if ch.isdigit()).zfill(3)[-3:]
+        terminal = "".join(ch for ch in (self.company_id.fp_terminal_code or "") if ch.isdigit()).zfill(5)[-5:]
+        document_code = self._fp_get_document_code()
+        sequence = self._fp_get_company_last_consecutive_sequence()
+        if self.fp_consecutive_number:
+            return self.fp_consecutive_number
+
+        next_sequence = sequence + 1
+        consecutive = f"{branch}{terminal}{document_code}{next_sequence:010d}"
+
+        field_name = self._fp_get_company_consecutive_field_name()
+        self.company_id.sudo()[field_name] = str(next_sequence)
+        self.fp_consecutive_number = consecutive
+        return consecutive
 
     def _fp_extract_consecutive_from_clave(self, clave):
         if len(clave or "") >= 43:
@@ -583,7 +629,7 @@ class AccountMove(models.Model):
         date_token = invoice_date.strftime("%d%m%y")
         company_vat = "".join(ch for ch in (self.company_id.vat or "") if ch.isdigit()).zfill(12)[-12:]
         document_code = self._fp_get_document_code()
-        consecutive = self._fp_get_company_consecutive()
+        consecutive = self.fp_consecutive_number or self._fp_get_company_consecutive()
         situation = "1"
         security_code = f"{random.SystemRandom().randrange(0, 100000000):08d}"
         return f"{country_code}{date_token}{company_vat}{document_code}{consecutive}{situation}{security_code}"
