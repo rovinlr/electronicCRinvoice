@@ -3,6 +3,7 @@ import binascii
 
 from cryptography.hazmat.primitives.serialization import pkcs12
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 
@@ -134,6 +135,16 @@ class ResCompany(models.Model):
         string="Versión",
         compute="_compute_fp_certificate_info",
     )
+
+
+    @api.constrains("fp_hacienda_token_url")
+    def _check_fp_hacienda_token_url(self):
+        for company in self:
+            token_url = (company.fp_hacienda_token_url or "").strip()
+            if token_url and "openid-connect/token" not in token_url:
+                raise ValidationError(
+                    "La URL OAuth de Hacienda debe apuntar al endpoint '/protocol/openid-connect/token'."
+                )
 
     def action_fp_refresh_certificate_info(self):
         for company in self:
