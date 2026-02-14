@@ -256,7 +256,6 @@ class AccountMove(models.Model):
             self._fp_generate_and_sign_xml_attachment()
 
         clave = self._fp_build_clave()
-        consecutivo = self._fp_extract_consecutive_from_clave(clave)
         partner_vat = "".join(ch for ch in (self.partner_id.vat or "") if ch.isdigit())
 
         payload = {
@@ -267,7 +266,6 @@ class AccountMove(models.Model):
                 "numeroIdentificacion": "".join(ch for ch in (self.company_id.vat or "") if ch.isdigit()),
             },
             "comprobanteXml": self.fp_xml_attachment_id.datas.decode("utf-8"),
-            "consecutivoReceptor": consecutivo,
         }
         if partner_vat and self.partner_id.fp_identification_type:
             payload["receptor"] = {
