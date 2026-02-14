@@ -175,6 +175,7 @@ class AccountMove(models.Model):
                 token=token,
                 base_url=move.company_id.fp_hacienda_api_base_url,
                 method="GET",
+                params={"emisor": "".join(ch for ch in (move.company_id.vat or "") if ch.isdigit())},
             )
             move._fp_store_hacienda_response_xml(response_data)
             status = (response_data.get("ind-estado") or "").lower()
@@ -644,14 +645,14 @@ class AccountMove(models.Model):
         security_code = f"{random.SystemRandom().randrange(0, 100000000):08d}"
         return f"{country_code}{date_token}{company_vat}{document_code}{consecutive}{situation}{security_code}"
 
-    def _fp_call_api(self, endpoint, payload, timeout, token, base_url, method="POST"):
+    def _fp_call_api(self, endpoint, payload, timeout, token, base_url, method="POST", params=None):
         url = f"{base_url.rstrip('/')}{endpoint}"
         headers = {
             "Authorization": self._fp_build_authorization_header(token),
             "Content-Type": "application/json",
         }
         if method == "GET":
-            response = requests.get(url, headers=headers, timeout=timeout)
+            response = requests.get(url, headers=headers, timeout=timeout, params=params)
         else:
             response = requests.post(url, data=json.dumps(payload), headers=headers, timeout=timeout)
         if response.status_code >= 400:
