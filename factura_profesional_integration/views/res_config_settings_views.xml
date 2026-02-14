@@ -51,24 +51,30 @@
                         <setting string="Consultar automáticamente después de enviar">
                             <field name="fp_auto_consult_after_send"/>
                         </setting>
+                        <setting string="Código de sucursal FE">
+                            <field name="fp_branch_code"/>
+                        </setting>
+                        <setting string="Código de terminal FE">
+                            <field name="fp_terminal_code"/>
+                        </setting>
                     </block>
-                    <block title="Consecutivos por tipo de comprobante (Hacienda 4.4)">
-                        <setting string="Factura electrónica (01)">
+                    <block title="Último consecutivo por tipo de comprobante (Hacienda 4.4)">
+                        <setting string="Factura electrónica (01) - último número">
                             <field name="fp_consecutive_fe"/>
                         </setting>
-                        <setting string="Tiquete electrónico (04)">
+                        <setting string="Tiquete electrónico (04) - último número">
                             <field name="fp_consecutive_te"/>
                         </setting>
-                        <setting string="Factura electrónica de compra (08)">
+                        <setting string="Factura electrónica de compra (08) - último número">
                             <field name="fp_consecutive_fec"/>
                         </setting>
-                        <setting string="Nota de crédito electrónica (03)">
+                        <setting string="Nota de crédito electrónica (03) - último número">
                             <field name="fp_consecutive_nc"/>
                         </setting>
-                        <setting string="Nota de débito electrónica (02)">
+                        <setting string="Nota de débito electrónica (02) - último número">
                             <field name="fp_consecutive_nd"/>
                         </setting>
-                        <setting string="Otros comprobantes">
+                        <setting string="Otros comprobantes - último número">
                             <field name="fp_consecutive_others"/>
                         </setting>
                     </block>

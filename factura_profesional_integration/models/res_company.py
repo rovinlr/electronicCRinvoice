@@ -9,6 +9,19 @@ from odoo import api, fields, models
 class ResCompany(models.Model):
     _inherit = "res.company"
 
+    fp_branch_code = fields.Char(
+        string="Sucursal FE",
+        company_dependent=True,
+        default="001",
+        help="Código de sucursal de 3 dígitos usado para formar el consecutivo FE.",
+    )
+    fp_terminal_code = fields.Char(
+        string="Terminal FE",
+        company_dependent=True,
+        default="00001",
+        help="Código de terminal de 5 dígitos usado para formar el consecutivo FE.",
+    )
+
     fp_hacienda_api_base_url = fields.Char(
         string="Hacienda API Base URL",
         company_dependent=True,
@@ -60,37 +73,37 @@ class ResCompany(models.Model):
     fp_consecutive_fe = fields.Char(
         string="Consecutivo FE (01)",
         company_dependent=True,
-        default="00100001010000000001",
-        help="Consecutivo de 20 dígitos para Factura Electrónica (tipo 01).",
+        default="1",
+        help="Último consecutivo utilizado para Factura Electrónica (tipo 01).",
     )
     fp_consecutive_te = fields.Char(
         string="Consecutivo TE (04)",
         company_dependent=True,
-        default="00100001040000000001",
-        help="Consecutivo de 20 dígitos para Tiquete Electrónico (tipo 04).",
+        default="1",
+        help="Último consecutivo utilizado para Tiquete Electrónico (tipo 04).",
     )
     fp_consecutive_fec = fields.Char(
         string="Consecutivo FEC (08)",
         company_dependent=True,
-        default="00100001080000000001",
-        help="Consecutivo de 20 dígitos para Factura Electrónica de Compra (tipo 08).",
+        default="1",
+        help="Último consecutivo utilizado para Factura Electrónica de Compra (tipo 08).",
     )
     fp_consecutive_nc = fields.Char(
         string="Consecutivo NC (03)",
         company_dependent=True,
-        default="00100001030000000001",
-        help="Consecutivo de 20 dígitos para Nota de Crédito Electrónica (tipo 03).",
+        default="1",
+        help="Último consecutivo utilizado para Nota de Crédito Electrónica (tipo 03).",
     )
     fp_consecutive_nd = fields.Char(
         string="Consecutivo ND (02)",
         company_dependent=True,
-        default="00100001020000000001",
-        help="Consecutivo de 20 dígitos para Nota de Débito Electrónica (tipo 02).",
+        default="1",
+        help="Último consecutivo utilizado para Nota de Débito Electrónica (tipo 02).",
     )
     fp_consecutive_others = fields.Char(
         string="Consecutivo otros comprobantes",
         company_dependent=True,
-        help="Consecutivo de 20 dígitos para otros comprobantes electrónicos según Hacienda 4.4.",
+        help="Último consecutivo utilizado para otros comprobantes electrónicos según Hacienda 4.4.",
     )
 
     fp_certificate_subject = fields.Char(

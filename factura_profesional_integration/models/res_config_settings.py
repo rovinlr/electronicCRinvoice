@@ -37,6 +37,8 @@ class ResConfigSettings(models.TransientModel):
     fp_certificate_serial_number = fields.Char(related="company_id.fp_certificate_serial_number", readonly=True)
     fp_certificate_version = fields.Char(related="company_id.fp_certificate_version", readonly=True)
 
+    fp_branch_code = fields.Char(related="company_id.fp_branch_code", readonly=False)
+    fp_terminal_code = fields.Char(related="company_id.fp_terminal_code", readonly=False)
     fp_consecutive_fe = fields.Char(related="company_id.fp_consecutive_fe", readonly=False)
     fp_consecutive_te = fields.Char(related="company_id.fp_consecutive_te", readonly=False)
     fp_consecutive_fec = fields.Char(related="company_id.fp_consecutive_fec", readonly=False)
