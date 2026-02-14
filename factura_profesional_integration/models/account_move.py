@@ -643,7 +643,11 @@ class AccountMove(models.Model):
         consecutive = self.fp_consecutive_number or self._fp_get_company_consecutive()
         situation = "1"
         security_code = f"{random.SystemRandom().randrange(0, 100000000):08d}"
-        return f"{country_code}{date_token}{company_vat}{document_code}{consecutive}{situation}{security_code}"
+        clave = f"{country_code}{date_token}{company_vat}{document_code}{consecutive}{situation}{security_code}"
+        # Persistimos la clave al primer cálculo para reutilizar exactamente el
+        # mismo valor en XML, payload y reintentos de envío.
+        self.fp_external_id = clave
+        return clave
 
     def _fp_call_api(self, endpoint, payload, timeout, token, base_url, method="POST", params=None):
         url = f"{base_url.rstrip('/')}{endpoint}"
