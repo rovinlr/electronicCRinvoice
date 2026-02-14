@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import json
+from json import JSONDecodeError
 from datetime import datetime
 import random
 from xml.etree import ElementTree as ET
@@ -233,7 +234,8 @@ class AccountMove(models.Model):
         if response.status_code >= 400:
             raise UserError(_("Error autenticando contra Hacienda (%s): %s") % (response.status_code, response.text))
 
-        access_token = response.json().get("access_token")
+        response_data = self._fp_parse_json_response(response, context="autenticación")
+        access_token = response_data.get("access_token")
         if not access_token:
             raise UserError(_("Hacienda no devolvió access_token."))
         return access_token
@@ -649,7 +651,27 @@ class AccountMove(models.Model):
             raise UserError(_("Error API Hacienda (%s): %s") % (response.status_code, response.text))
         if not response.text:
             return {}
-        return response.json()
+        return self._fp_parse_json_response(response, context="API")
+
+    def _fp_parse_json_response(self, response, context="API"):
+        self.ensure_one()
+        try:
+            return response.json()
+        except (ValueError, JSONDecodeError):
+            content_type = response.headers.get("Content-Type", "")
+            preview = (response.text or "")[:400]
+            raise UserError(
+                _(
+                    "Respuesta inválida de Hacienda durante %(context)s. "
+                    "Código: %(status)s, Content-Type: %(content_type)s, cuerpo: %(preview)s"
+                )
+                % {
+                    "context": context,
+                    "status": response.status_code,
+                    "content_type": content_type or "desconocido",
+                    "preview": preview or _("<vacío>"),
+                }
+            )
 
     def _fp_build_authorization_header(self, token):
         token = (token or "").strip()
