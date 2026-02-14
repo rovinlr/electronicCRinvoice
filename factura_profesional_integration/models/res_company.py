@@ -1,7 +1,7 @@
 import base64
 
 from cryptography.hazmat.primitives.serialization import pkcs12
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 
@@ -129,7 +129,7 @@ class ResCompany(models.Model):
         attrs = [attr.value for attr in x509_name if attr.oid._name == key]
         return ", ".join(attrs) if attrs else ""
 
-    @fields.depends("fp_signing_certificate_file", "fp_signing_certificate_password")
+    @api.depends("fp_signing_certificate_file", "fp_signing_certificate_password")
     def _compute_fp_certificate_info(self):
         for company in self:
             company.fp_certificate_subject = False
