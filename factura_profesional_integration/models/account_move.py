@@ -1,9 +1,10 @@
 import base64
 import hashlib
 import json
-from json import JSONDecodeError
-from datetime import datetime
 import random
+from datetime import datetime
+from json import JSONDecodeError
+from urllib.parse import urlparse
 from xml.etree import ElementTree as ET
 
 import requests
@@ -219,6 +220,15 @@ class AccountMove(models.Model):
         company = self.company_id
         if not company.fp_hacienda_username or not company.fp_hacienda_password:
             raise UserError(_("Configure usuario y contraseña de Hacienda en Ajustes > Contabilidad."))
+        token_url = (company.fp_hacienda_token_url or "").strip()
+        parsed_token_url = urlparse(token_url)
+        if "openid-connect/token" not in (parsed_token_url.path or ""):
+            raise UserError(
+                _(
+                    "La URL OAuth de Hacienda es inválida. Debe apuntar al endpoint de token "
+                    "y terminar en '/protocol/openid-connect/token'."
+                )
+            )
 
         data = {
             "grant_type": "password",
@@ -227,7 +237,7 @@ class AccountMove(models.Model):
             "password": company.fp_hacienda_password,
         }
         response = requests.post(
-            company.fp_hacienda_token_url,
+            token_url,
             data=data,
             timeout=company.fp_api_timeout,
         )
