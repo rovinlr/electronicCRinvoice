@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives.serialization import pkcs12
 from lxml import etree as LET
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 
@@ -34,6 +34,11 @@ XML_DOCUMENT_SPECS = {
         "root": "NotaDebitoElectronica",
         "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/notaDebitoElectronica",
         "xsd": "notaDebitoElectronica.xsd",
+    },
+    "FEE": {
+        "root": "FacturaElectronicaExportacion",
+        "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronicaExportacion",
+        "xsd": "facturaElectronicaExportacion.xsd",
     },
 }
 DS_XML_NS = "http://www.w3.org/2000/09/xmldsig#"
@@ -81,8 +86,22 @@ class AccountMove(models.Model):
         for move in self:
             if move.move_type == "out_refund" and move.fp_is_electronic_invoice:
                 move.fp_document_type = "NC"
-            elif move.move_type == "out_invoice" and move.fp_document_type == "NC":
+            elif move.move_type == "out_invoice" and move.fp_document_type not in ("FE", "TE", "FEE"):
                 move.fp_document_type = "FE"
+
+    @api.constrains("move_type", "fp_document_type", "fp_is_electronic_invoice")
+    def _check_fp_document_type_by_move_type(self):
+        for move in self:
+            if not move.fp_is_electronic_invoice:
+                continue
+            if move.move_type == "out_invoice" and move.fp_document_type not in ("FE", "TE", "FEE"):
+                raise ValidationError(
+                    _("Para facturas de cliente solo se permite FE, TE o Factura Electrónica de Exportación.")
+                )
+            if move.move_type == "out_refund" and move.fp_document_type != "NC":
+                raise ValidationError(
+                    _("Para rectificativas solo se permite Nota de Crédito Electrónica (NC).")
+                )
 
     @api.onchange("reversed_entry_id", "fp_document_type")
     def _onchange_fp_reference_defaults(self):
@@ -144,8 +163,8 @@ class AccountMove(models.Model):
     fp_document_type = fields.Selection(
         [
             ("FE", "Factura Electrónica"),
+            ("FEE", "Factura Electrónica de Exportación"),
             ("NC", "Nota de Crédito Electrónica"),
-            ("ND", "Nota de Débito Electrónica"),
             ("TE", "Tiquete Electrónico"),
         ],
         string="Tipo de documento (FE)",
@@ -1163,8 +1182,8 @@ class AccountMove(models.Model):
         self.ensure_one()
         document_map = {
             "FE": "01",
+            "FEE": "09",
             "NC": "03",
-            "ND": "02",
             "TE": "04",
         }
         return document_map.get(self.fp_document_type, "99")
@@ -1173,8 +1192,8 @@ class AccountMove(models.Model):
         self.ensure_one()
         return {
             "FE": "fp_consecutive_fe",
+            "FEE": "fp_consecutive_others",
             "NC": "fp_consecutive_nc",
-            "ND": "fp_consecutive_nd",
             "TE": "fp_consecutive_te",
         }.get(self.fp_document_type, "fp_consecutive_others")
 

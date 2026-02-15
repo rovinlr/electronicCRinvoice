@@ -11,7 +11,16 @@
             </xpath>
             <xpath expr="//field[@name='invoice_date']" position="after">
                 <field name="fp_is_electronic_invoice" invisible="1"/>
-                <field name="fp_document_type" invisible="not fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
+                <field
+                    name="fp_document_type"
+                    invisible="not fp_is_electronic_invoice or move_type == 'out_refund'"
+                    readonly="fp_api_state != 'pending'"
+                />
+                <field
+                    name="fp_document_type"
+                    invisible="not fp_is_electronic_invoice or move_type != 'out_refund'"
+                    readonly="1"
+                />
                 <field name="fp_economic_activity_id" invisible="not fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
                 <field name="fp_sale_condition" invisible="not fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
                 <field name="fp_payment_method" invisible="not fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
@@ -33,13 +42,13 @@
             </xpath>
 
             <xpath expr="//notebook" position="inside">
-                <page string="Información de referencia FE" invisible="fp_document_type not in ('NC', 'ND') or not fp_is_electronic_invoice">
+                <page string="Información de referencia FE" invisible="fp_document_type != 'NC' or not fp_is_electronic_invoice">
                     <group col="2">
-                        <field name="fp_reference_document_type" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
-                        <field name="fp_reference_number" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
-                        <field name="fp_reference_issue_datetime" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
-                        <field name="fp_reference_code" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
-                        <field name="fp_reference_reason" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
+                        <field name="fp_reference_document_type" required="fp_document_type == 'NC' and fp_is_electronic_invoice"/>
+                        <field name="fp_reference_number" required="fp_document_type == 'NC' and fp_is_electronic_invoice"/>
+                        <field name="fp_reference_issue_datetime" required="fp_document_type == 'NC' and fp_is_electronic_invoice"/>
+                        <field name="fp_reference_code" required="fp_document_type == 'NC' and fp_is_electronic_invoice"/>
+                        <field name="fp_reference_reason" required="fp_document_type == 'NC' and fp_is_electronic_invoice"/>
                     </group>
                 </page>
             </xpath>
