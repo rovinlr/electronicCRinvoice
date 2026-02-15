@@ -31,6 +31,18 @@
                 </div>
                 <field name="fp_invoice_status" readonly="1" invisible="not fp_is_electronic_invoice"/>
             </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Información de referencia FE" invisible="fp_document_type not in ('NC', 'ND') or not fp_is_electronic_invoice">
+                    <group col="2">
+                        <field name="fp_reference_document_type" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
+                        <field name="fp_reference_number" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
+                        <field name="fp_reference_issue_datetime" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
+                        <field name="fp_reference_code" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
+                        <field name="fp_reference_reason" required="fp_document_type in ('NC', 'ND') and fp_is_electronic_invoice"/>
+                    </group>
+                </page>
+            </xpath>
         </field>
     </record>
 </odoo>
