@@ -47,6 +47,12 @@ En **Ajustes > Contabilidad**:
 
 Además, el módulo ejecuta un `cron` cada 5 minutos para consultar facturas enviadas pendientes de respuesta.
 
+## Catálogo CABYS precargado
+
+El módulo ahora incluye una **lista CABYS base** que se instala automáticamente en `Catálogos FE > Códigos CABYS`, para facilitar la configuración inicial de productos.
+
+Si necesitas el catálogo oficial completo, puedes complementar o reemplazar estos registros desde el mismo menú de catálogos.
+
 ## Importante para producción
 
 La firma XML se genera dentro de Odoo a partir del certificado configurado por compañía.
