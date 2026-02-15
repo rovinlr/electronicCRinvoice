@@ -6,11 +6,9 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='vat']" position="after">
-                <label for="vat" string="Identificación"/>
-                <label for="fp_identification_type" string="Tipo de identificación"/>
                 <field name="fp_identification_type"/>
                 <field name="fp_economic_activity_id"/>
-                <group>
+                <group col="2">
                     <field name="fp_use_exonerations"/>
                     <button name="action_fp_fetch_hacienda_data" string="Consultar Hacienda" type="object" class="oe_highlight"/>
                 </group>
@@ -33,9 +31,7 @@
             </xpath>
 
             <xpath expr="//field[@name='state_id']" position="after">
-                <label for="fp_province_id" string="Provincia" invisible="not fp_is_costa_rica"/>
                 <field name="fp_province_id" string="Provincia" options="{'no_create': True}" invisible="not fp_is_costa_rica"/>
-                <label for="fp_canton_id" string="Cantón" invisible="not fp_is_costa_rica"/>
                 <field name="fp_canton_id" string="Cantón" options="{'no_create': True}" invisible="not fp_is_costa_rica"/>
                 <field name="fp_district_id" string="Distrito" options="{'no_create': True}" invisible="not fp_is_costa_rica"/>
             </xpath>
