@@ -1,12 +1,82 @@
 import requests
 
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.sql import column_exists
 
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
+
+    @staticmethod
+    def _fp_extract_code_and_name(activity):
+        if not isinstance(activity, dict):
+            return False, False
+        code = (
+            activity.get("codigo")
+            or activity.get("codigo_actividad")
+            or activity.get("codigoActividad")
+            or activity.get("cod_actividad")
+            or activity.get("actividad")
+            or activity.get("id")
+        )
+        name = (
+            activity.get("descripcion")
+            or activity.get("descripcion_actividad")
+            or activity.get("desc_actividad")
+            or activity.get("nombre")
+        )
+        code = str(code).strip() if code else False
+        name = str(name).strip() if name else False
+        return code, name
+
+    @api.model
+    def _fp_get_or_create_economic_activity(self, code, name=False):
+        if not code:
+            return self.env["fp.economic.activity"]
+        activity_model = self.env["fp.economic.activity"].with_context(active_test=False)
+        activity = activity_model.search([("code", "=", code)], limit=1)
+        if activity:
+            if name and not activity.name:
+                activity.name = name
+            return activity
+        return activity_model.create({"code": code, "name": name or code})
+
+    @api.model
+    def _fp_extract_hacienda_main_activity(self, data):
+        if not isinstance(data, dict):
+            return False, False
+
+        candidates = [
+            data.get("actividad_principal"),
+            data.get("actividadPrincipal"),
+            data.get("actividad_economica"),
+            data.get("actividadEconomica"),
+            data.get("actividad"),
+        ]
+        for candidate in candidates:
+            code, name = self._fp_extract_code_and_name(candidate)
+            if code:
+                return code, name
+
+        activities = data.get("actividades") or data.get("actividades_economicas") or data.get("actividadesEconomicas")
+        if isinstance(activities, list):
+            principal = False
+            for activity in activities:
+                if not isinstance(activity, dict):
+                    continue
+                is_principal = activity.get("principal") or activity.get("es_principal") or activity.get("actividad_principal")
+                if activity.get("tipo") == "P":
+                    is_principal = True
+                if is_principal:
+                    principal = activity
+                    break
+                if not principal:
+                    principal = activity
+            if principal:
+                return self._fp_extract_code_and_name(principal)
+
+        return False, False
 
     def _auto_init(self):
         """Ensure FE columns exist before normal ORM reads on broken schemas.
@@ -23,6 +93,7 @@ class ResPartner(models.Model):
             "fp_canton_code": "varchar",
             "fp_district_code": "varchar",
             "fp_neighborhood_code": "varchar",
+            "fp_economic_activity_id": "integer",
         }
         for column_name, sql_type in missing_columns.items():
             if not column_exists(self.env.cr, self._table, column_name):
@@ -56,6 +127,16 @@ class ResPartner(models.Model):
         size=2,
         help="Código de barrio según Anexos y Estructuras v4.4 (2 dígitos).",
     )
+    fp_economic_activity_id = fields.Many2one(
+        "fp.economic.activity",
+        string="Actividad económica principal (FE)",
+        help="Actividad económica principal del cliente para facturación electrónica.",
+    )
+    fp_economic_activity_code = fields.Char(
+        related="fp_economic_activity_id.code",
+        string="Código actividad económica principal (FE)",
+        readonly=True,
+    )
 
     def action_fp_fetch_hacienda_data(self):
         for partner in self:
@@ -81,3 +162,7 @@ class ResPartner(models.Model):
             email = data.get("correo_electronico") or data.get("email")
             if email:
                 partner.email = email
+
+            activity_code, activity_name = self._fp_extract_hacienda_main_activity(data)
+            if activity_code:
+                partner.fp_economic_activity_id = self._fp_get_or_create_economic_activity(activity_code, activity_name)
