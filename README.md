@@ -55,3 +55,27 @@ Además, valida los catálogos y estructuras vigentes según la documentación o
 
 - https://api.hacienda.go.cr/docs/
 - https://www.hacienda.go.cr/docs/Anexosyestructuras.pdf
+
+
+## Logo del Ministerio en la lista de Apps (Odoo)
+
+Para que la app **Hacienda** muestre un logo en el listado de Apps de Odoo, debes colocar un archivo exactamente en:
+
+`factura_profesional_integration/static/description/icon.png`
+
+Recomendaciones:
+
+- Formato: **PNG**
+- Tamaño sugerido: **1024x1024** (Odoo lo reescala)
+- Nombre obligatorio: `icon.png`
+
+Pasos rápidos:
+
+1. Crea la carpeta si no existe:
+   - `mkdir -p factura_profesional_integration/static/description`
+2. Copia ahí el logo oficial del Ministerio (renombrado como `icon.png`).
+3. Reinicia Odoo.
+4. Actualiza el módulo:
+   - `odoo -u factura_profesional_integration -d <tu_base>`
+
+Con eso, Odoo toma automáticamente ese ícono para la tarjeta de la app.
