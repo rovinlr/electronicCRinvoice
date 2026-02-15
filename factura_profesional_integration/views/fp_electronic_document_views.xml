@@ -46,6 +46,14 @@
         <field name="context">{'search_default_posted': 1}</field>
     </record>
 
+    <record id="action_fp_hacienda_settings" model="ir.actions.act_window">
+        <field name="name">Parámetros FE</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'factura_profesional_integration'}</field>
+    </record>
+
     <menuitem
         id="menu_fp_hacienda_root"
         name="Hacienda"
@@ -75,7 +83,7 @@
         id="menu_fp_hacienda_settings"
         name="Parámetros FE"
         parent="menu_fp_hacienda_configuration"
-        action="account.res_config_settings_action"
+        action="action_fp_hacienda_settings"
         sequence="10"
         groups="account.group_account_manager"
     />
