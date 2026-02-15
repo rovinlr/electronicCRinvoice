@@ -883,7 +883,8 @@ class AccountMove(models.Model):
         ET.SubElement(exoneration_node, "TipoDocumentoEX1").text = exoneration.exoneration_type or "99"
         ET.SubElement(exoneration_node, "NumeroDocumento").text = (exoneration.exoneration_number or "")[:40]
         ET.SubElement(exoneration_node, "NombreInstitucion").text = (exoneration.institution_name or "")[:160]
-        ET.SubElement(exoneration_node, "FechaEmision").text = fields.Datetime.to_string(exoneration.issue_date)
+        exoneration_issue_dt = fields.Datetime.to_datetime(exoneration.issue_date)
+        ET.SubElement(exoneration_node, "FechaEmisionEX").text = exoneration_issue_dt.strftime("%Y-%m-%dT%H:%M:%S") if exoneration_issue_dt else ""
         percentage = max(min(exoneration.exoneration_percentage or 0.0, 100.0), 0.0)
         tax_discount = tax_amount * (percentage / 100.0)
         ET.SubElement(exoneration_node, "PorcentajeExoneracion").text = self._fp_format_decimal(percentage)
