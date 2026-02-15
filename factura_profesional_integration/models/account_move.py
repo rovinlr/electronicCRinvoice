@@ -18,7 +18,24 @@ from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
-FE_XML_NS = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
+
+XML_DOCUMENT_SPECS = {
+    "FE": {
+        "root": "FacturaElectronica",
+        "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica",
+        "xsd": "facturaElectronica.xsd",
+    },
+    "NC": {
+        "root": "NotaCreditoElectronica",
+        "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/notaCreditoElectronica",
+        "xsd": "notaCreditoElectronica.xsd",
+    },
+    "ND": {
+        "root": "NotaDebitoElectronica",
+        "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/notaDebitoElectronica",
+        "xsd": "notaDebitoElectronica.xsd",
+    },
+}
 DS_XML_NS = "http://www.w3.org/2000/09/xmldsig#"
 XADES_XML_NS = "http://uri.etsi.org/01903/v1.3.2#"
 XADES_SIGNATURE_POLICY_IDENTIFIER = (
@@ -394,20 +411,33 @@ class AccountMove(models.Model):
         xml_bytes = self._fp_ensure_signed_xml_integrity()
         return base64.b64encode(xml_bytes).decode("utf-8")
 
+    def _fp_get_xml_document_spec(self):
+        self.ensure_one()
+        if self.fp_document_type == "TE":
+            raise UserError(
+                _(
+                    "El Tiquete Electrónico (TE) requiere una estructura XML específica de v4.4. "
+                    "Configure FE/NC/ND o implemente el generador TE antes de enviar a Hacienda."
+                )
+            )
+        spec = XML_DOCUMENT_SPECS.get(self.fp_document_type)
+        if not spec:
+            raise UserError(_("Tipo de documento FE no soportado: %s") % (self.fp_document_type or ""))
+        return spec
+
     def _fp_generate_invoice_xml(self, clave=None):
         self.ensure_one()
         clave = clave or self._fp_build_clave()
+        document_spec = self._fp_get_xml_document_spec()
+        namespace = document_spec["namespace"]
         root = ET.Element(
-            "FacturaElectronica",
+            document_spec["root"],
             {
-                "xmlns": FE_XML_NS,
+                "xmlns": namespace,
                 "xmlns:ds": DS_XML_NS,
                 "xmlns:xsd": "http://www.w3.org/2001/XMLSchema",
                 "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                "xsi:schemaLocation": (
-                    "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica "
-                    "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica.xsd"
-                ),
+                "xsi:schemaLocation": f"{namespace} {namespace}/{document_spec['xsd']}",
             },
         )
         ET.SubElement(root, "Clave").text = clave
@@ -454,7 +484,7 @@ class AccountMove(models.Model):
         ET.SubElement(medio_pago, "TipoMedioPago").text = self.fp_payment_method or "01"
         ET.SubElement(resumen, "TotalComprobante").text = self._fp_format_decimal(detalle_vals["total_comprobante"])
 
-        ET.register_namespace("", FE_XML_NS)
+        ET.register_namespace("", namespace)
         ET.register_namespace("ds", DS_XML_NS)
         return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
 
