@@ -10,6 +10,7 @@
                 <field name="fp_canton_code"/>
                 <field name="fp_district_code"/>
                 <field name="fp_neighborhood_code"/>
+                <field name="fp_economic_activity_id"/>
                 <button name="action_fp_fetch_hacienda_data" string="Consultar Hacienda" type="object" class="oe_highlight"/>
             </xpath>
         </field>
