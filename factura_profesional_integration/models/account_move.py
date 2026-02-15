@@ -96,6 +96,17 @@ class AccountMove(models.Model):
             move._fp_generate_and_sign_xml_attachment()
         return moves
 
+    def _reverse_moves(self, default_values_list=None, cancel=False):
+        reversed_moves = super()._reverse_moves(default_values_list=default_values_list, cancel=cancel)
+        electronic_refunds = reversed_moves.filtered(
+            lambda move: move.fp_is_electronic_invoice
+            and move.move_type == "out_refund"
+            and move.fp_document_type != "NC"
+        )
+        if electronic_refunds:
+            electronic_refunds.write({"fp_document_type": "NC"})
+        return reversed_moves
+
     @api.model
     def _default_fp_economic_activity_id(self):
         """Safely resolve company default even during module bootstrap.
