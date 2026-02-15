@@ -6,8 +6,8 @@
         <field name="inherit_id" ref="account.view_account_journal_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet//group" position="inside">
-                <label for="fp_is_electronic_invoice" string="FE 4.4"/>
-                <div>
+                <div class="o_row">
+                    <label for="fp_is_electronic_invoice" string="FE 4.4"/>
                     <field name="fp_is_electronic_invoice" nolabel="1"/>
                 </div>
             </xpath>
