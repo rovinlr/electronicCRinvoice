@@ -5,10 +5,14 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="string">Identificación</attribute>
+            </xpath>
+
             <xpath expr="//field[@name='vat']" position="after">
-                <field name="fp_identification_type"/>
-                <field name="fp_economic_activity_id"/>
-                <group col="2">
+                <group string="Facturación Electrónica CR" col="2">
+                    <field name="fp_identification_type" string="Tipo de identificación"/>
+                    <field name="fp_economic_activity_id" string="Actividad económica"/>
                     <field name="fp_use_exonerations"/>
                     <button name="action_fp_fetch_hacienda_data" string="Consultar Hacienda" type="object" class="oe_highlight"/>
                 </group>
@@ -30,14 +34,26 @@
                 <attribute name="string">OtrasSeñas</attribute>
             </xpath>
 
-            <xpath expr="//field[@name='state_id']" position="after">
-                <field name="fp_province_id" string="Provincia" options="{'no_create': True}" invisible="not fp_is_costa_rica"/>
-                <field name="fp_canton_id" string="Cantón" options="{'no_create': True}" invisible="not fp_is_costa_rica"/>
-                <field name="fp_district_id" string="Distrito" options="{'no_create': True}" invisible="not fp_is_costa_rica"/>
-            </xpath>
+            <xpath expr="//field[@name='zip']" position="after">
+                <label for="fp_province_id" string="Provincia" invisible="not fp_is_costa_rica"/>
+                <div class="o_address_state" invisible="not fp_is_costa_rica">
+                    <field name="fp_province_id" string="Provincia" options="{'no_create': True}" nolabel="1"/>
+                </div>
 
-            <xpath expr="//field[@name='fp_district_id']" position="after">
-                <field name="fp_neighborhood_code" string="Barrio" placeholder="Barrio" class="o_address_zip" invisible="not fp_is_costa_rica"/>
+                <label for="fp_canton_id" string="Cantón" invisible="not fp_is_costa_rica"/>
+                <div class="o_address_city" invisible="not fp_is_costa_rica">
+                    <field name="fp_canton_id" string="Cantón" options="{'no_create': True}" nolabel="1"/>
+                </div>
+
+                <label for="fp_district_id" string="Distrito" invisible="not fp_is_costa_rica"/>
+                <div class="o_address_city" invisible="not fp_is_costa_rica">
+                    <field name="fp_district_id" string="Distrito" options="{'no_create': True}" nolabel="1"/>
+                </div>
+
+                <label for="fp_neighborhood_code" string="Barrio" invisible="not fp_is_costa_rica"/>
+                <div class="o_address_zip" invisible="not fp_is_costa_rica">
+                    <field name="fp_neighborhood_code" string="Barrio" placeholder="Barrio" nolabel="1"/>
+                </div>
             </xpath>
 
             <xpath expr="//notebook" position="inside">
