@@ -681,6 +681,22 @@ class AccountMove(models.Model):
             if force and not move.fp_reference_reason:
                 move.fp_reference_reason = _("Documento de referencia para nota electrónica")
 
+    def _fp_get_tax_rate_from_code(self, tax_rate_code):
+        iva_rate_map = {
+            "01": 0.0,
+            "02": 1.0,
+            "03": 2.0,
+            "04": 4.0,
+            "05": 0.0,
+            "06": 4.0,
+            "07": 8.0,
+            "08": 13.0,
+            "09": 0.5,
+            "10": 0.0,
+            "11": 0.0,
+        }
+        return iva_rate_map.get((tax_rate_code or "").strip(), 0.0)
+
     def _fp_build_detail_lines(self, lines_node):
         totals = {
             "total_serv_gravados": 0.0,
@@ -735,13 +751,18 @@ class AccountMove(models.Model):
             tax = line.tax_ids[:1]
             tax_code = (tax.fp_tax_type or tax.fp_tax_code or "01") if tax else "01"
             tax_rate_code = (tax.fp_tax_rate_code_iva or "08") if tax else "08"
-            tax_rate = (tax.fp_tax_rate if tax and tax.fp_tax_rate else (tax.amount if tax else 0.0))
+            configured_tax_rate = tax.fp_tax_rate if tax and tax.fp_tax_rate else 0.0
+            odoo_tax_rate = tax.amount if tax else 0.0
+            code_tax_rate = self._fp_get_tax_rate_from_code(tax_rate_code) if tax else 0.0
+            tax_rate = configured_tax_rate or odoo_tax_rate or code_tax_rate
             total_impuesto_xml_linea = subtotal * (tax_rate / 100.0) if tax else 0.0
             has_tax = bool(tax)
 
             ET.SubElement(detail, "MontoTotal").text = self._fp_format_decimal(monto_total)
             ET.SubElement(detail, "SubTotal").text = self._fp_format_decimal(subtotal)
+            exoneration = self.env["fp.client.exoneration"]
             exoneration_amount = 0.0
+            has_exoneration = False
             if has_tax:
                 ET.SubElement(detail, "BaseImponible").text = self._fp_format_decimal(subtotal)
                 impuesto = ET.SubElement(detail, "Impuesto")
@@ -749,7 +770,9 @@ class AccountMove(models.Model):
                 ET.SubElement(impuesto, "CodigoTarifaIVA").text = tax_rate_code
                 ET.SubElement(impuesto, "Tarifa").text = self._fp_format_decimal(tax_rate)
                 ET.SubElement(impuesto, "Monto").text = self._fp_format_decimal(total_impuesto_xml_linea)
-                exoneration_amount = self._fp_append_exoneracion_node(impuesto, line, total_impuesto_xml_linea)
+                exoneration = self._fp_get_line_exoneration(line)
+                exoneration_amount = self._fp_append_exoneracion_node(impuesto, exoneration, total_impuesto_xml_linea)
+                has_exoneration = bool(exoneration)
                 impuesto_neto_linea = max(total_impuesto_linea - exoneration_amount, 0.0)
                 monto_total_linea = subtotal + impuesto_neto_linea
                 ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
@@ -762,8 +785,8 @@ class AccountMove(models.Model):
 
             product_type = line.product_id.product_tmpl_id.type if line.product_id else False
             is_service = product_type == "service"
-            if has_tax and total_impuesto_xml_linea > 0:
-                if exoneration_amount > 0:
+            if has_tax and (total_impuesto_xml_linea > 0 or has_exoneration):
+                if has_exoneration:
                     if is_service:
                         totals["total_serv_exonerado"] += subtotal
                     else:
@@ -852,12 +875,12 @@ class AccountMove(models.Model):
                     return exoneration
         return self.env["fp.client.exoneration"]
 
-    def _fp_append_exoneracion_node(self, impuesto_node, line, tax_amount):
-        exoneration = self._fp_get_line_exoneration(line)
+    def _fp_append_exoneracion_node(self, impuesto_node, exoneration, tax_amount):
         if not exoneration:
             return 0.0
         exoneration_node = ET.SubElement(impuesto_node, "Exoneracion")
-        ET.SubElement(exoneration_node, "TipoDocumento").text = exoneration.exoneration_type or "99"
+        # En v4.4, el nodo de exoneración utiliza TipoDocumentoEX1 (no TipoDocumento).
+        ET.SubElement(exoneration_node, "TipoDocumentoEX1").text = exoneration.exoneration_type or "99"
         ET.SubElement(exoneration_node, "NumeroDocumento").text = (exoneration.exoneration_number or "")[:40]
         ET.SubElement(exoneration_node, "NombreInstitucion").text = (exoneration.institution_name or "")[:160]
         ET.SubElement(exoneration_node, "FechaEmision").text = fields.Datetime.to_string(exoneration.issue_date)
