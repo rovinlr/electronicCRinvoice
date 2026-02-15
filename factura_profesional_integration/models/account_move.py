@@ -510,7 +510,7 @@ class AccountMove(models.Model):
         LET.SubElement(
             signed_info,
             LET.QName(DS_XML_NS, "CanonicalizationMethod"),
-            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
+            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
         )
         LET.SubElement(
             signed_info,
@@ -527,7 +527,13 @@ class AccountMove(models.Model):
         LET.SubElement(
             transforms,
             LET.QName(DS_XML_NS, "Transform"),
-            {"Algorithm": "http://www.w3.org/2000/09/xmldsig#enveloped-signature"},
+            {"Algorithm": "http://www.w3.org/TR/1999/REC-xpath-19991116"},
+        )
+        LET.SubElement(transforms[-1], LET.QName(DS_XML_NS, "XPath")).text = "not(ancestor-or-self::ds:Signature)"
+        LET.SubElement(
+            transforms,
+            LET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
         )
         LET.SubElement(
             reference_document,
@@ -643,8 +649,7 @@ class AccountMove(models.Model):
             LET.QName(XADES_XML_NS, "DataObjectFormat"),
             {"ObjectReference": f"#{reference_id}"},
         )
-        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "text/xml"
-        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "Encoding")).text = "UTF-8"
+        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "application/octet-stream"
 
         signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=False, with_comments=False)
         reference_signed_properties_digest.text = base64.b64encode(hashlib.sha256(signed_properties_c14n).digest()).decode("utf-8")
