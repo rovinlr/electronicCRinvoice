@@ -26,9 +26,10 @@
         <field name="arch" type="xml">
             <form string="Documentos Electrónicos" create="false" edit="false" delete="false">
                 <header>
-                    <button name="action_fp_send_to_api" string="Enviar a Hacienda" type="object" class="oe_highlight"/>
-                    <button name="action_fp_consult_api_document" string="Consultar Hacienda" type="object"/>
+                    <button name="action_fp_send_to_api" string="Enviar a Hacienda" type="object" class="oe_highlight" invisible="fp_api_state != 'pending'"/>
+                    <button name="action_fp_consult_api_document" string="Consultar Hacienda" type="object" invisible="fp_api_state in ('done','error')"/>
                     <field name="fp_invoice_status" widget="statusbar"/>
+                    <field name="fp_api_state" invisible="1"/>
                 </header>
                 <sheet>
                     <group col="2">

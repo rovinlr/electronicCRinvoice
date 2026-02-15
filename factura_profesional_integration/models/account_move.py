@@ -183,6 +183,8 @@ class AccountMove(models.Model):
         for move in self:
             if not move.fp_is_electronic_invoice:
                 raise UserError(_("El diario no está marcado como factura electrónica."))
+            if move.fp_api_state != "pending":
+                raise UserError(_("La factura ya fue enviada a Hacienda y no puede reenviarse desde este botón."))
             if move.move_type not in ("out_invoice", "out_refund"):
                 raise UserError(_("Solo se permite facturación de cliente o nota de crédito."))
             if move.state != "posted":
@@ -193,6 +195,8 @@ class AccountMove(models.Model):
         for move in self:
             if not move.fp_external_id:
                 raise UserError(_("La factura no tiene Clave para consultar estado en Hacienda."))
+            if move.fp_api_state in ("done", "error"):
+                raise UserError(_("La factura ya recibió una respuesta final de Hacienda."))
 
             token = move._fp_get_hacienda_access_token()
             response_data = move._fp_call_api(
