@@ -21,9 +21,13 @@ from odoo.exceptions import UserError
 FE_XML_NS = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
 DS_XML_NS = "http://www.w3.org/2000/09/xmldsig#"
 XADES_XML_NS = "http://uri.etsi.org/01903/v1.3.2#"
-XADES_SIGNATURE_POLICY_IDENTIFIER = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
+XADES_SIGNATURE_POLICY_IDENTIFIER = (
+    "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/"
+    "Resoluci%C3%B3n_General_sobre_disposiciones_t%C3%A9cnicas_comprobantes_electr%C3%B3nicos_para_efectos_tributarios.pdf"
+)
 XADES_SIGNATURE_POLICY_DESCRIPTION = "Política de firma para comprobantes electrónicos de Costa Rica"
-XADES_SIGNATURE_POLICY_HASH = "Ohixl6upD6av8N7pEvDABhEL6hM="
+XADES_SIGNATURE_POLICY_HASH_ALGORITHM = "http://www.w3.org/2001/04/xmlenc#sha256"
+XADES_SIGNATURE_POLICY_HASH = "DWxin1xWOeI8OuWQXazh4VjLWAaCLAA954em7DMh0h8="
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -130,6 +134,7 @@ class AccountMove(models.Model):
     fp_external_id = fields.Char(string="Clave Hacienda", copy=False)
     fp_consecutive_number = fields.Char(string="Consecutivo Hacienda", copy=False, readonly=True)
     fp_xml_attachment_id = fields.Many2one("ir.attachment", string="Factura XML", copy=False)
+    fp_xml_signed_digest = fields.Char(string="Digest XML firmado", copy=False, readonly=True)
     fp_response_xml_attachment_id = fields.Many2one("ir.attachment", string="XML Respuesta Hacienda", copy=False)
     fp_xml_attachment_name = fields.Char(related="fp_xml_attachment_id.name", string="Nombre XML Factura", readonly=True)
     fp_response_xml_attachment_name = fields.Char(
@@ -193,6 +198,32 @@ class AccountMove(models.Model):
             elif status:
                 move.fp_invoice_status = "sent"
 
+    def action_fp_open_hacienda_documents(self):
+        self.ensure_one()
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            "factura_profesional_integration.action_fp_electronic_documents"
+        )
+        domain = [
+            ("fp_is_electronic_invoice", "=", True),
+            ("move_type", "in", ["out_invoice", "out_refund"]),
+        ]
+        if self.fp_consecutive_number:
+            domain.append(("fp_consecutive_number", "=", self.fp_consecutive_number))
+            action["name"] = _("Hacienda: %s") % self.fp_consecutive_number
+            action["res_id"] = self.id
+            action["views"] = [
+                (self.env.ref("factura_profesional_integration.view_move_form_fp_documents").id, "form"),
+                (self.env.ref("factura_profesional_integration.view_move_tree_fp_documents").id, "list"),
+            ]
+
+        action["domain"] = domain
+        action["context"] = {
+            **self.env.context,
+            "search_default_posted": 1,
+            "search_default_fp_documents": 1,
+        }
+        return action
+
     def _fp_send_to_hacienda(self):
         self.ensure_one()
         company = self.company_id
@@ -202,6 +233,7 @@ class AccountMove(models.Model):
         if not self.fp_xml_attachment_id:
             self._fp_generate_and_sign_xml_attachment()
 
+        self._fp_ensure_signed_xml_integrity()
         payload = self._fp_build_hacienda_payload()
         token = self._fp_get_hacienda_access_token()
         self.fp_api_state = "sent"
@@ -261,17 +293,18 @@ class AccountMove(models.Model):
         if not self.fp_xml_attachment_id or not self.fp_xml_attachment_id.datas:
             self._fp_generate_and_sign_xml_attachment()
 
+        signed_xml_b64 = self._fp_get_signed_xml_payload_base64()
         clave = self._fp_build_clave()
         partner_vat = "".join(ch for ch in (self.partner_id.vat or "") if ch.isdigit())
 
         payload = {
             "clave": clave,
-            "fecha": datetime.now().astimezone().isoformat(),
+            "fecha": datetime.now().astimezone().isoformat(timespec="seconds"),
             "emisor": {
                 "tipoIdentificacion": self.company_id.partner_id.fp_identification_type or "02",
                 "numeroIdentificacion": "".join(ch for ch in (self.company_id.vat or "") if ch.isdigit()),
             },
-            "comprobanteXml": self.fp_xml_attachment_id.datas.decode("utf-8"),
+            "comprobanteXml": signed_xml_b64,
         }
         if partner_vat and self.partner_id.fp_identification_type:
             payload["receptor"] = {
@@ -282,23 +315,54 @@ class AccountMove(models.Model):
 
     def _fp_generate_and_sign_xml_attachment(self):
         self.ensure_one()
-        xml_text = self._fp_generate_invoice_xml()
+        clave = self._fp_build_clave()
+        xml_text = self._fp_generate_invoice_xml(clave=clave)
         signed_xml_text = self._fp_sign_xml(xml_text)
+        signed_xml_bytes = signed_xml_text.encode("utf-8")
+        signed_xml_b64 = base64.b64encode(signed_xml_bytes)
         attachment = self.env["ir.attachment"].create(
             {
                 "name": f"{self.name or 'factura'}-firmado.xml",
                 "type": "binary",
-                "datas": base64.b64encode(signed_xml_text.encode("utf-8")),
+                "datas": signed_xml_b64,
                 "res_model": "account.move",
                 "res_id": self.id,
                 "mimetype": "application/xml",
             }
         )
         self.fp_xml_attachment_id = attachment
+        self.fp_xml_signed_digest = hashlib.sha256(signed_xml_bytes).hexdigest()
 
-    def _fp_generate_invoice_xml(self):
+    def _fp_ensure_signed_xml_integrity(self):
         self.ensure_one()
-        clave = self._fp_build_clave()
+        attachment = self.fp_xml_attachment_id
+        if not attachment or not attachment.datas:
+            raise UserError(_("La factura no tiene XML firmado adjunto."))
+
+        xml_bytes = base64.b64decode(attachment.datas)
+        current_digest = hashlib.sha256(xml_bytes).hexdigest()
+        if self.fp_xml_signed_digest and current_digest != self.fp_xml_signed_digest:
+            raise UserError(
+                _(
+                    "El XML firmado fue alterado luego de la firma digital. "
+                    "Genere y firme nuevamente antes de enviar a Hacienda."
+                )
+            )
+
+        if not self.fp_xml_signed_digest:
+            # Backward compatibility for documents signed before this guard existed.
+            self.fp_xml_signed_digest = current_digest
+
+        return xml_bytes
+
+    def _fp_get_signed_xml_payload_base64(self):
+        self.ensure_one()
+        xml_bytes = self._fp_ensure_signed_xml_integrity()
+        return base64.b64encode(xml_bytes).decode("utf-8")
+
+    def _fp_generate_invoice_xml(self, clave=None):
+        self.ensure_one()
+        clave = clave or self._fp_build_clave()
         root = ET.Element(
             "FacturaElectronica",
             {
@@ -308,7 +372,7 @@ class AccountMove(models.Model):
                 "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
                 "xsi:schemaLocation": (
                     "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica "
-                    "FacturaElectronica_V4.4.xsd"
+                    "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica.xsd"
                 ),
             },
         )
@@ -320,7 +384,7 @@ class AccountMove(models.Model):
         if self.partner_id.fp_economic_activity_id and self.partner_id.fp_economic_activity_id.code:
             ET.SubElement(root, "CodigoActividadReceptor").text = self.partner_id.fp_economic_activity_id.code
         ET.SubElement(root, "NumeroConsecutivo").text = self._fp_extract_consecutive_from_clave(clave)
-        ET.SubElement(root, "FechaEmision").text = datetime.now().astimezone().isoformat()
+        ET.SubElement(root, "FechaEmision").text = datetime.now().astimezone().isoformat(timespec="seconds")
 
         emisor = ET.SubElement(root, "Emisor")
         ET.SubElement(emisor, "Nombre").text = self.company_id.name or ""
@@ -447,7 +511,7 @@ class AccountMove(models.Model):
         province = partner.state_id.code if partner.state_id and partner.state_id.code else "1"
         canton = self._fp_pad_numeric_code(partner.fp_canton_code, 2, "01")
         district = self._fp_pad_numeric_code(partner.fp_district_code, 2, "01")
-        neighborhood = self._fp_pad_numeric_code(partner.fp_neighborhood_code, 2, "01")
+        neighborhood = self._fp_format_neighborhood_code(partner.fp_neighborhood_code)
 
         location_node = ET.SubElement(parent_node, "Ubicacion")
         ET.SubElement(location_node, "Provincia").text = self._fp_pad_numeric_code(province, 1, "1")
@@ -468,6 +532,12 @@ class AccountMove(models.Model):
         if not digits:
             digits = default
         return digits.zfill(length)[-length:]
+
+    def _fp_format_neighborhood_code(self, value):
+        code = (value or "").strip()
+        if not code:
+            return "01"
+        return code[:64]
 
     def _fp_sign_xml(self, xml_text):
         self.ensure_one()
@@ -510,7 +580,7 @@ class AccountMove(models.Model):
         LET.SubElement(
             signed_info,
             LET.QName(DS_XML_NS, "CanonicalizationMethod"),
-            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
+            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
         )
         LET.SubElement(
             signed_info,
@@ -529,11 +599,11 @@ class AccountMove(models.Model):
             LET.QName(DS_XML_NS, "Transform"),
             {"Algorithm": "http://www.w3.org/TR/1999/REC-xpath-19991116"},
         )
-        LET.SubElement(transforms[-1], LET.QName(DS_XML_NS, "XPath")).text = "not(ancestor-or-self::ds:Signature)"
+        transforms = LET.SubElement(reference_document, LET.QName(DS_XML_NS, "Transforms"))
         LET.SubElement(
             transforms,
             LET.QName(DS_XML_NS, "Transform"),
-            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
+            {"Algorithm": "http://www.w3.org/2000/09/xmldsig#enveloped-signature"},
         )
         LET.SubElement(
             reference_document,
@@ -635,7 +705,7 @@ class AccountMove(models.Model):
         LET.SubElement(
             sig_policy_hash,
             LET.QName(DS_XML_NS, "DigestMethod"),
-            {"Algorithm": "http://www.w3.org/2000/09/xmldsig#sha1"},
+            {"Algorithm": XADES_SIGNATURE_POLICY_HASH_ALGORITHM},
         )
         LET.SubElement(sig_policy_hash, LET.QName(DS_XML_NS, "DigestValue")).text = XADES_SIGNATURE_POLICY_HASH
 
@@ -649,7 +719,11 @@ class AccountMove(models.Model):
             LET.QName(XADES_XML_NS, "DataObjectFormat"),
             {"ObjectReference": f"#{reference_id}"},
         )
-        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "application/octet-stream"
+        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "text/xml"
+        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "Encoding")).text = "UTF-8"
+
+        key_info_c14n = LET.tostring(key_info, method="c14n", exclusive=False, with_comments=False)
+        reference_key_info_digest.text = base64.b64encode(hashlib.sha256(key_info_c14n).digest()).decode("utf-8")
 
         signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=False, with_comments=False)
         reference_signed_properties_digest.text = base64.b64encode(hashlib.sha256(signed_properties_c14n).digest()).decode("utf-8")

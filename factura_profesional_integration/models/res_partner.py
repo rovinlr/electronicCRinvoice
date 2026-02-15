@@ -124,8 +124,8 @@ class ResPartner(models.Model):
     )
     fp_neighborhood_code = fields.Char(
         string="Barrio (FE)",
-        size=2,
-        help="Código de barrio según Anexos y Estructuras v4.4 (2 dígitos).",
+        size=64,
+        help="Barrio para facturación electrónica. Permite texto o números.",
     )
     fp_economic_activity_id = fields.Many2one(
         "fp.economic.activity",
