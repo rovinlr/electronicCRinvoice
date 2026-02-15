@@ -10,13 +10,22 @@
                 <field name="fp_economic_activity_id"/>
                 <button name="action_fp_fetch_hacienda_data" string="Consultar Hacienda" type="object" class="oe_highlight"/>
             </xpath>
-            <xpath expr="//field[@name='state_id']" position="after">
-                <field name="fp_province_code"/>
+
+            <xpath expr="//field[@name='state_id']" position="attributes">
+                <attribute name="string">Provincia</attribute>
             </xpath>
+
+            <xpath expr="//field[@name='city']" position="attributes">
+                <attribute name="string">Cantón</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='street']" position="attributes">
+                <attribute name="string">OtrasSeñas</attribute>
+            </xpath>
+
             <xpath expr="//field[@name='city']" position="after">
-                <field name="fp_canton_code"/>
-                <field name="fp_district_code"/>
-                <field name="fp_neighborhood_code"/>
+                <field name="fp_district_code" string="Distrito"/>
+                <field name="fp_neighborhood_code" string="Barrio"/>
             </xpath>
         </field>
     </record>
