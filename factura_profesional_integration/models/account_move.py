@@ -20,6 +20,8 @@ from odoo.exceptions import UserError
 FE_XML_NS = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
 DS_XML_NS = "http://www.w3.org/2000/09/xmldsig#"
 XADES_XML_NS = "http://uri.etsi.org/01903/v1.3.2#"
+XADES_SIGNATURE_POLICY_URL = "https://tribunet.hacienda.go.cr/docs/esquemas/2016/v4.1/Resolucion_Comprobantes_Electronicos_DGT-R-48-2016.pdf"
+XADES_SIGNATURE_POLICY_HASH = "vPjYEG5pdxOi+6DB29+KqF3I4VOcMEaixzE3d2iUiJk="
 
 
 class AccountMove(models.Model):
@@ -584,6 +586,22 @@ class AccountMove(models.Model):
         issuer_serial = LET.SubElement(cert_node, LET.QName(XADES_XML_NS, "IssuerSerial"))
         LET.SubElement(issuer_serial, LET.QName(DS_XML_NS, "X509IssuerName")).text = certificate.issuer.rfc4514_string()
         LET.SubElement(issuer_serial, LET.QName(DS_XML_NS, "X509SerialNumber")).text = str(certificate.serial_number)
+
+        signature_policy_identifier = LET.SubElement(
+            signed_signature_properties,
+            LET.QName(XADES_XML_NS, "SignaturePolicyIdentifier"),
+        )
+        signature_policy_id = LET.SubElement(signature_policy_identifier, LET.QName(XADES_XML_NS, "SignaturePolicyId"))
+        sig_policy_id = LET.SubElement(signature_policy_id, LET.QName(XADES_XML_NS, "SigPolicyId"))
+        LET.SubElement(sig_policy_id, LET.QName(XADES_XML_NS, "Identifier")).text = XADES_SIGNATURE_POLICY_URL
+        LET.SubElement(sig_policy_id, LET.QName(XADES_XML_NS, "Description")).text = ""
+        sig_policy_hash = LET.SubElement(signature_policy_id, LET.QName(XADES_XML_NS, "SigPolicyHash"))
+        LET.SubElement(
+            sig_policy_hash,
+            LET.QName(DS_XML_NS, "DigestMethod"),
+            {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
+        )
+        LET.SubElement(sig_policy_hash, LET.QName(DS_XML_NS, "DigestValue")).text = XADES_SIGNATURE_POLICY_HASH
 
         signed_data_object_properties = LET.SubElement(signed_properties, LET.QName(XADES_XML_NS, "SignedDataObjectProperties"))
         data_object_format = LET.SubElement(
