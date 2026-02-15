@@ -729,7 +729,8 @@ class AccountMove(models.Model):
             subtotal = line.price_subtotal
             discount_amount = max(monto_total - subtotal, 0.0)
             total_impuesto_linea = max(line.price_total - line.price_subtotal, 0.0)
-            monto_total_linea = subtotal + total_impuesto_linea
+            impuesto_neto_linea = total_impuesto_linea
+            monto_total_linea = subtotal + impuesto_neto_linea
 
             tax = line.tax_ids[:1]
             tax_code = (tax.fp_tax_type or tax.fp_tax_code or "01") if tax else "01"
@@ -748,11 +749,13 @@ class AccountMove(models.Model):
                 ET.SubElement(impuesto, "Tarifa").text = self._fp_format_decimal(tax_rate)
                 ET.SubElement(impuesto, "Monto").text = self._fp_format_decimal(total_impuesto_linea)
                 exoneration_amount = self._fp_append_exoneracion_node(impuesto, line, total_impuesto_linea)
+                impuesto_neto_linea = max(total_impuesto_linea - exoneration_amount, 0.0)
+                monto_total_linea = subtotal + impuesto_neto_linea
                 ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
-                ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(total_impuesto_linea)
+                ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(impuesto_neto_linea)
                 desglose_key = (tax_code, tax_rate_code)
                 totals["total_desglose_impuesto"][desglose_key] = (
-                    totals["total_desglose_impuesto"].get(desglose_key, 0.0) + total_impuesto_linea
+                    totals["total_desglose_impuesto"].get(desglose_key, 0.0) + impuesto_neto_linea
                 )
             ET.SubElement(detail, "MontoTotalLinea").text = self._fp_format_decimal(monto_total_linea)
 
@@ -793,7 +796,7 @@ class AccountMove(models.Model):
             totals["total_venta"] += monto_total
             totals["total_descuentos"] += discount_amount
             totals["total_venta_neta"] += subtotal
-            totals["total_impuesto"] += total_impuesto_linea
+            totals["total_impuesto"] += impuesto_neto_linea
             totals["total_comprobante"] += monto_total_linea
 
         return totals
