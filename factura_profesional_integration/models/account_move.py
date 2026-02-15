@@ -857,7 +857,8 @@ class AccountMove(models.Model):
         if not exoneration:
             return 0.0
         exoneration_node = ET.SubElement(impuesto_node, "Exoneracion")
-        ET.SubElement(exoneration_node, "TipoDocumento").text = exoneration.exoneration_type or "99"
+        # En v4.4, el nodo de exoneración utiliza TipoDocumentoEX1 (no TipoDocumento).
+        ET.SubElement(exoneration_node, "TipoDocumentoEX1").text = exoneration.exoneration_type or "99"
         ET.SubElement(exoneration_node, "NumeroDocumento").text = (exoneration.exoneration_number or "")[:40]
         ET.SubElement(exoneration_node, "NombreInstitucion").text = (exoneration.institution_name or "")[:160]
         ET.SubElement(exoneration_node, "FechaEmision").text = fields.Datetime.to_string(exoneration.issue_date)
