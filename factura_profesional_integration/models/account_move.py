@@ -534,7 +534,7 @@ class AccountMove(models.Model):
         ET.SubElement(identification_node, "Numero").text = "".join(ch for ch in (vat_source or "") if ch.isdigit())
 
     def _fp_append_location_nodes(self, parent_node, partner):
-        province = partner.state_id.code if partner.state_id and partner.state_id.code else "1"
+        province = partner.fp_province_code if partner.fp_province_code else (partner.state_id.code if partner.state_id and partner.state_id.code else "1")
         canton = self._fp_pad_numeric_code(partner.fp_canton_code, 2, "01")
         district = self._fp_pad_numeric_code(partner.fp_district_code, 2, "01")
         neighborhood = self._fp_format_neighborhood_code(partner.fp_neighborhood_code)
@@ -544,6 +544,8 @@ class AccountMove(models.Model):
         ET.SubElement(location_node, "Canton").text = canton
         ET.SubElement(location_node, "Distrito").text = district
         ET.SubElement(location_node, "Barrio").text = neighborhood
+        if partner.street:
+            ET.SubElement(location_node, "OtrasSenas").text = partner.street[:160]
 
     def _fp_append_contact_nodes(self, parent_node, partner):
         if partner.phone:

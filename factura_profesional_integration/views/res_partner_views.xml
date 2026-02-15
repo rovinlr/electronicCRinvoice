@@ -7,11 +7,16 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='vat']" position="after">
                 <field name="fp_identification_type"/>
+                <field name="fp_economic_activity_id"/>
+                <button name="action_fp_fetch_hacienda_data" string="Consultar Hacienda" type="object" class="oe_highlight"/>
+            </xpath>
+            <xpath expr="//field[@name='state_id']" position="after">
+                <field name="fp_province_code"/>
+            </xpath>
+            <xpath expr="//field[@name='city']" position="after">
                 <field name="fp_canton_code"/>
                 <field name="fp_district_code"/>
                 <field name="fp_neighborhood_code"/>
-                <field name="fp_economic_activity_id"/>
-                <button name="action_fp_fetch_hacienda_data" string="Consultar Hacienda" type="object" class="oe_highlight"/>
             </xpath>
         </field>
     </record>
