@@ -921,9 +921,14 @@ class AccountMove(models.Model):
             )
 
     def _fp_build_authorization_header(self, token):
-        token = (token or "").strip()
-        if token.lower().startswith("bearer "):
-            return token
+        token = (token or "").strip().replace("\r", "").replace("\n", "")
+        if token.lower().startswith("authorization:"):
+            token = token.split(":", 1)[1].strip()
+        if token.lower().startswith("bearer"):
+            token = token.split(" ", 1)[-1].strip()
+        token = token.strip("\"'")
+        if not token:
+            raise UserError(_("No se obtuvo un token OAuth válido para autenticarse con Hacienda."))
         return f"Bearer {token}"
 
     def _fp_cron_consult_pending_documents(self):
