@@ -28,87 +28,101 @@
         <xpath expr="//div[@id='informations']" position="before">
             <t t-if="o.fp_is_electronic_invoice">
                 <style>
-                    .fp-block {
-                        border: 2px solid #000;
+                    .fp-doc-heading {
+                        font-size: 20px;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.8px;
+                        color: #0b0f19;
+                        margin: 8px 0 14px 0;
+                    }
+                    .fp-reference-line {
+                        font-size: 15px;
+                        margin-bottom: 2px;
+                        color: #141d2e;
+                    }
+                    .fp-reference-line .fp-label-inline {
+                        font-weight: 700;
+                    }
+                    .fp-section-title {
+                        font-size: 19px;
+                        font-weight: 700;
+                        margin: 14px 0 8px 0;
+                        color: #111827;
+                    }
+                    .fp-card {
+                        border: 2px solid #1b2c96;
+                        border-radius: 18px;
+                        padding: 16px 18px;
                         margin: 12px 0;
+                        background: #f8faff;
                         width: 100%;
                     }
                     .fp-grid {
                         width: 100%;
-                        border-collapse: collapse;
-                        table-layout: fixed;
+                        border-collapse: separate;
+                        border-spacing: 0 8px;
                     }
                     .fp-grid td {
-                        padding: 3px 6px;
                         vertical-align: top;
+                        font-size: 15px;
+                        color: #111827;
+                        padding: 0;
                     }
-                    .fp-grid td.fp-label {
-                        background: #efefef;
-                        font-weight: 600;
-                        width: 18%;
+                    .fp-grid td.fp-cell {
+                        padding-right: 24px;
                     }
-                    .fp-grid td.fp-value {
-                        background: #f5e7db;
+                    .fp-grid td.fp-cell:last-child {
+                        padding-right: 0;
                     }
-                    .fp-section-title {
-                        font-size: 18px;
+                    .fp-grid .fp-label {
                         font-weight: 700;
-                        margin: 10px 0 6px 0;
+                        margin-right: 4px;
+                    }
+                    .fp-wide {
+                        width: 100%;
                     }
                 </style>
 
-                <div class="fp-block">
-                    <table class="fp-grid">
-                        <tr>
-                            <td class="fp-label">Consecutivo:</td>
-                            <td class="fp-value"><span t-field="o.fp_consecutive_number"/></td>
-                            <td class="fp-label">Clave:</td>
-                            <td class="fp-value"><span t-field="o.fp_external_id"/></td>
-                        </tr>
-                    </table>
+                <div class="fp-doc-heading">Factura Electrónica</div>
+
+                <div class="fp-reference-line">
+                    <span class="fp-label-inline">Consecutivo:</span>
+                    <span t-field="o.fp_consecutive_number"/>
+                </div>
+                <div class="fp-reference-line">
+                    <span class="fp-label-inline">Clave:</span>
+                    <span t-field="o.fp_external_id"/>
                 </div>
 
-                <div class="fp-block">
+                <div class="fp-card">
                     <table class="fp-grid">
                         <tr>
-                            <td class="fp-label">Fecha:</td>
-                            <td class="fp-value"><span t-field="o.invoice_date"/></td>
-                            <td class="fp-label">Condición de venta:</td>
-                            <td class="fp-value"><span t-field="o.fp_sale_condition"/></td>
-                            <td class="fp-label">Moneda:</td>
-                            <td class="fp-value"><span t-field="o.currency_id"/></td>
+                            <td class="fp-cell"><span class="fp-label">Fecha:</span><span t-field="o.invoice_date"/></td>
+                            <td class="fp-cell"><span class="fp-label">Condición de venta:</span><span t-field="o.fp_sale_condition"/></td>
+                            <td class="fp-cell"><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></td>
                         </tr>
                         <tr>
-                            <td class="fp-label">Vencimiento:</td>
-                            <td class="fp-value"><span t-field="o.invoice_date_due"/></td>
-                            <td class="fp-label">Medio de pago:</td>
-                            <td class="fp-value"><span t-field="o.fp_payment_method"/></td>
-                            <td class="fp-label">Tipo de cambio:</td>
-                            <td class="fp-value">
-                                <span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/>
-                            </td>
+                            <td class="fp-cell"><span class="fp-label">Vencimiento:</span><span t-field="o.invoice_date_due"/></td>
+                            <td class="fp-cell"><span class="fp-label">Medio de pago:</span><span t-field="o.fp_payment_method"/></td>
+                            <td class="fp-cell"><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></td>
                         </tr>
                     </table>
                 </div>
 
                 <div class="fp-section-title">Datos del receptor:</div>
-                <div class="fp-block">
+                <div class="fp-card">
                     <table class="fp-grid">
                         <tr>
-                            <td class="fp-label">Cliente:</td>
-                            <td class="fp-value"><span t-field="o.partner_id"/></td>
-                            <td class="fp-label">Correo:</td>
-                            <td class="fp-value"><span t-field="o.partner_id.email"/></td>
+                            <td class="fp-cell"><span class="fp-label">Cliente:</span><span t-field="o.partner_id"/></td>
+                            <td class="fp-cell"><span class="fp-label">Correo:</span><span t-field="o.partner_id.email"/></td>
                         </tr>
                         <tr>
-                            <td class="fp-label">Identificación:</td>
-                            <td class="fp-value"><span t-esc="o.partner_id.vat or ''"/></td>
-                            <td class="fp-label">Teléfono:</td>
-                            <td class="fp-value"><span t-field="o.partner_id.phone"/></td>
+                            <td class="fp-cell"><span class="fp-label">Identificación:</span><span t-esc="o.partner_id.vat or ''"/></td>
+                            <td class="fp-cell"><span class="fp-label">Teléfono:</span><span t-field="o.partner_id.phone"/></td>
                         </tr>
                         <tr>
-                            <td class="fp-label">Dirección:</td>
-                            <td class="fp-value" colspan="3">
+                            <td class="fp-cell fp-wide" colspan="2"><span class="fp-label">Dirección:</span>
                                 <span t-if="o.partner_id.country_id.code == 'CR'" t-esc="', '.join([part for part in [o.partner_id.street, o.partner_id.fp_neighborhood_code, o.partner_id.fp_district_code, o.partner_id.city, o.partner_id.state_id.name] if part])"/>
                                 <span t-if="o.partner_id.country_id.code != 'CR'" t-field="o.partner_id.contact_address"/>
                             </td>
