@@ -14,51 +14,113 @@
                         'CPCE': 'Confirmación Parcial de Aceptación',
                         'RCE': 'Confirmación de Rechazo'
                     }"/>
-                    <span t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
-                    <span t-if="o.name and o.name != '/'" t-field="o.name"/>
+                    <div class="fp-electronic-title">
+                        <strong>Tipo de documento (FE, TE, NC, ND, FEE)</strong>
+                        <div>
+                            <span t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
+                            <span t-if="o.name and o.name != '/'" t-field="o.name"/>
+                        </div>
+                    </div>
                 </t>
             </t>
         </xpath>
 
         <xpath expr="//div[@id='informations']" position="before">
             <t t-if="o.fp_is_electronic_invoice">
-                <div class="mt-2 mb-2">
-                    <div>
-                        <strong>Consecutivo:</strong>
-                        <span t-field="o.fp_consecutive_number"/>
-                    </div>
-                    <div>
-                        <strong>Clave:</strong>
-                        <span t-field="o.fp_external_id"/>
-                    </div>
+                <style>
+                    .fp-block {
+                        border: 2px solid #000;
+                        margin: 12px 0;
+                        width: 100%;
+                    }
+                    .fp-grid {
+                        width: 100%;
+                        border-collapse: collapse;
+                        table-layout: fixed;
+                    }
+                    .fp-grid td {
+                        padding: 3px 6px;
+                        vertical-align: top;
+                    }
+                    .fp-grid td.fp-label {
+                        background: #efefef;
+                        font-weight: 600;
+                        width: 18%;
+                    }
+                    .fp-grid td.fp-value {
+                        background: #f5e7db;
+                    }
+                    .fp-section-title {
+                        font-size: 18px;
+                        font-weight: 700;
+                        margin: 10px 0 6px 0;
+                    }
+                </style>
+
+                <div class="fp-block">
+                    <table class="fp-grid">
+                        <tr>
+                            <td class="fp-label">Consecutivo:</td>
+                            <td class="fp-value"><span t-field="o.fp_consecutive_number"/></td>
+                            <td class="fp-label">Clave:</td>
+                            <td class="fp-value"><span t-field="o.fp_external_id"/></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="fp-block">
+                    <table class="fp-grid">
+                        <tr>
+                            <td class="fp-label">Fecha:</td>
+                            <td class="fp-value"><span t-field="o.invoice_date"/></td>
+                            <td class="fp-label">Condición de venta:</td>
+                            <td class="fp-value"><span t-field="o.fp_sale_condition"/></td>
+                            <td class="fp-label">Moneda:</td>
+                            <td class="fp-value"><span t-field="o.currency_id"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-label">Vencimiento:</td>
+                            <td class="fp-value"><span t-field="o.invoice_date_due"/></td>
+                            <td class="fp-label">Medio de pago:</td>
+                            <td class="fp-value"><span t-field="o.fp_payment_method"/></td>
+                            <td class="fp-label">Tipo de cambio:</td>
+                            <td class="fp-value">
+                                <span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="fp-section-title">Datos del receptor:</div>
+                <div class="fp-block">
+                    <table class="fp-grid">
+                        <tr>
+                            <td class="fp-label">Cliente:</td>
+                            <td class="fp-value"><span t-field="o.partner_id"/></td>
+                            <td class="fp-label">Correo:</td>
+                            <td class="fp-value"><span t-field="o.partner_id.email"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-label">Identificación:</td>
+                            <td class="fp-value"><span t-esc="o.partner_id.vat or ''"/></td>
+                            <td class="fp-label">Teléfono:</td>
+                            <td class="fp-value"><span t-field="o.partner_id.phone"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-label">Dirección:</td>
+                            <td class="fp-value" colspan="3">
+                                <span t-if="o.partner_id.country_id.code == 'CR'" t-esc="', '.join([part for part in [o.partner_id.street, o.partner_id.fp_neighborhood_code, o.partner_id.fp_district_code, o.partner_id.city, o.partner_id.state_id.name] if part])"/>
+                                <span t-if="o.partner_id.country_id.code != 'CR'" t-field="o.partner_id.contact_address"/>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </t>
         </xpath>
-        <xpath expr="//div[@id='informations']" position="after">
-            <t t-if="o.partner_id.country_id.code == 'CR'">
-                <div class="mt-2">
-                    <div>
-                        <strong>Provincia:</strong>
-                        <span t-esc="o.partner_id.state_id.name or ''"/>
-                    </div>
-                    <div>
-                        <strong>Cantón:</strong>
-                        <span t-esc="o.partner_id.city or ''"/>
-                    </div>
-                    <div>
-                        <strong>Distrito:</strong>
-                        <span t-esc="o.partner_id.fp_district_code or ''"/>
-                    </div>
-                    <div>
-                        <strong>Barrio:</strong>
-                        <span t-esc="o.partner_id.fp_neighborhood_code or ''"/>
-                    </div>
-                    <div t-if="o.partner_id.street">
-                        <strong>OtrasSenas:</strong>
-                        <span t-esc="o.partner_id.street"/>
-                    </div>
-                </div>
-            </t>
+
+
+        <xpath expr="//td[@name='account_invoice_line_name']/span[@t-field='line.name']" position="before">
+            <span t-if="line.product_id and line.product_id.fp_cabys_code" t-esc="'[' + line.product_id.fp_cabys_code + '] '"/>
         </xpath>
 
         <xpath expr="//div[contains(@class, 'page')]" position="inside">
