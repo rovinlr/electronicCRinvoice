@@ -328,15 +328,17 @@ class AccountMove(models.Model):
         self.ensure_one()
         base_path = (urlparse(self.company_id.fp_hacienda_api_base_url or "").path or "").rstrip("/")
 
+        # Hacienda (incluyendo sandbox actual) publica la recepción bajo /recepcion/v1.
+        # Si la URL configurada ya incluye parte de esa ruta, agregamos solo el segmento faltante.
         if base_path.endswith("/recepcion/v1") or base_path.endswith("/recepcion-sandbox/v1"):
             endpoint = "/recepcion"
         elif base_path.endswith("/recepcion/v1/recepcion") or base_path.endswith("/recepcion-sandbox/v1/recepcion"):
             endpoint = ""
         else:
-            endpoint = "/recepcion-sandbox/v1/recepcion" if self._fp_get_hacienda_environment() == "sandbox" else "/recepcion/v1/recepcion"
+            endpoint = "/recepcion/v1/recepcion"
 
         if clave:
-            return f"{endpoint}/{clave}"
+            return f"{endpoint}/{clave}" if endpoint else f"/{clave}"
         return endpoint or "/"
 
     def _fp_build_hacienda_payload(self):
