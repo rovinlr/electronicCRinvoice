@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class FpClientExoneration(models.Model):
@@ -34,7 +34,7 @@ class FpClientExoneration(models.Model):
         ("fp_client_exoneration_unique", "unique(exoneration_number, partner_id)", "Ya existe esta exoneración para el cliente."),
     ]
 
-    @fields.depends("exoneration_number", "exoneration_percentage")
+    @api.depends("exoneration_number", "exoneration_percentage")
     def _compute_name(self):
         for rec in self:
             rec.name = f"{rec.exoneration_number or ''} - {rec.exoneration_percentage or 0.0}%"
