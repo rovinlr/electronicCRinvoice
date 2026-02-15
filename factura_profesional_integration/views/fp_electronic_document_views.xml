@@ -20,6 +20,48 @@
         </field>
     </record>
 
+    <record id="view_move_form_fp_documents" model="ir.ui.view">
+        <field name="name">account.move.form.fp.documents</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <form string="Documentos Electrónicos" create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_fp_send_to_api" string="Enviar a Hacienda" type="object" class="oe_highlight"/>
+                    <button name="action_fp_consult_api_document" string="Consultar Hacienda" type="object"/>
+                    <field name="fp_invoice_status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="fp_external_id" string="Clave" readonly="1"/>
+                            <field name="fp_consecutive_number" string="Consecutivo" readonly="1"/>
+                            <field name="name" string="Factura" readonly="1"/>
+                            <field name="fp_document_type" string="Tipo de comprobante" readonly="1"/>
+                            <field name="partner_id" string="Cliente" readonly="1"/>
+                            <field name="invoice_date" string="Fecha emisión" readonly="1"/>
+                            <field name="fp_sale_condition" string="Condición de venta" readonly="1"/>
+                            <field name="currency_id" string="Moneda" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="company_id" string="Empresa" readonly="1"/>
+                            <field name="invoice_origin" string="Origen" readonly="1"/>
+                            <field name="fp_economic_activity_id" string="Actividad económica" readonly="1"/>
+                            <field name="fp_payment_method" string="Medio de pago" readonly="1"/>
+                            <field name="amount_tax" string="Impuesto" readonly="1"/>
+                            <field name="amount_total" string="Importe total" readonly="1"/>
+                            <field name="state" string="Estado contable" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="fp_xml_attachment_id" string="Archivo XML" readonly="1"/>
+                        <field name="fp_response_xml_attachment_id" string="Archivo XML MH" readonly="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
     <record id="view_move_search_fp_documents" model="ir.ui.view">
         <field name="name">account.move.search.fp.documents</field>
         <field name="model">account.move</field>
@@ -38,6 +80,9 @@
         <field name="res_model">account.move</field>
         <field name="view_mode">list,form</field>
         <field name="view_id" ref="view_move_tree_fp_documents"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_move_tree_fp_documents')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_move_form_fp_documents')})]"/>
         <field name="search_view_id" ref="view_move_search_fp_documents"/>
         <field name="domain">[
             ('fp_is_electronic_invoice', '=', True),
@@ -57,7 +102,7 @@
     <menuitem
         id="menu_fp_hacienda_root"
         name="Hacienda"
-        parent="account.menu_finance"
+        action="action_fp_electronic_documents"
         sequence="14"
         groups="account.group_account_invoice"
     />
