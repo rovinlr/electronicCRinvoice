@@ -56,6 +56,26 @@ Además, valida los catálogos y estructuras vigentes según la documentación o
 - https://api.hacienda.go.cr/docs/
 - https://www.hacienda.go.cr/docs/Anexosyestructuras.pdf
 
+## Diagnóstico rápido de rechazos de Hacienda
+
+Si Hacienda responde un `MensajeHacienda` con:
+
+- `EstadoMensaje`: `Rechazado`
+- `DetalleMensaje`: `...[ SIG_CRYPTO_FAILURE ]`
+
+el rechazo es de **firma criptográfica** (la firma XML no pudo validarse en el lado de Hacienda).
+
+Checklist recomendado:
+
+1. Confirmar que el certificado `.p12/.pfx` y su contraseña son correctos para la compañía emisora.
+2. Verificar que el número de identificación del emisor en Odoo coincide exactamente con el del certificado usado para firmar.
+3. Validar que el certificado no esté vencido o revocado.
+4. Revisar fecha/hora del servidor Odoo (desfase grande puede invalidar validaciones de firma).
+5. Comprobar que el XML firmado no fue modificado después del proceso de firma.
+6. Reintentar envío generando de nuevo el XML firmado desde Odoo.
+
+Este código de error no suele ser un problema de estructura del XML, sino de **certificado, firma o consistencia de identidad**.
+
 
 ## Logo del Ministerio en la lista de Apps (Odoo)
 
