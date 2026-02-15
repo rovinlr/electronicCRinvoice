@@ -6,8 +6,8 @@
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='uom_id']" position="after">
-                <label for="fp_cabys_code_id" string="Código CABYS"/>
-                <div>
+                <div class="o_row">
+                    <label for="fp_cabys_code_id" string="Código CABYS"/>
                     <field name="fp_cabys_code_id" nolabel="1"/>
                 </div>
             </xpath>
@@ -20,8 +20,8 @@
         <field name="inherit_id" ref="product.product_normal_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='uom_id']" position="after">
-                <label for="fp_cabys_code_id" string="Código CABYS"/>
-                <div>
+                <div class="o_row">
+                    <label for="fp_cabys_code_id" string="Código CABYS"/>
                     <field name="fp_cabys_code_id" nolabel="1"/>
                 </div>
             </xpath>
