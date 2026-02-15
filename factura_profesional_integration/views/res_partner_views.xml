@@ -19,14 +19,14 @@
 
             <xpath expr="//field[@name='state_id']" position="attributes">
                 <attribute name="string">Provincia</attribute>
-                <attribute name="invisible">country_id == ref('base.cr')</attribute>
+                <attribute name="invisible">fp_is_costa_rica</attribute>
             </xpath>
 
             <xpath expr="//field[@name='city']" position="attributes">
                 <attribute name="string">Cantón (texto)</attribute>
                 <attribute name="placeholder">Cantón</attribute>
                 <attribute name="class">o_address_city</attribute>
-                <attribute name="invisible">country_id == ref('base.cr')</attribute>
+                <attribute name="invisible">fp_is_costa_rica</attribute>
             </xpath>
 
             <xpath expr="//field[@name='street']" position="attributes">
@@ -34,13 +34,13 @@
             </xpath>
 
             <xpath expr="//field[@name='state_id']" position="after">
-                <field name="fp_province_id" string="Provincia" options="{'no_create': True}" invisible="country_id != ref('base.cr')"/>
-                <field name="fp_canton_id" string="Cantón" options="{'no_create': True}" invisible="country_id != ref('base.cr')"/>
-                <field name="fp_district_id" string="Distrito" options="{'no_create': True}" invisible="country_id != ref('base.cr')"/>
+                <field name="fp_province_id" string="Provincia" options="{'no_create': True}" invisible="not fp_is_costa_rica"/>
+                <field name="fp_canton_id" string="Cantón" options="{'no_create': True}" invisible="not fp_is_costa_rica"/>
+                <field name="fp_district_id" string="Distrito" options="{'no_create': True}" invisible="not fp_is_costa_rica"/>
             </xpath>
 
             <xpath expr="//field[@name='fp_district_id']" position="after">
-                <field name="fp_neighborhood_code" string="Barrio" placeholder="Barrio" class="o_address_zip" invisible="country_id != ref('base.cr')"/>
+                <field name="fp_neighborhood_code" string="Barrio" placeholder="Barrio" class="o_address_zip" invisible="not fp_is_costa_rica"/>
             </xpath>
 
             <xpath expr="//notebook" position="inside">
