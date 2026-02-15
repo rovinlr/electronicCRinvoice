@@ -13,6 +13,7 @@
         "views/fp_electronic_document_views.xml",
         "views/account_tax_views.xml",
         "views/account_journal_views.xml",
+        "views/account_invoice_report_views.xml",
         "views/product_template_views.xml",
         "views/uom_uom_views.xml",
         "views/fp_catalog_views.xml",
