@@ -572,10 +572,21 @@ class AccountMove(models.Model):
         ET.SubElement(identification_node, "Numero").text = "".join(ch for ch in (vat_source or "") if ch.isdigit())
 
     def _fp_append_location_nodes(self, parent_node, partner):
-        province = partner.fp_province_code if partner.fp_province_code else (partner.state_id.code if partner.state_id and partner.state_id.code else "1")
-        canton = self._fp_pad_numeric_code(partner.fp_canton_code, 2, "01")
-        district = self._fp_pad_numeric_code(partner.fp_district_code, 2, "01")
-        neighborhood = self._fp_format_neighborhood_code(partner.fp_neighborhood_code)
+        if partner.country_id.code == "CR":
+            province_source = partner.state_id.code if partner.state_id and partner.state_id.code else partner.fp_province_code
+            canton_source = partner.city or partner.fp_canton_code
+            district_source = partner.fp_district_code
+            neighborhood_source = partner.fp_neighborhood_code
+        else:
+            province_source = partner.fp_province_code if partner.fp_province_code else (partner.state_id.code if partner.state_id and partner.state_id.code else "1")
+            canton_source = partner.fp_canton_code
+            district_source = partner.fp_district_code
+            neighborhood_source = partner.fp_neighborhood_code
+
+        province = self._fp_pad_numeric_code(province_source, 1, "1")
+        canton = self._fp_pad_numeric_code(canton_source, 2, "01")
+        district = self._fp_pad_numeric_code(district_source, 2, "01")
+        neighborhood = self._fp_format_neighborhood_code(neighborhood_source)
 
         location_node = ET.SubElement(parent_node, "Ubicacion")
         ET.SubElement(location_node, "Provincia").text = self._fp_pad_numeric_code(province, 1, "1")
