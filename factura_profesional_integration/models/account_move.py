@@ -206,6 +206,7 @@ class AccountMove(models.Model):
         if not self.fp_xml_attachment_id:
             self._fp_generate_and_sign_xml_attachment()
 
+        self._fp_ensure_signed_xml_integrity()
         payload = self._fp_build_hacienda_payload()
         token = self._fp_get_hacienda_access_token()
         self.fp_api_state = "sent"
@@ -287,7 +288,8 @@ class AccountMove(models.Model):
 
     def _fp_generate_and_sign_xml_attachment(self):
         self.ensure_one()
-        xml_text = self._fp_generate_invoice_xml()
+        clave = self._fp_build_clave()
+        xml_text = self._fp_generate_invoice_xml(clave=clave)
         signed_xml_text = self._fp_sign_xml(xml_text)
         signed_xml_bytes = signed_xml_text.encode("utf-8")
         signed_xml_b64 = base64.b64encode(signed_xml_bytes)
@@ -304,7 +306,7 @@ class AccountMove(models.Model):
         self.fp_xml_attachment_id = attachment
         self.fp_xml_signed_digest = hashlib.sha256(signed_xml_bytes).hexdigest()
 
-    def _fp_get_signed_xml_payload_base64(self):
+    def _fp_ensure_signed_xml_integrity(self):
         self.ensure_one()
         attachment = self.fp_xml_attachment_id
         if not attachment or not attachment.datas:
@@ -324,11 +326,16 @@ class AccountMove(models.Model):
             # Backward compatibility for documents signed before this guard existed.
             self.fp_xml_signed_digest = current_digest
 
+        return xml_bytes
+
+    def _fp_get_signed_xml_payload_base64(self):
+        self.ensure_one()
+        xml_bytes = self._fp_ensure_signed_xml_integrity()
         return base64.b64encode(xml_bytes).decode("utf-8")
 
-    def _fp_generate_invoice_xml(self):
+    def _fp_generate_invoice_xml(self, clave=None):
         self.ensure_one()
-        clave = self._fp_build_clave()
+        clave = clave or self._fp_build_clave()
         root = ET.Element(
             "FacturaElectronica",
             {
@@ -477,7 +484,7 @@ class AccountMove(models.Model):
         province = partner.state_id.code if partner.state_id and partner.state_id.code else "1"
         canton = self._fp_pad_numeric_code(partner.fp_canton_code, 2, "01")
         district = self._fp_pad_numeric_code(partner.fp_district_code, 2, "01")
-        neighborhood = self._fp_pad_numeric_code(partner.fp_neighborhood_code, 2, "01")
+        neighborhood = self._fp_format_neighborhood_code(partner.fp_neighborhood_code)
 
         location_node = ET.SubElement(parent_node, "Ubicacion")
         ET.SubElement(location_node, "Provincia").text = self._fp_pad_numeric_code(province, 1, "1")
@@ -498,6 +505,12 @@ class AccountMove(models.Model):
         if not digits:
             digits = default
         return digits.zfill(length)[-length:]
+
+    def _fp_format_neighborhood_code(self, value):
+        code = (value or "").strip()
+        if not code:
+            return "01"
+        return code[:64]
 
     def _fp_sign_xml(self, xml_text):
         self.ensure_one()
