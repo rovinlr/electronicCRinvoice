@@ -546,7 +546,7 @@ class AccountMove(models.Model):
         LET.SubElement(
             signed_info,
             LET.QName(DS_XML_NS, "CanonicalizationMethod"),
-            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
+            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
         )
         LET.SubElement(
             signed_info,
@@ -594,6 +594,12 @@ class AccountMove(models.Model):
             signed_info,
             LET.QName(DS_XML_NS, "Reference"),
             {"Id": "ReferenceKeyInfo", "URI": f"#{key_info_id}"},
+        )
+        key_info_transforms = LET.SubElement(reference_key_info, LET.QName(DS_XML_NS, "Transforms"))
+        LET.SubElement(
+            key_info_transforms,
+            LET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
         )
         LET.SubElement(
             reference_key_info,
@@ -664,13 +670,13 @@ class AccountMove(models.Model):
         LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "text/xml"
         LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "Encoding")).text = "UTF-8"
 
-        key_info_c14n = LET.tostring(key_info, method="c14n", exclusive=False, with_comments=False)
+        key_info_c14n = LET.tostring(key_info, method="c14n", exclusive=True, with_comments=False)
         reference_key_info_digest.text = base64.b64encode(hashlib.sha256(key_info_c14n).digest()).decode("utf-8")
 
         signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=True, with_comments=False)
         reference_signed_properties_digest.text = base64.b64encode(hashlib.sha256(signed_properties_c14n).digest()).decode("utf-8")
 
-        signed_info_c14n = LET.tostring(signed_info, method="c14n", exclusive=False, with_comments=False)
+        signed_info_c14n = LET.tostring(signed_info, method="c14n", exclusive=True, with_comments=False)
         signature = private_key.sign(signed_info_c14n, padding.PKCS1v15(), hashes.SHA256())
         LET.SubElement(
             signature_node,
