@@ -68,6 +68,138 @@
         <field name="view_mode">list,form</field>
     </record>
 
+
+
+    <record id="view_fp_province_tree" model="ir.ui.view">
+        <field name="name">fp.province.tree</field>
+        <field name="model">fp.province</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_province_form" model="ir.ui.view">
+        <field name="name">fp.province.form</field>
+        <field name="model">fp.province</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Cantones">
+                            <field name="canton_ids" context="{'default_province_id': id}">
+                                <list editable="bottom">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_province" model="ir.actions.act_window">
+        <field name="name">Provincias</field>
+        <field name="res_model">fp.province</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_fp_canton_tree" model="ir.ui.view">
+        <field name="name">fp.canton.tree</field>
+        <field name="model">fp.canton</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="province_id"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_canton_form" model="ir.ui.view">
+        <field name="name">fp.canton.form</field>
+        <field name="model">fp.canton</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="province_id"/>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                    <notebook>
+                        <page string="Distritos">
+                            <field name="district_ids" context="{'default_canton_id': id}">
+                                <list editable="bottom">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_canton" model="ir.actions.act_window">
+        <field name="name">Cantones</field>
+        <field name="res_model">fp.canton</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_fp_district_tree" model="ir.ui.view">
+        <field name="name">fp.district.tree</field>
+        <field name="model">fp.district</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="province_id"/>
+                <field name="canton_id"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fp_district_form" model="ir.ui.view">
+        <field name="name">fp.district.form</field>
+        <field name="model">fp.district</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="province_id" readonly="1"/>
+                        <field name="canton_id"/>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fp_district" model="ir.actions.act_window">
+        <field name="name">Distritos</field>
+        <field name="res_model">fp.district</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
     <record id="view_fp_client_exoneration_tree" model="ir.ui.view">
         <field name="name">fp.client.exoneration.tree</field>
         <field name="model">fp.client.exoneration</field>
@@ -131,5 +263,11 @@
 
     <menuitem id="menu_fp_economic_activity" name="Actividades económicas" parent="menu_fp_catalog_root" action="action_fp_economic_activity" sequence="20" groups="account.group_account_manager"/>
 
-    <menuitem id="menu_fp_client_exoneration" name="Exoneraciones de Clientes" parent="menu_fp_catalog_root" action="action_fp_client_exoneration" sequence="30" groups="account.group_account_manager"/>
+    <menuitem id="menu_fp_province" name="Provincias" parent="menu_fp_catalog_root" action="action_fp_province" sequence="30" groups="account.group_account_manager"/>
+
+    <menuitem id="menu_fp_canton" name="Cantones" parent="menu_fp_catalog_root" action="action_fp_canton" sequence="40" groups="account.group_account_manager"/>
+
+    <menuitem id="menu_fp_district" name="Distritos" parent="menu_fp_catalog_root" action="action_fp_district" sequence="50" groups="account.group_account_manager"/>
+
+    <menuitem id="menu_fp_client_exoneration" name="Exoneraciones de Clientes" parent="menu_fp_catalog_root" action="action_fp_client_exoneration" sequence="60" groups="account.group_account_manager"/>
 </odoo>

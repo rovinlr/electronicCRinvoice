@@ -20,7 +20,7 @@
             </xpath>
 
             <xpath expr="//field[@name='city']" position="attributes">
-                <attribute name="string">Cantón</attribute>
+                <attribute name="string">Cantón (texto)</attribute>
                 <attribute name="placeholder">Cantón</attribute>
                 <attribute name="class">o_address_city</attribute>
             </xpath>
@@ -29,8 +29,13 @@
                 <attribute name="string">OtrasSeñas</attribute>
             </xpath>
 
+            <xpath expr="//field[@name='state_id']" position="after">
+                <field name="fp_province_id" options="{'no_create': True}"/>
+                <field name="fp_canton_id" options="{'no_create': True}"/>
+                <field name="fp_district_id" options="{'no_create': True}"/>
+            </xpath>
+
             <xpath expr="//field[@name='city']" position="after">
-                <field name="fp_district_code" string="Distrito" placeholder="Distrito" class="o_address_state"/>
                 <field name="fp_neighborhood_code" string="Barrio" placeholder="Barrio" class="o_address_zip"/>
             </xpath>
 
