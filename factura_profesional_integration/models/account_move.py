@@ -210,6 +210,11 @@ class AccountMove(models.Model):
         if self.fp_consecutive_number:
             domain.append(("fp_consecutive_number", "=", self.fp_consecutive_number))
             action["name"] = _("Hacienda: %s") % self.fp_consecutive_number
+            action["res_id"] = self.id
+            action["views"] = [
+                (self.env.ref("factura_profesional_integration.view_move_form_fp_documents").id, "form"),
+                (self.env.ref("factura_profesional_integration.view_move_tree_fp_documents").id, "list"),
+            ]
 
         action["domain"] = domain
         action["context"] = {
