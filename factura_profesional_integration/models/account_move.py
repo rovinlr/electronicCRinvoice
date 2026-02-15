@@ -771,7 +771,12 @@ class AccountMove(models.Model):
                 ET.SubElement(impuesto, "Tarifa").text = self._fp_format_decimal(tax_rate)
                 ET.SubElement(impuesto, "Monto").text = self._fp_format_decimal(total_impuesto_xml_linea)
                 exoneration = self._fp_get_line_exoneration(line)
-                exoneration_amount = self._fp_append_exoneracion_node(impuesto, exoneration, total_impuesto_xml_linea)
+                exoneration_amount = self._fp_append_exoneracion_node(
+                    impuesto,
+                    exoneration,
+                    total_impuesto_xml_linea,
+                    tax_rate,
+                )
                 has_exoneration = bool(exoneration)
                 impuesto_neto_linea = max(total_impuesto_linea - exoneration_amount, 0.0)
                 monto_total_linea = subtotal + impuesto_neto_linea
@@ -875,7 +880,7 @@ class AccountMove(models.Model):
                     return exoneration
         return self.env["fp.client.exoneration"]
 
-    def _fp_append_exoneracion_node(self, impuesto_node, exoneration, tax_amount):
+    def _fp_append_exoneracion_node(self, impuesto_node, exoneration, tax_amount, tax_rate):
         if not exoneration:
             return 0.0
         exoneration_node = ET.SubElement(impuesto_node, "Exoneracion")
@@ -887,7 +892,7 @@ class AccountMove(models.Model):
         ET.SubElement(exoneration_node, "FechaEmisionEX").text = exoneration_issue_dt.strftime("%Y-%m-%dT%H:%M:%S") if exoneration_issue_dt else ""
         percentage = max(min(exoneration.exoneration_percentage or 0.0, 100.0), 0.0)
         tax_discount = tax_amount * (percentage / 100.0)
-        ET.SubElement(exoneration_node, "PorcentajeExoneracion").text = self._fp_format_decimal(percentage)
+        ET.SubElement(exoneration_node, "TarifaExonerada").text = self._fp_format_decimal(tax_rate)
         ET.SubElement(exoneration_node, "MontoExoneracion").text = self._fp_format_decimal(tax_discount)
         if exoneration.article:
             ET.SubElement(exoneration_node, "Articulo").text = (exoneration.article or "")[:3]
