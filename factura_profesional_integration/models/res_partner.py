@@ -91,6 +91,7 @@ class ResPartner(models.Model):
         missing_columns = {
             "fp_identification_type": "varchar",
             "fp_canton_code": "varchar",
+            "fp_province_code": "varchar",
             "fp_district_code": "varchar",
             "fp_neighborhood_code": "varchar",
             "fp_economic_activity_id": "integer",
@@ -117,6 +118,11 @@ class ResPartner(models.Model):
         size=2,
         help="Código de cantón según Anexos y Estructuras v4.4 (2 dígitos).",
     )
+    fp_province_code = fields.Char(
+        string="Provincia (FE)",
+        size=1,
+        help="Código de provincia según Anexos y Estructuras v4.4 (1 dígito).",
+    )
     fp_district_code = fields.Char(
         string="Distrito (FE)",
         size=2,
@@ -132,6 +138,25 @@ class ResPartner(models.Model):
         string="Actividad económica principal (FE)",
         help="Actividad económica principal del cliente para facturación electrónica.",
     )
+
+
+    @api.onchange("country_id", "city")
+    def _onchange_fp_sync_canton_from_city(self):
+        for partner in self:
+            if partner.country_id.code == "CR" and partner.city:
+                partner.fp_canton_code = partner.city
+
+    @api.onchange("country_id", "fp_canton_code")
+    def _onchange_fp_sync_city_from_canton(self):
+        for partner in self:
+            if partner.country_id.code == "CR" and partner.fp_canton_code:
+                partner.city = partner.fp_canton_code
+
+    @api.onchange("country_id", "state_id")
+    def _onchange_fp_sync_province_from_state(self):
+        for partner in self:
+            if partner.country_id.code == "CR" and partner.state_id and partner.state_id.code:
+                partner.fp_province_code = "".join(ch for ch in partner.state_id.code if ch.isdigit())[:1]
 
     def action_fp_fetch_hacienda_data(self):
         for partner in self:
