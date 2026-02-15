@@ -197,6 +197,27 @@ class AccountMove(models.Model):
             elif status:
                 move.fp_invoice_status = "sent"
 
+    def action_fp_open_hacienda_documents(self):
+        self.ensure_one()
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            "factura_profesional_integration.action_fp_electronic_documents"
+        )
+        domain = [
+            ("fp_is_electronic_invoice", "=", True),
+            ("move_type", "in", ["out_invoice", "out_refund"]),
+        ]
+        if self.fp_consecutive_number:
+            domain.append(("fp_consecutive_number", "=", self.fp_consecutive_number))
+            action["name"] = _("Hacienda: %s") % self.fp_consecutive_number
+
+        action["domain"] = domain
+        action["context"] = {
+            **self.env.context,
+            "search_default_posted": 1,
+            "search_default_fp_documents": 1,
+        }
+        return action
+
     def _fp_send_to_hacienda(self):
         self.ensure_one()
         company = self.company_id
