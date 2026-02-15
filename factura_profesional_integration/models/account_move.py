@@ -567,9 +567,9 @@ class AccountMove(models.Model):
             ET.SubElement(detail, "MontoTotal").text = self._fp_format_decimal(monto_total)
             ET.SubElement(detail, "SubTotal").text = self._fp_format_decimal(subtotal)
             if has_tax:
+                ET.SubElement(detail, "BaseImponible").text = self._fp_format_decimal(subtotal)
                 impuesto = ET.SubElement(detail, "Impuesto")
                 ET.SubElement(impuesto, "Codigo").text = tax_code
-                ET.SubElement(impuesto, "BaseImponible").text = self._fp_format_decimal(subtotal)
                 ET.SubElement(impuesto, "CodigoTarifaIVA").text = tax_rate_code
                 ET.SubElement(impuesto, "Tarifa").text = self._fp_format_decimal(tax_rate)
                 ET.SubElement(impuesto, "Monto").text = self._fp_format_decimal(total_impuesto_linea)
