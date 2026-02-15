@@ -1,0 +1,2861 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="fp_province_1" model="fp.province">
+        <field name="code">1</field>
+        <field name="name">San José</field>
+    </record>
+    <record id="fp_canton_1_01" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">01</field>
+        <field name="name">Central</field>
+    </record>
+    <record id="fp_district_1_01_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">01</field>
+        <field name="name">Carmen</field>
+    </record>
+    <record id="fp_district_1_01_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">02</field>
+        <field name="name">Merced</field>
+    </record>
+    <record id="fp_district_1_01_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">03</field>
+        <field name="name">Hospital</field>
+    </record>
+    <record id="fp_district_1_01_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">04</field>
+        <field name="name">Catedral</field>
+    </record>
+    <record id="fp_district_1_01_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">05</field>
+        <field name="name">Zapote</field>
+    </record>
+    <record id="fp_district_1_01_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">06</field>
+        <field name="name">San Francisco De Dos Rios</field>
+    </record>
+    <record id="fp_district_1_01_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">07</field>
+        <field name="name">Uruca</field>
+    </record>
+    <record id="fp_district_1_01_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">08</field>
+        <field name="name">Mata Redonda</field>
+    </record>
+    <record id="fp_district_1_01_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">09</field>
+        <field name="name">Pavas</field>
+    </record>
+    <record id="fp_district_1_01_10" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">10</field>
+        <field name="name">Hatillo</field>
+    </record>
+    <record id="fp_district_1_01_11" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_01"/>
+        <field name="code">11</field>
+        <field name="name">San Sebastián</field>
+    </record>
+    <record id="fp_canton_1_02" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">02</field>
+        <field name="name">Escazú</field>
+    </record>
+    <record id="fp_district_1_02_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_02"/>
+        <field name="code">01</field>
+        <field name="name">Escazú</field>
+    </record>
+    <record id="fp_district_1_02_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_02"/>
+        <field name="code">02</field>
+        <field name="name">San Antonio</field>
+    </record>
+    <record id="fp_district_1_02_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_02"/>
+        <field name="code">03</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_canton_1_03" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">03</field>
+        <field name="name">Desamparados</field>
+    </record>
+    <record id="fp_district_1_03_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">01</field>
+        <field name="name">Desamparados</field>
+    </record>
+    <record id="fp_district_1_03_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">02</field>
+        <field name="name">San Miguel</field>
+    </record>
+    <record id="fp_district_1_03_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">03</field>
+        <field name="name">San Juan De Dios</field>
+    </record>
+    <record id="fp_district_1_03_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">04</field>
+        <field name="name">San Rafael Arriba</field>
+    </record>
+    <record id="fp_district_1_03_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">05</field>
+        <field name="name">San Rafael Abajo</field>
+    </record>
+    <record id="fp_district_1_03_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">06</field>
+        <field name="name">San Antonio</field>
+    </record>
+    <record id="fp_district_1_03_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">07</field>
+        <field name="name">Frailes</field>
+    </record>
+    <record id="fp_district_1_03_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">08</field>
+        <field name="name">Patarra</field>
+    </record>
+    <record id="fp_district_1_03_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">09</field>
+        <field name="name">San Cristobal</field>
+    </record>
+    <record id="fp_district_1_03_10" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">10</field>
+        <field name="name">Rosario</field>
+    </record>
+    <record id="fp_district_1_03_11" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">11</field>
+        <field name="name">Damas</field>
+    </record>
+    <record id="fp_district_1_03_12" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">12</field>
+        <field name="name">Gravilias</field>
+    </record>
+    <record id="fp_district_1_03_13" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_03"/>
+        <field name="code">13</field>
+        <field name="name">Los Guido</field>
+    </record>
+    <record id="fp_canton_1_04" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">04</field>
+        <field name="name">Puriscal</field>
+    </record>
+    <record id="fp_district_1_04_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_04"/>
+        <field name="code">01</field>
+        <field name="name">Santiago</field>
+    </record>
+    <record id="fp_district_1_04_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_04"/>
+        <field name="code">02</field>
+        <field name="name">Mercedes Sur</field>
+    </record>
+    <record id="fp_district_1_04_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_04"/>
+        <field name="code">03</field>
+        <field name="name">Barbacoas</field>
+    </record>
+    <record id="fp_district_1_04_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_04"/>
+        <field name="code">04</field>
+        <field name="name">Grifo Alto</field>
+    </record>
+    <record id="fp_district_1_04_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_04"/>
+        <field name="code">05</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_1_04_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_04"/>
+        <field name="code">06</field>
+        <field name="name">Candelarita</field>
+    </record>
+    <record id="fp_district_1_04_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_04"/>
+        <field name="code">07</field>
+        <field name="name">Desamparaditos</field>
+    </record>
+    <record id="fp_district_1_04_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_04"/>
+        <field name="code">08</field>
+        <field name="name">San Antonio</field>
+    </record>
+    <record id="fp_district_1_04_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_04"/>
+        <field name="code">09</field>
+        <field name="name">Chires</field>
+    </record>
+    <record id="fp_canton_1_05" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">05</field>
+        <field name="name">Tarrazú</field>
+    </record>
+    <record id="fp_district_1_05_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_05"/>
+        <field name="code">01</field>
+        <field name="name">San Marcos</field>
+    </record>
+    <record id="fp_district_1_05_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_05"/>
+        <field name="code">02</field>
+        <field name="name">San Lorenzo</field>
+    </record>
+    <record id="fp_district_1_05_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_05"/>
+        <field name="code">03</field>
+        <field name="name">San Carlos</field>
+    </record>
+    <record id="fp_canton_1_06" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">06</field>
+        <field name="name">Aserrí</field>
+    </record>
+    <record id="fp_district_1_06_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_06"/>
+        <field name="code">01</field>
+        <field name="name">Aserrí</field>
+    </record>
+    <record id="fp_district_1_06_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_06"/>
+        <field name="code">02</field>
+        <field name="name">Tarbaca</field>
+    </record>
+    <record id="fp_district_1_06_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_06"/>
+        <field name="code">03</field>
+        <field name="name">Vuelta De Jorco</field>
+    </record>
+    <record id="fp_district_1_06_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_06"/>
+        <field name="code">04</field>
+        <field name="name">San Gabriel</field>
+    </record>
+    <record id="fp_district_1_06_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_06"/>
+        <field name="code">05</field>
+        <field name="name">Legua</field>
+    </record>
+    <record id="fp_district_1_06_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_06"/>
+        <field name="code">06</field>
+        <field name="name">Monterrey</field>
+    </record>
+    <record id="fp_district_1_06_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_06"/>
+        <field name="code">07</field>
+        <field name="name">Salitrillos</field>
+    </record>
+    <record id="fp_canton_1_07" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">07</field>
+        <field name="name">Mora</field>
+    </record>
+    <record id="fp_district_1_07_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_07"/>
+        <field name="code">01</field>
+        <field name="name">Colón</field>
+    </record>
+    <record id="fp_district_1_07_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_07"/>
+        <field name="code">02</field>
+        <field name="name">Guayabo</field>
+    </record>
+    <record id="fp_district_1_07_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_07"/>
+        <field name="code">03</field>
+        <field name="name">Tabarcia</field>
+    </record>
+    <record id="fp_district_1_07_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_07"/>
+        <field name="code">04</field>
+        <field name="name">Piedras Negras</field>
+    </record>
+    <record id="fp_district_1_07_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_07"/>
+        <field name="code">05</field>
+        <field name="name">Picagres</field>
+    </record>
+    <record id="fp_district_1_07_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_07"/>
+        <field name="code">06</field>
+        <field name="name">Jaris</field>
+    </record>
+    <record id="fp_canton_1_08" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">08</field>
+        <field name="name">Goicoechea</field>
+    </record>
+    <record id="fp_district_1_08_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_08"/>
+        <field name="code">01</field>
+        <field name="name">Guadalupe</field>
+    </record>
+    <record id="fp_district_1_08_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_08"/>
+        <field name="code">02</field>
+        <field name="name">San Francisco</field>
+    </record>
+    <record id="fp_district_1_08_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_08"/>
+        <field name="code">03</field>
+        <field name="name">Calle Blancos</field>
+    </record>
+    <record id="fp_district_1_08_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_08"/>
+        <field name="code">04</field>
+        <field name="name">Mata De Platano</field>
+    </record>
+    <record id="fp_district_1_08_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_08"/>
+        <field name="code">05</field>
+        <field name="name">Ipís</field>
+    </record>
+    <record id="fp_district_1_08_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_08"/>
+        <field name="code">06</field>
+        <field name="name">Rancho Redondo</field>
+    </record>
+    <record id="fp_district_1_08_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_08"/>
+        <field name="code">07</field>
+        <field name="name">Purral</field>
+    </record>
+    <record id="fp_canton_1_09" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">09</field>
+        <field name="name">Santa Ana</field>
+    </record>
+    <record id="fp_district_1_09_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_09"/>
+        <field name="code">01</field>
+        <field name="name">Santa Ana</field>
+    </record>
+    <record id="fp_district_1_09_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_09"/>
+        <field name="code">02</field>
+        <field name="name">Salitral</field>
+    </record>
+    <record id="fp_district_1_09_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_09"/>
+        <field name="code">03</field>
+        <field name="name">Pozos</field>
+    </record>
+    <record id="fp_district_1_09_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_09"/>
+        <field name="code">04</field>
+        <field name="name">Uruca</field>
+    </record>
+    <record id="fp_district_1_09_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_09"/>
+        <field name="code">05</field>
+        <field name="name">Piedades</field>
+    </record>
+    <record id="fp_district_1_09_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_09"/>
+        <field name="code">06</field>
+        <field name="name">Brasil</field>
+    </record>
+    <record id="fp_canton_1_10" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">10</field>
+        <field name="name">Alajuelita</field>
+    </record>
+    <record id="fp_district_1_10_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_10"/>
+        <field name="code">01</field>
+        <field name="name">Alajuelita</field>
+    </record>
+    <record id="fp_district_1_10_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_10"/>
+        <field name="code">02</field>
+        <field name="name">San Josecito</field>
+    </record>
+    <record id="fp_district_1_10_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_10"/>
+        <field name="code">03</field>
+        <field name="name">San Antonio</field>
+    </record>
+    <record id="fp_district_1_10_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_10"/>
+        <field name="code">04</field>
+        <field name="name">Concepción</field>
+    </record>
+    <record id="fp_district_1_10_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_10"/>
+        <field name="code">05</field>
+        <field name="name">San Felipe</field>
+    </record>
+    <record id="fp_canton_1_11" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">11</field>
+        <field name="name">Vázquez De Coronado</field>
+    </record>
+    <record id="fp_district_1_11_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_11"/>
+        <field name="code">01</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_district_1_11_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_11"/>
+        <field name="code">02</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_1_11_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_11"/>
+        <field name="code">03</field>
+        <field name="name">Dulce Nombre De Jesus</field>
+    </record>
+    <record id="fp_district_1_11_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_11"/>
+        <field name="code">04</field>
+        <field name="name">Patalillo</field>
+    </record>
+    <record id="fp_district_1_11_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_11"/>
+        <field name="code">05</field>
+        <field name="name">Cascajal</field>
+    </record>
+    <record id="fp_canton_1_12" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">12</field>
+        <field name="name">Acosta</field>
+    </record>
+    <record id="fp_district_1_12_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_12"/>
+        <field name="code">01</field>
+        <field name="name">San Ignacio</field>
+    </record>
+    <record id="fp_district_1_12_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_12"/>
+        <field name="code">02</field>
+        <field name="name">Guaitil</field>
+    </record>
+    <record id="fp_district_1_12_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_12"/>
+        <field name="code">03</field>
+        <field name="name">Palmichal</field>
+    </record>
+    <record id="fp_district_1_12_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_12"/>
+        <field name="code">04</field>
+        <field name="name">Cangrejal</field>
+    </record>
+    <record id="fp_district_1_12_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_12"/>
+        <field name="code">05</field>
+        <field name="name">Sabanillas</field>
+    </record>
+    <record id="fp_canton_1_13" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">13</field>
+        <field name="name">Tibás</field>
+    </record>
+    <record id="fp_district_1_13_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_13"/>
+        <field name="code">01</field>
+        <field name="name">San Juan</field>
+    </record>
+    <record id="fp_district_1_13_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_13"/>
+        <field name="code">02</field>
+        <field name="name">Cinco Esquinas</field>
+    </record>
+    <record id="fp_district_1_13_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_13"/>
+        <field name="code">03</field>
+        <field name="name">Anselmo Llorente</field>
+    </record>
+    <record id="fp_district_1_13_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_13"/>
+        <field name="code">04</field>
+        <field name="name">Leon Xiii</field>
+    </record>
+    <record id="fp_district_1_13_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_13"/>
+        <field name="code">05</field>
+        <field name="name">Colima</field>
+    </record>
+    <record id="fp_canton_1_14" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">14</field>
+        <field name="name">Moravia</field>
+    </record>
+    <record id="fp_district_1_14_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_14"/>
+        <field name="code">01</field>
+        <field name="name">San Vicente</field>
+    </record>
+    <record id="fp_district_1_14_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_14"/>
+        <field name="code">02</field>
+        <field name="name">San Jeronimo</field>
+    </record>
+    <record id="fp_district_1_14_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_14"/>
+        <field name="code">03</field>
+        <field name="name">La Trinidad</field>
+    </record>
+    <record id="fp_canton_1_15" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">15</field>
+        <field name="name">Montes De Oca</field>
+    </record>
+    <record id="fp_district_1_15_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_15"/>
+        <field name="code">01</field>
+        <field name="name">San Pedro</field>
+    </record>
+    <record id="fp_district_1_15_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_15"/>
+        <field name="code">02</field>
+        <field name="name">Sabanilla</field>
+    </record>
+    <record id="fp_district_1_15_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_15"/>
+        <field name="code">03</field>
+        <field name="name">Mercedes</field>
+    </record>
+    <record id="fp_district_1_15_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_15"/>
+        <field name="code">04</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_canton_1_16" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">16</field>
+        <field name="name">Turrubares</field>
+    </record>
+    <record id="fp_district_1_16_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_16"/>
+        <field name="code">01</field>
+        <field name="name">San Pablo</field>
+    </record>
+    <record id="fp_district_1_16_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_16"/>
+        <field name="code">02</field>
+        <field name="name">San Pedro</field>
+    </record>
+    <record id="fp_district_1_16_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_16"/>
+        <field name="code">03</field>
+        <field name="name">San Juan De Mata</field>
+    </record>
+    <record id="fp_district_1_16_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_16"/>
+        <field name="code">04</field>
+        <field name="name">San Luis</field>
+    </record>
+    <record id="fp_district_1_16_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_16"/>
+        <field name="code">05</field>
+        <field name="name">Carara</field>
+    </record>
+    <record id="fp_canton_1_17" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">17</field>
+        <field name="name">Dota</field>
+    </record>
+    <record id="fp_district_1_17_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_17"/>
+        <field name="code">01</field>
+        <field name="name">Santa María</field>
+    </record>
+    <record id="fp_district_1_17_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_17"/>
+        <field name="code">02</field>
+        <field name="name">Jardin</field>
+    </record>
+    <record id="fp_district_1_17_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_17"/>
+        <field name="code">03</field>
+        <field name="name">Copey</field>
+    </record>
+    <record id="fp_canton_1_18" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">18</field>
+        <field name="name">Curridabat</field>
+    </record>
+    <record id="fp_district_1_18_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_18"/>
+        <field name="code">01</field>
+        <field name="name">Curridabat</field>
+    </record>
+    <record id="fp_district_1_18_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_18"/>
+        <field name="code">02</field>
+        <field name="name">Granadilla</field>
+    </record>
+    <record id="fp_district_1_18_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_18"/>
+        <field name="code">03</field>
+        <field name="name">Sanchez</field>
+    </record>
+    <record id="fp_district_1_18_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_18"/>
+        <field name="code">04</field>
+        <field name="name">Tirrases</field>
+    </record>
+    <record id="fp_canton_1_19" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">19</field>
+        <field name="name">Pérez Zeledón</field>
+    </record>
+    <record id="fp_district_1_19_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">01</field>
+        <field name="name">San Isidro De El General</field>
+    </record>
+    <record id="fp_district_1_19_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">02</field>
+        <field name="name">El General</field>
+    </record>
+    <record id="fp_district_1_19_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">03</field>
+        <field name="name">Daniel Flores</field>
+    </record>
+    <record id="fp_district_1_19_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">04</field>
+        <field name="name">Rivas</field>
+    </record>
+    <record id="fp_district_1_19_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">05</field>
+        <field name="name">San Pedro</field>
+    </record>
+    <record id="fp_district_1_19_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">06</field>
+        <field name="name">Platanares</field>
+    </record>
+    <record id="fp_district_1_19_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">07</field>
+        <field name="name">Pejibaye</field>
+    </record>
+    <record id="fp_district_1_19_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">08</field>
+        <field name="name">Cajon</field>
+    </record>
+    <record id="fp_district_1_19_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">09</field>
+        <field name="name">Baru</field>
+    </record>
+    <record id="fp_district_1_19_10" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">10</field>
+        <field name="name">Rio Nuevo</field>
+    </record>
+    <record id="fp_district_1_19_11" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_19"/>
+        <field name="code">11</field>
+        <field name="name">Páramo</field>
+    </record>
+    <record id="fp_canton_1_20" model="fp.canton">
+        <field name="province_id" ref="fp_province_1"/>
+        <field name="code">20</field>
+        <field name="name">León Cortés Castro</field>
+    </record>
+    <record id="fp_district_1_20_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_20"/>
+        <field name="code">01</field>
+        <field name="name">San Pablo</field>
+    </record>
+    <record id="fp_district_1_20_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_20"/>
+        <field name="code">02</field>
+        <field name="name">San Andres</field>
+    </record>
+    <record id="fp_district_1_20_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_20"/>
+        <field name="code">03</field>
+        <field name="name">Llano Bonito</field>
+    </record>
+    <record id="fp_district_1_20_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_20"/>
+        <field name="code">04</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_district_1_20_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_20"/>
+        <field name="code">05</field>
+        <field name="name">Santa Cruz</field>
+    </record>
+    <record id="fp_district_1_20_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_1_20"/>
+        <field name="code">06</field>
+        <field name="name">San Antonio</field>
+    </record>
+    <record id="fp_province_2" model="fp.province">
+        <field name="code">2</field>
+        <field name="name">Alajuela</field>
+    </record>
+    <record id="fp_canton_2_01" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">01</field>
+        <field name="name">Central</field>
+    </record>
+    <record id="fp_district_2_01_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">01</field>
+        <field name="name">Alajuela</field>
+    </record>
+    <record id="fp_district_2_01_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">02</field>
+        <field name="name">San José</field>
+    </record>
+    <record id="fp_district_2_01_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">03</field>
+        <field name="name">Carrizal</field>
+    </record>
+    <record id="fp_district_2_01_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">04</field>
+        <field name="name">San Antonio</field>
+    </record>
+    <record id="fp_district_2_01_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">05</field>
+        <field name="name">Guácima</field>
+    </record>
+    <record id="fp_district_2_01_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">06</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_district_2_01_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">07</field>
+        <field name="name">Sabanilla</field>
+    </record>
+    <record id="fp_district_2_01_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">08</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_2_01_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">09</field>
+        <field name="name">Rio Segundo</field>
+    </record>
+    <record id="fp_district_2_01_10" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">10</field>
+        <field name="name">Desamparados</field>
+    </record>
+    <record id="fp_district_2_01_11" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">11</field>
+        <field name="name">Turrucares</field>
+    </record>
+    <record id="fp_district_2_01_12" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">12</field>
+        <field name="name">Tambor</field>
+    </record>
+    <record id="fp_district_2_01_13" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">13</field>
+        <field name="name">Garita</field>
+    </record>
+    <record id="fp_district_2_01_14" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_01"/>
+        <field name="code">14</field>
+        <field name="name">Sarapiquí</field>
+    </record>
+    <record id="fp_canton_2_02" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">02</field>
+        <field name="name">San Ramón</field>
+    </record>
+    <record id="fp_district_2_02_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">01</field>
+        <field name="name">San Ramón</field>
+    </record>
+    <record id="fp_district_2_02_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">02</field>
+        <field name="name">Santiago</field>
+    </record>
+    <record id="fp_district_2_02_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">03</field>
+        <field name="name">San Juan</field>
+    </record>
+    <record id="fp_district_2_02_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">04</field>
+        <field name="name">Piedades Norte</field>
+    </record>
+    <record id="fp_district_2_02_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">05</field>
+        <field name="name">Piedades Sur</field>
+    </record>
+    <record id="fp_district_2_02_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">06</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_2_02_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">07</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_district_2_02_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">08</field>
+        <field name="name">Angeles</field>
+    </record>
+    <record id="fp_district_2_02_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">09</field>
+        <field name="name">Alfaro</field>
+    </record>
+    <record id="fp_district_2_02_10" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">10</field>
+        <field name="name">Volio</field>
+    </record>
+    <record id="fp_district_2_02_11" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">11</field>
+        <field name="name">Concepción</field>
+    </record>
+    <record id="fp_district_2_02_12" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">12</field>
+        <field name="name">Zapotal</field>
+    </record>
+    <record id="fp_district_2_02_13" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">13</field>
+        <field name="name">Peñas Blancas</field>
+    </record>
+    <record id="fp_district_2_02_14" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_02"/>
+        <field name="code">14</field>
+        <field name="name">San Lorenzo</field>
+    </record>
+    <record id="fp_canton_2_03" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">03</field>
+        <field name="name">Grecia</field>
+    </record>
+    <record id="fp_district_2_03_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_03"/>
+        <field name="code">01</field>
+        <field name="name">Grecia</field>
+    </record>
+    <record id="fp_district_2_03_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_03"/>
+        <field name="code">02</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_district_2_03_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_03"/>
+        <field name="code">03</field>
+        <field name="name">San José</field>
+    </record>
+    <record id="fp_district_2_03_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_03"/>
+        <field name="code">04</field>
+        <field name="name">San Roque</field>
+    </record>
+    <record id="fp_district_2_03_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_03"/>
+        <field name="code">05</field>
+        <field name="name">Tacares</field>
+    </record>
+    <record id="fp_district_2_03_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_03"/>
+        <field name="code">06</field>
+        <field name="name">Rio Cuarto</field>
+    </record>
+    <record id="fp_district_2_03_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_03"/>
+        <field name="code">07</field>
+        <field name="name">Puente De Piedra</field>
+    </record>
+    <record id="fp_district_2_03_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_03"/>
+        <field name="code">08</field>
+        <field name="name">Bolivar</field>
+    </record>
+    <record id="fp_canton_2_04" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">04</field>
+        <field name="name">San Mateo</field>
+    </record>
+    <record id="fp_district_2_04_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_04"/>
+        <field name="code">01</field>
+        <field name="name">San Mateo</field>
+    </record>
+    <record id="fp_district_2_04_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_04"/>
+        <field name="code">02</field>
+        <field name="name">Desmonte</field>
+    </record>
+    <record id="fp_district_2_04_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_04"/>
+        <field name="code">03</field>
+        <field name="name">Jesús María</field>
+    </record>
+    <record id="fp_district_2_04_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_04"/>
+        <field name="code">04</field>
+        <field name="name">Labrador</field>
+    </record>
+    <record id="fp_canton_2_05" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">05</field>
+        <field name="name">Atenas</field>
+    </record>
+    <record id="fp_district_2_05_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_05"/>
+        <field name="code">01</field>
+        <field name="name">Atenas</field>
+    </record>
+    <record id="fp_district_2_05_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_05"/>
+        <field name="code">02</field>
+        <field name="name">Jesús</field>
+    </record>
+    <record id="fp_district_2_05_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_05"/>
+        <field name="code">03</field>
+        <field name="name">Mercedes</field>
+    </record>
+    <record id="fp_district_2_05_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_05"/>
+        <field name="code">04</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_district_2_05_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_05"/>
+        <field name="code">05</field>
+        <field name="name">Concepción</field>
+    </record>
+    <record id="fp_district_2_05_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_05"/>
+        <field name="code">06</field>
+        <field name="name">San José</field>
+    </record>
+    <record id="fp_district_2_05_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_05"/>
+        <field name="code">07</field>
+        <field name="name">Santa Eulalia</field>
+    </record>
+    <record id="fp_district_2_05_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_05"/>
+        <field name="code">08</field>
+        <field name="name">Escobal</field>
+    </record>
+    <record id="fp_canton_2_06" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">06</field>
+        <field name="name">Naranjo</field>
+    </record>
+    <record id="fp_district_2_06_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_06"/>
+        <field name="code">01</field>
+        <field name="name">Naranjo</field>
+    </record>
+    <record id="fp_district_2_06_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_06"/>
+        <field name="code">06</field>
+        <field name="name">San Juan</field>
+    </record>
+    <record id="fp_district_2_06_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_06"/>
+        <field name="code">02</field>
+        <field name="name">San Miguel</field>
+    </record>
+    <record id="fp_district_2_06_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_06"/>
+        <field name="code">08</field>
+        <field name="name">Palmitos</field>
+    </record>
+    <record id="fp_district_2_06_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_06"/>
+        <field name="code">07</field>
+        <field name="name">El Rosario</field>
+    </record>
+    <record id="fp_district_2_06_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_06"/>
+        <field name="code">03</field>
+        <field name="name">San José</field>
+    </record>
+    <record id="fp_district_2_06_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_06"/>
+        <field name="code">04</field>
+        <field name="name">Cirrí Sur</field>
+    </record>
+    <record id="fp_district_2_06_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_06"/>
+        <field name="code">05</field>
+        <field name="name">San Jerónimo</field>
+    </record>
+    <record id="fp_canton_2_07" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">07</field>
+        <field name="name">Palmares</field>
+    </record>
+    <record id="fp_district_2_07_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_07"/>
+        <field name="code">01</field>
+        <field name="name">Palmares</field>
+    </record>
+    <record id="fp_district_2_07_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_07"/>
+        <field name="code">02</field>
+        <field name="name">Zaragoza</field>
+    </record>
+    <record id="fp_district_2_07_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_07"/>
+        <field name="code">03</field>
+        <field name="name">Buenos Aires</field>
+    </record>
+    <record id="fp_district_2_07_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_07"/>
+        <field name="code">04</field>
+        <field name="name">Santiago</field>
+    </record>
+    <record id="fp_district_2_07_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_07"/>
+        <field name="code">05</field>
+        <field name="name">Candelaria</field>
+    </record>
+    <record id="fp_district_2_07_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_07"/>
+        <field name="code">06</field>
+        <field name="name">Esquipulas</field>
+    </record>
+    <record id="fp_district_2_07_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_07"/>
+        <field name="code">07</field>
+        <field name="name">La Granja</field>
+    </record>
+    <record id="fp_canton_2_08" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">08</field>
+        <field name="name">Poás</field>
+    </record>
+    <record id="fp_district_2_08_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_08"/>
+        <field name="code">01</field>
+        <field name="name">San Pedro</field>
+    </record>
+    <record id="fp_district_2_08_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_08"/>
+        <field name="code">02</field>
+        <field name="name">San Juan</field>
+    </record>
+    <record id="fp_district_2_08_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_08"/>
+        <field name="code">03</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_2_08_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_08"/>
+        <field name="code">04</field>
+        <field name="name">Carrillos</field>
+    </record>
+    <record id="fp_district_2_08_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_08"/>
+        <field name="code">05</field>
+        <field name="name">Sabana Redonda</field>
+    </record>
+    <record id="fp_canton_2_09" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">09</field>
+        <field name="name">Orotina</field>
+    </record>
+    <record id="fp_district_2_09_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_09"/>
+        <field name="code">01</field>
+        <field name="name">Orotina</field>
+    </record>
+    <record id="fp_district_2_09_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_09"/>
+        <field name="code">02</field>
+        <field name="name">El Mastate</field>
+    </record>
+    <record id="fp_district_2_09_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_09"/>
+        <field name="code">03</field>
+        <field name="name">Hacienda Vieja</field>
+    </record>
+    <record id="fp_district_2_09_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_09"/>
+        <field name="code">04</field>
+        <field name="name">Coyolar</field>
+    </record>
+    <record id="fp_district_2_09_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_09"/>
+        <field name="code">05</field>
+        <field name="name">La Ceiba</field>
+    </record>
+    <record id="fp_canton_2_10" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">10</field>
+        <field name="name">San Carlos</field>
+    </record>
+    <record id="fp_district_2_10_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">01</field>
+        <field name="name">Quesada</field>
+    </record>
+    <record id="fp_district_2_10_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">02</field>
+        <field name="name">Florencia</field>
+    </record>
+    <record id="fp_district_2_10_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">03</field>
+        <field name="name">Buenavista</field>
+    </record>
+    <record id="fp_district_2_10_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">04</field>
+        <field name="name">Aguas Zarcas</field>
+    </record>
+    <record id="fp_district_2_10_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">05</field>
+        <field name="name">Venecia</field>
+    </record>
+    <record id="fp_district_2_10_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">06</field>
+        <field name="name">Pital</field>
+    </record>
+    <record id="fp_district_2_10_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">07</field>
+        <field name="name">La Fortuna</field>
+    </record>
+    <record id="fp_district_2_10_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">08</field>
+        <field name="name">La Tigra</field>
+    </record>
+    <record id="fp_district_2_10_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">09</field>
+        <field name="name">La Palmera</field>
+    </record>
+    <record id="fp_district_2_10_10" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">10</field>
+        <field name="name">Venado</field>
+    </record>
+    <record id="fp_district_2_10_11" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">11</field>
+        <field name="name">Cutris</field>
+    </record>
+    <record id="fp_district_2_10_12" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">12</field>
+        <field name="name">Monterrey</field>
+    </record>
+    <record id="fp_district_2_10_13" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_10"/>
+        <field name="code">13</field>
+        <field name="name">Pocosol</field>
+    </record>
+    <record id="fp_canton_2_11" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">11</field>
+        <field name="name">Zarcero</field>
+    </record>
+    <record id="fp_district_2_11_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_11"/>
+        <field name="code">01</field>
+        <field name="name">Zarcero</field>
+    </record>
+    <record id="fp_district_2_11_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_11"/>
+        <field name="code">02</field>
+        <field name="name">Laguna</field>
+    </record>
+    <record id="fp_district_2_11_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_11"/>
+        <field name="code">03</field>
+        <field name="name">Tapesco</field>
+    </record>
+    <record id="fp_district_2_11_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_11"/>
+        <field name="code">04</field>
+        <field name="name">Guadalupe</field>
+    </record>
+    <record id="fp_district_2_11_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_11"/>
+        <field name="code">05</field>
+        <field name="name">Palmira</field>
+    </record>
+    <record id="fp_district_2_11_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_11"/>
+        <field name="code">06</field>
+        <field name="name">Zapote</field>
+    </record>
+    <record id="fp_district_2_11_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_11"/>
+        <field name="code">07</field>
+        <field name="name">Brisas</field>
+    </record>
+    <record id="fp_canton_2_12" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">12</field>
+        <field name="name">Sarchí</field>
+    </record>
+    <record id="fp_district_2_12_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_12"/>
+        <field name="code">01</field>
+        <field name="name">Sarchí Norte</field>
+    </record>
+    <record id="fp_district_2_12_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_12"/>
+        <field name="code">02</field>
+        <field name="name">Sarchí Sur</field>
+    </record>
+    <record id="fp_district_2_12_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_12"/>
+        <field name="code">03</field>
+        <field name="name">Toro Amarillo</field>
+    </record>
+    <record id="fp_district_2_12_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_12"/>
+        <field name="code">04</field>
+        <field name="name">San Pedro</field>
+    </record>
+    <record id="fp_district_2_12_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_12"/>
+        <field name="code">05</field>
+        <field name="name">Rodriguez</field>
+    </record>
+    <record id="fp_canton_2_13" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">13</field>
+        <field name="name">Upala</field>
+    </record>
+    <record id="fp_district_2_13_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_13"/>
+        <field name="code">01</field>
+        <field name="name">Upala</field>
+    </record>
+    <record id="fp_district_2_13_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_13"/>
+        <field name="code">02</field>
+        <field name="name">Aguas Claras</field>
+    </record>
+    <record id="fp_district_2_13_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_13"/>
+        <field name="code">03</field>
+        <field name="name">San José o Pizote</field>
+    </record>
+    <record id="fp_district_2_13_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_13"/>
+        <field name="code">04</field>
+        <field name="name">Bijagua</field>
+    </record>
+    <record id="fp_district_2_13_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_13"/>
+        <field name="code">05</field>
+        <field name="name">Delicias</field>
+    </record>
+    <record id="fp_district_2_13_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_13"/>
+        <field name="code">06</field>
+        <field name="name">Dos Rios</field>
+    </record>
+    <record id="fp_district_2_13_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_13"/>
+        <field name="code">07</field>
+        <field name="name">Yolillal</field>
+    </record>
+    <record id="fp_district_2_13_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_13"/>
+        <field name="code">08</field>
+        <field name="name">Canalete</field>
+    </record>
+    <record id="fp_canton_2_14" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">14</field>
+        <field name="name">Los Chiles</field>
+    </record>
+    <record id="fp_district_2_14_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_14"/>
+        <field name="code">01</field>
+        <field name="name">Los Chiles</field>
+    </record>
+    <record id="fp_district_2_14_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_14"/>
+        <field name="code">02</field>
+        <field name="name">Caño Negro</field>
+    </record>
+    <record id="fp_district_2_14_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_14"/>
+        <field name="code">03</field>
+        <field name="name">El Amparo</field>
+    </record>
+    <record id="fp_district_2_14_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_14"/>
+        <field name="code">04</field>
+        <field name="name">San Jorge</field>
+    </record>
+    <record id="fp_canton_2_15" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">15</field>
+        <field name="name">Guatuso</field>
+    </record>
+    <record id="fp_district_2_15_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_15"/>
+        <field name="code">01</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_2_15_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_15"/>
+        <field name="code">02</field>
+        <field name="name">Buenavista</field>
+    </record>
+    <record id="fp_district_2_15_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_15"/>
+        <field name="code">03</field>
+        <field name="name">Cote</field>
+    </record>
+    <record id="fp_district_2_15_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_15"/>
+        <field name="code">04</field>
+        <field name="name">Katira</field>
+    </record>
+    <record id="fp_canton_2_16" model="fp.canton">
+        <field name="province_id" ref="fp_province_2"/>
+        <field name="code">16</field>
+        <field name="name">Río Cuarto</field>
+    </record>
+    <record id="fp_district_2_16_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_16"/>
+        <field name="code">01</field>
+        <field name="name">Río Cuarto</field>
+    </record>
+    <record id="fp_district_2_16_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_16"/>
+        <field name="code">02</field>
+        <field name="name">Santa Rita</field>
+    </record>
+    <record id="fp_district_2_16_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_2_16"/>
+        <field name="code">03</field>
+        <field name="name">Santa Isabel</field>
+    </record>
+    <record id="fp_province_3" model="fp.province">
+        <field name="code">3</field>
+        <field name="name">Cartago</field>
+    </record>
+    <record id="fp_canton_3_01" model="fp.canton">
+        <field name="province_id" ref="fp_province_3"/>
+        <field name="code">01</field>
+        <field name="name">Central</field>
+    </record>
+    <record id="fp_district_3_01_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">01</field>
+        <field name="name">Oriental</field>
+    </record>
+    <record id="fp_district_3_01_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">02</field>
+        <field name="name">Occidental</field>
+    </record>
+    <record id="fp_district_3_01_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">03</field>
+        <field name="name">Carmen</field>
+    </record>
+    <record id="fp_district_3_01_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">04</field>
+        <field name="name">San Nicolás</field>
+    </record>
+    <record id="fp_district_3_01_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">05</field>
+        <field name="name">Aguacaliente o San Francisco</field>
+    </record>
+    <record id="fp_district_3_01_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">06</field>
+        <field name="name">Guadalupe o Arenilla</field>
+    </record>
+    <record id="fp_district_3_01_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">07</field>
+        <field name="name">Corralillo</field>
+    </record>
+    <record id="fp_district_3_01_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">08</field>
+        <field name="name">Tierra Blanca</field>
+    </record>
+    <record id="fp_district_3_01_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">09</field>
+        <field name="name">Dulce Nombre</field>
+    </record>
+    <record id="fp_district_3_01_10" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">10</field>
+        <field name="name">Llano Grande</field>
+    </record>
+    <record id="fp_district_3_01_11" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_01"/>
+        <field name="code">11</field>
+        <field name="name">Quebradilla</field>
+    </record>
+    <record id="fp_canton_3_02" model="fp.canton">
+        <field name="province_id" ref="fp_province_3"/>
+        <field name="code">02</field>
+        <field name="name">Paraíso</field>
+    </record>
+    <record id="fp_district_3_02_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_02"/>
+        <field name="code">01</field>
+        <field name="name">Paraiso</field>
+    </record>
+    <record id="fp_district_3_02_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_02"/>
+        <field name="code">02</field>
+        <field name="name">Santiago</field>
+    </record>
+    <record id="fp_district_3_02_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_02"/>
+        <field name="code">03</field>
+        <field name="name">Orosi</field>
+    </record>
+    <record id="fp_district_3_02_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_02"/>
+        <field name="code">04</field>
+        <field name="name">Cachí</field>
+    </record>
+    <record id="fp_district_3_02_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_02"/>
+        <field name="code">05</field>
+        <field name="name">Llanos de Santa Lucía</field>
+    </record>
+    <record id="fp_canton_3_03" model="fp.canton">
+        <field name="province_id" ref="fp_province_3"/>
+        <field name="code">03</field>
+        <field name="name">La Unión</field>
+    </record>
+    <record id="fp_district_3_03_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_03"/>
+        <field name="code">01</field>
+        <field name="name">Tres Rios</field>
+    </record>
+    <record id="fp_district_3_03_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_03"/>
+        <field name="code">02</field>
+        <field name="name">San Diego</field>
+    </record>
+    <record id="fp_district_3_03_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_03"/>
+        <field name="code">03</field>
+        <field name="name">San Juan</field>
+    </record>
+    <record id="fp_district_3_03_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_03"/>
+        <field name="code">04</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_3_03_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_03"/>
+        <field name="code">05</field>
+        <field name="name">Concepción</field>
+    </record>
+    <record id="fp_district_3_03_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_03"/>
+        <field name="code">06</field>
+        <field name="name">Dulce Nombre</field>
+    </record>
+    <record id="fp_district_3_03_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_03"/>
+        <field name="code">07</field>
+        <field name="name">San Ramón</field>
+    </record>
+    <record id="fp_district_3_03_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_03"/>
+        <field name="code">08</field>
+        <field name="name">Rio Azul</field>
+    </record>
+    <record id="fp_canton_3_04" model="fp.canton">
+        <field name="province_id" ref="fp_province_3"/>
+        <field name="code">04</field>
+        <field name="name">Jiménez</field>
+    </record>
+    <record id="fp_district_3_04_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_04"/>
+        <field name="code">01</field>
+        <field name="name">Juan Viñas</field>
+    </record>
+    <record id="fp_district_3_04_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_04"/>
+        <field name="code">02</field>
+        <field name="name">Tucurrique</field>
+    </record>
+    <record id="fp_district_3_04_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_04"/>
+        <field name="code">03</field>
+        <field name="name">Pejibaye</field>
+    </record>
+    <record id="fp_canton_3_05" model="fp.canton">
+        <field name="province_id" ref="fp_province_3"/>
+        <field name="code">05</field>
+        <field name="name">Turrialba</field>
+    </record>
+    <record id="fp_district_3_05_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">01</field>
+        <field name="name">Turrialba</field>
+    </record>
+    <record id="fp_district_3_05_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">02</field>
+        <field name="name">La Suiza</field>
+    </record>
+    <record id="fp_district_3_05_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">03</field>
+        <field name="name">Peralta</field>
+    </record>
+    <record id="fp_district_3_05_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">04</field>
+        <field name="name">Santa Cruz</field>
+    </record>
+    <record id="fp_district_3_05_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">05</field>
+        <field name="name">Santa Teresita</field>
+    </record>
+    <record id="fp_district_3_05_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">06</field>
+        <field name="name">Pavones</field>
+    </record>
+    <record id="fp_district_3_05_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">07</field>
+        <field name="name">Tuis</field>
+    </record>
+    <record id="fp_district_3_05_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">08</field>
+        <field name="name">Tayutic</field>
+    </record>
+    <record id="fp_district_3_05_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">09</field>
+        <field name="name">Santa Rosa</field>
+    </record>
+    <record id="fp_district_3_05_10" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">10</field>
+        <field name="name">Tres Equis</field>
+    </record>
+    <record id="fp_district_3_05_11" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">11</field>
+        <field name="name">La Isabel</field>
+    </record>
+    <record id="fp_district_3_05_12" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_05"/>
+        <field name="code">12</field>
+        <field name="name">Chirripó</field>
+    </record>
+    <record id="fp_canton_3_06" model="fp.canton">
+        <field name="province_id" ref="fp_province_3"/>
+        <field name="code">06</field>
+        <field name="name">Alvarado</field>
+    </record>
+    <record id="fp_district_3_06_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_06"/>
+        <field name="code">01</field>
+        <field name="name">Pacayas</field>
+    </record>
+    <record id="fp_district_3_06_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_06"/>
+        <field name="code">02</field>
+        <field name="name">Cervantes</field>
+    </record>
+    <record id="fp_district_3_06_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_06"/>
+        <field name="code">03</field>
+        <field name="name">Capellades</field>
+    </record>
+    <record id="fp_canton_3_07" model="fp.canton">
+        <field name="province_id" ref="fp_province_3"/>
+        <field name="code">07</field>
+        <field name="name">Oreamuno</field>
+    </record>
+    <record id="fp_district_3_07_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_07"/>
+        <field name="code">01</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_3_07_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_07"/>
+        <field name="code">02</field>
+        <field name="name">Cot</field>
+    </record>
+    <record id="fp_district_3_07_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_07"/>
+        <field name="code">03</field>
+        <field name="name">Potrero Cerrado</field>
+    </record>
+    <record id="fp_district_3_07_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_07"/>
+        <field name="code">04</field>
+        <field name="name">Cipreses</field>
+    </record>
+    <record id="fp_district_3_07_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_07"/>
+        <field name="code">05</field>
+        <field name="name">Santa Rosa</field>
+    </record>
+    <record id="fp_canton_3_08" model="fp.canton">
+        <field name="province_id" ref="fp_province_3"/>
+        <field name="code">08</field>
+        <field name="name">El Guarco</field>
+    </record>
+    <record id="fp_district_3_08_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_08"/>
+        <field name="code">01</field>
+        <field name="name">El Tejar</field>
+    </record>
+    <record id="fp_district_3_08_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_08"/>
+        <field name="code">02</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_district_3_08_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_08"/>
+        <field name="code">03</field>
+        <field name="name">Tobosi</field>
+    </record>
+    <record id="fp_district_3_08_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_3_08"/>
+        <field name="code">04</field>
+        <field name="name">Patio De Agua</field>
+    </record>
+    <record id="fp_province_4" model="fp.province">
+        <field name="code">4</field>
+        <field name="name">Heredia</field>
+    </record>
+    <record id="fp_canton_4_01" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">01</field>
+        <field name="name">Central</field>
+    </record>
+    <record id="fp_district_4_01_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_01"/>
+        <field name="code">01</field>
+        <field name="name">Heredia</field>
+    </record>
+    <record id="fp_district_4_01_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_01"/>
+        <field name="code">02</field>
+        <field name="name">Mercedes</field>
+    </record>
+    <record id="fp_district_4_01_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_01"/>
+        <field name="code">03</field>
+        <field name="name">San Francisco</field>
+    </record>
+    <record id="fp_district_4_01_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_01"/>
+        <field name="code">04</field>
+        <field name="name">Ulloa</field>
+    </record>
+    <record id="fp_district_4_01_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_01"/>
+        <field name="code">05</field>
+        <field name="name">Varablanca</field>
+    </record>
+    <record id="fp_canton_4_02" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">02</field>
+        <field name="name">Barva</field>
+    </record>
+    <record id="fp_district_4_02_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_02"/>
+        <field name="code">01</field>
+        <field name="name">Barva</field>
+    </record>
+    <record id="fp_district_4_02_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_02"/>
+        <field name="code">02</field>
+        <field name="name">San Pedro</field>
+    </record>
+    <record id="fp_district_4_02_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_02"/>
+        <field name="code">03</field>
+        <field name="name">San Pablo</field>
+    </record>
+    <record id="fp_district_4_02_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_02"/>
+        <field name="code">04</field>
+        <field name="name">San Roque</field>
+    </record>
+    <record id="fp_district_4_02_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_02"/>
+        <field name="code">05</field>
+        <field name="name">Santa Lucía</field>
+    </record>
+    <record id="fp_district_4_02_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_02"/>
+        <field name="code">06</field>
+        <field name="name">San José de la Montaña</field>
+    </record>
+    <record id="fp_canton_4_03" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">03</field>
+        <field name="name">Santo Domingo</field>
+    </record>
+    <record id="fp_district_4_03_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_03"/>
+        <field name="code">01</field>
+        <field name="name">Santo Domingo</field>
+    </record>
+    <record id="fp_district_4_03_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_03"/>
+        <field name="code">02</field>
+        <field name="name">San Vicente</field>
+    </record>
+    <record id="fp_district_4_03_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_03"/>
+        <field name="code">03</field>
+        <field name="name">San Miguel</field>
+    </record>
+    <record id="fp_district_4_03_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_03"/>
+        <field name="code">04</field>
+        <field name="name">Paracito</field>
+    </record>
+    <record id="fp_district_4_03_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_03"/>
+        <field name="code">05</field>
+        <field name="name">Santo Tomás</field>
+    </record>
+    <record id="fp_district_4_03_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_03"/>
+        <field name="code">06</field>
+        <field name="name">Santa Rosa</field>
+    </record>
+    <record id="fp_district_4_03_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_03"/>
+        <field name="code">07</field>
+        <field name="name">Tures</field>
+    </record>
+    <record id="fp_district_4_03_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_03"/>
+        <field name="code">08</field>
+        <field name="name">Para</field>
+    </record>
+    <record id="fp_canton_4_04" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">04</field>
+        <field name="name">Santa Barbara</field>
+    </record>
+    <record id="fp_district_4_04_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_04"/>
+        <field name="code">01</field>
+        <field name="name">Santa Bárbara</field>
+    </record>
+    <record id="fp_district_4_04_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_04"/>
+        <field name="code">02</field>
+        <field name="name">San Pedro</field>
+    </record>
+    <record id="fp_district_4_04_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_04"/>
+        <field name="code">03</field>
+        <field name="name">San Juan</field>
+    </record>
+    <record id="fp_district_4_04_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_04"/>
+        <field name="code">04</field>
+        <field name="name">Jesús</field>
+    </record>
+    <record id="fp_district_4_04_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_04"/>
+        <field name="code">05</field>
+        <field name="name">Santo Domingo</field>
+    </record>
+    <record id="fp_district_4_04_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_04"/>
+        <field name="code">06</field>
+        <field name="name">Puraba</field>
+    </record>
+    <record id="fp_canton_4_05" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">05</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_4_05_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_05"/>
+        <field name="code">01</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_4_05_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_05"/>
+        <field name="code">02</field>
+        <field name="name">San Josecito</field>
+    </record>
+    <record id="fp_district_4_05_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_05"/>
+        <field name="code">03</field>
+        <field name="name">Santiago</field>
+    </record>
+    <record id="fp_district_4_05_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_05"/>
+        <field name="code">04</field>
+        <field name="name">Los Ángeles</field>
+    </record>
+    <record id="fp_district_4_05_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_05"/>
+        <field name="code">05</field>
+        <field name="name">Concepción</field>
+    </record>
+    <record id="fp_canton_4_06" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">06</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_district_4_06_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_06"/>
+        <field name="code">01</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_district_4_06_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_06"/>
+        <field name="code">02</field>
+        <field name="name">San José</field>
+    </record>
+    <record id="fp_district_4_06_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_06"/>
+        <field name="code">03</field>
+        <field name="name">Concepción</field>
+    </record>
+    <record id="fp_district_4_06_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_06"/>
+        <field name="code">04</field>
+        <field name="name">San Francisco</field>
+    </record>
+    <record id="fp_canton_4_07" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">07</field>
+        <field name="name">Belén</field>
+    </record>
+    <record id="fp_district_4_07_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_07"/>
+        <field name="code">01</field>
+        <field name="name">San Antonio</field>
+    </record>
+    <record id="fp_district_4_07_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_07"/>
+        <field name="code">02</field>
+        <field name="name">La Ribera</field>
+    </record>
+    <record id="fp_district_4_07_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_07"/>
+        <field name="code">03</field>
+        <field name="name">La Asuncion</field>
+    </record>
+    <record id="fp_canton_4_08" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">08</field>
+        <field name="name">Flores</field>
+    </record>
+    <record id="fp_district_4_08_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_08"/>
+        <field name="code">01</field>
+        <field name="name">San Joaquín</field>
+    </record>
+    <record id="fp_district_4_08_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_08"/>
+        <field name="code">02</field>
+        <field name="name">Barrantes</field>
+    </record>
+    <record id="fp_district_4_08_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_08"/>
+        <field name="code">03</field>
+        <field name="name">Llorente</field>
+    </record>
+    <record id="fp_canton_4_09" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">09</field>
+        <field name="name">San Pablo</field>
+    </record>
+    <record id="fp_district_4_09_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_09"/>
+        <field name="code">01</field>
+        <field name="name">San Pablo</field>
+    </record>
+    <record id="fp_district_4_09_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_09"/>
+        <field name="code">02</field>
+        <field name="name">Rincon De Sabanilla</field>
+    </record>
+    <record id="fp_canton_4_10" model="fp.canton">
+        <field name="province_id" ref="fp_province_4"/>
+        <field name="code">10</field>
+        <field name="name">Sarapiquí</field>
+    </record>
+    <record id="fp_district_4_10_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_10"/>
+        <field name="code">01</field>
+        <field name="name">Puerto Viejo</field>
+    </record>
+    <record id="fp_district_4_10_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_10"/>
+        <field name="code">02</field>
+        <field name="name">La Virgen</field>
+    </record>
+    <record id="fp_district_4_10_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_10"/>
+        <field name="code">03</field>
+        <field name="name">Las Horquetas</field>
+    </record>
+    <record id="fp_district_4_10_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_10"/>
+        <field name="code">04</field>
+        <field name="name">Llanuras Del Gaspar</field>
+    </record>
+    <record id="fp_district_4_10_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_4_10"/>
+        <field name="code">05</field>
+        <field name="name">Cureña</field>
+    </record>
+    <record id="fp_province_5" model="fp.province">
+        <field name="code">5</field>
+        <field name="name">Guanacaste</field>
+    </record>
+    <record id="fp_canton_5_01" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">01</field>
+        <field name="name">Liberia</field>
+    </record>
+    <record id="fp_district_5_01_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_01"/>
+        <field name="code">01</field>
+        <field name="name">Liberia</field>
+    </record>
+    <record id="fp_district_5_01_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_01"/>
+        <field name="code">04</field>
+        <field name="name">Nacascolo</field>
+    </record>
+    <record id="fp_district_5_01_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_01"/>
+        <field name="code">02</field>
+        <field name="name">Cañas Dulces</field>
+    </record>
+    <record id="fp_district_5_01_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_01"/>
+        <field name="code">03</field>
+        <field name="name">Mayorga</field>
+    </record>
+    <record id="fp_district_5_01_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_01"/>
+        <field name="code">05</field>
+        <field name="name">Curubande</field>
+    </record>
+    <record id="fp_canton_5_02" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">02</field>
+        <field name="name">Nicoya</field>
+    </record>
+    <record id="fp_district_5_02_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_02"/>
+        <field name="code">01</field>
+        <field name="name">Nicoya</field>
+    </record>
+    <record id="fp_district_5_02_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_02"/>
+        <field name="code">02</field>
+        <field name="name">Mansión</field>
+    </record>
+    <record id="fp_district_5_02_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_02"/>
+        <field name="code">03</field>
+        <field name="name">San Antonio</field>
+    </record>
+    <record id="fp_district_5_02_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_02"/>
+        <field name="code">04</field>
+        <field name="name">Quebrada Honda</field>
+    </record>
+    <record id="fp_district_5_02_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_02"/>
+        <field name="code">05</field>
+        <field name="name">Sámara</field>
+    </record>
+    <record id="fp_district_5_02_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_02"/>
+        <field name="code">06</field>
+        <field name="name">Nosara</field>
+    </record>
+    <record id="fp_district_5_02_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_02"/>
+        <field name="code">07</field>
+        <field name="name">Belén De Nosarita</field>
+    </record>
+    <record id="fp_canton_5_03" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">03</field>
+        <field name="name">Santa Cruz</field>
+    </record>
+    <record id="fp_district_5_03_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_03"/>
+        <field name="code">01</field>
+        <field name="name">Santa Cruz</field>
+    </record>
+    <record id="fp_district_5_03_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_03"/>
+        <field name="code">02</field>
+        <field name="name">Bolson</field>
+    </record>
+    <record id="fp_district_5_03_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_03"/>
+        <field name="code">03</field>
+        <field name="name">Veintisiete de Abril</field>
+    </record>
+    <record id="fp_district_5_03_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_03"/>
+        <field name="code">04</field>
+        <field name="name">Tempate</field>
+    </record>
+    <record id="fp_district_5_03_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_03"/>
+        <field name="code">05</field>
+        <field name="name">Cartagena</field>
+    </record>
+    <record id="fp_district_5_03_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_03"/>
+        <field name="code">06</field>
+        <field name="name">Cuajiniquil</field>
+    </record>
+    <record id="fp_district_5_03_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_03"/>
+        <field name="code">07</field>
+        <field name="name">Diria</field>
+    </record>
+    <record id="fp_district_5_03_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_03"/>
+        <field name="code">08</field>
+        <field name="name">Cabo Velas</field>
+    </record>
+    <record id="fp_district_5_03_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_03"/>
+        <field name="code">09</field>
+        <field name="name">Tamarindo</field>
+    </record>
+    <record id="fp_canton_5_04" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">04</field>
+        <field name="name">Bagaces</field>
+    </record>
+    <record id="fp_district_5_04_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_04"/>
+        <field name="code">01</field>
+        <field name="name">Bagaces</field>
+    </record>
+    <record id="fp_district_5_04_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_04"/>
+        <field name="code">02</field>
+        <field name="name">La Fortuna</field>
+    </record>
+    <record id="fp_district_5_04_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_04"/>
+        <field name="code">03</field>
+        <field name="name">Mogote</field>
+    </record>
+    <record id="fp_district_5_04_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_04"/>
+        <field name="code">04</field>
+        <field name="name">Rio Naranjo</field>
+    </record>
+    <record id="fp_canton_5_05" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">05</field>
+        <field name="name">Carrillo</field>
+    </record>
+    <record id="fp_district_5_05_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_05"/>
+        <field name="code">01</field>
+        <field name="name">Filadelfia</field>
+    </record>
+    <record id="fp_district_5_05_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_05"/>
+        <field name="code">02</field>
+        <field name="name">Palmira</field>
+    </record>
+    <record id="fp_district_5_05_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_05"/>
+        <field name="code">03</field>
+        <field name="name">Sardinal</field>
+    </record>
+    <record id="fp_district_5_05_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_05"/>
+        <field name="code">04</field>
+        <field name="name">Belen</field>
+    </record>
+    <record id="fp_canton_5_06" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">06</field>
+        <field name="name">Cañas</field>
+    </record>
+    <record id="fp_district_5_06_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_06"/>
+        <field name="code">01</field>
+        <field name="name">Cañas</field>
+    </record>
+    <record id="fp_district_5_06_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_06"/>
+        <field name="code">02</field>
+        <field name="name">Palmira</field>
+    </record>
+    <record id="fp_district_5_06_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_06"/>
+        <field name="code">03</field>
+        <field name="name">San Miguel</field>
+    </record>
+    <record id="fp_district_5_06_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_06"/>
+        <field name="code">04</field>
+        <field name="name">Bebedero</field>
+    </record>
+    <record id="fp_district_5_06_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_06"/>
+        <field name="code">05</field>
+        <field name="name">Porozal</field>
+    </record>
+    <record id="fp_canton_5_07" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">07</field>
+        <field name="name">Abangares</field>
+    </record>
+    <record id="fp_district_5_07_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_07"/>
+        <field name="code">01</field>
+        <field name="name">Las Juntas</field>
+    </record>
+    <record id="fp_district_5_07_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_07"/>
+        <field name="code">02</field>
+        <field name="name">Sierra</field>
+    </record>
+    <record id="fp_district_5_07_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_07"/>
+        <field name="code">03</field>
+        <field name="name">San Juan</field>
+    </record>
+    <record id="fp_district_5_07_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_07"/>
+        <field name="code">04</field>
+        <field name="name">Colorado</field>
+    </record>
+    <record id="fp_canton_5_08" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">08</field>
+        <field name="name">Tilarán</field>
+    </record>
+    <record id="fp_district_5_08_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_08"/>
+        <field name="code">01</field>
+        <field name="name">Tilarán</field>
+    </record>
+    <record id="fp_district_5_08_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_08"/>
+        <field name="code">02</field>
+        <field name="name">Quebrada Grande</field>
+    </record>
+    <record id="fp_district_5_08_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_08"/>
+        <field name="code">03</field>
+        <field name="name">Tronadora</field>
+    </record>
+    <record id="fp_district_5_08_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_08"/>
+        <field name="code">04</field>
+        <field name="name">Santa Rosa</field>
+    </record>
+    <record id="fp_district_5_08_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_08"/>
+        <field name="code">05</field>
+        <field name="name">Líbano</field>
+    </record>
+    <record id="fp_district_5_08_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_08"/>
+        <field name="code">06</field>
+        <field name="name">Tierras Morenas</field>
+    </record>
+    <record id="fp_district_5_08_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_08"/>
+        <field name="code">07</field>
+        <field name="name">Arenal</field>
+    </record>
+    <record id="fp_district_5_08_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_08"/>
+        <field name="code">08</field>
+        <field name="name">Cabeceras</field>
+    </record>
+    <record id="fp_canton_5_09" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">09</field>
+        <field name="name">Nandayure</field>
+    </record>
+    <record id="fp_district_5_09_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_09"/>
+        <field name="code">01</field>
+        <field name="name">Carmona</field>
+    </record>
+    <record id="fp_district_5_09_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_09"/>
+        <field name="code">02</field>
+        <field name="name">Santa Rita</field>
+    </record>
+    <record id="fp_district_5_09_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_09"/>
+        <field name="code">03</field>
+        <field name="name">Zapotal</field>
+    </record>
+    <record id="fp_district_5_09_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_09"/>
+        <field name="code">04</field>
+        <field name="name">San Pablo</field>
+    </record>
+    <record id="fp_district_5_09_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_09"/>
+        <field name="code">05</field>
+        <field name="name">Porvenir</field>
+    </record>
+    <record id="fp_district_5_09_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_09"/>
+        <field name="code">06</field>
+        <field name="name">Bejuco</field>
+    </record>
+    <record id="fp_canton_5_10" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">10</field>
+        <field name="name">La Cruz</field>
+    </record>
+    <record id="fp_district_5_10_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_10"/>
+        <field name="code">01</field>
+        <field name="name">La Cruz</field>
+    </record>
+    <record id="fp_district_5_10_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_10"/>
+        <field name="code">02</field>
+        <field name="name">Santa Cecilia</field>
+    </record>
+    <record id="fp_district_5_10_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_10"/>
+        <field name="code">03</field>
+        <field name="name">La Garita</field>
+    </record>
+    <record id="fp_district_5_10_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_10"/>
+        <field name="code">04</field>
+        <field name="name">Santa Elena</field>
+    </record>
+    <record id="fp_canton_5_11" model="fp.canton">
+        <field name="province_id" ref="fp_province_5"/>
+        <field name="code">11</field>
+        <field name="name">Hojancha</field>
+    </record>
+    <record id="fp_district_5_11_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_11"/>
+        <field name="code">01</field>
+        <field name="name">Hojancha</field>
+    </record>
+    <record id="fp_district_5_11_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_11"/>
+        <field name="code">02</field>
+        <field name="name">Monte Romo</field>
+    </record>
+    <record id="fp_district_5_11_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_11"/>
+        <field name="code">03</field>
+        <field name="name">Puerto Carrillo</field>
+    </record>
+    <record id="fp_district_5_11_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_5_11"/>
+        <field name="code">04</field>
+        <field name="name">Huacas</field>
+    </record>
+    <record id="fp_province_6" model="fp.province">
+        <field name="code">6</field>
+        <field name="name">Puntarenas</field>
+    </record>
+    <record id="fp_canton_6_01" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">01</field>
+        <field name="name">Central</field>
+    </record>
+    <record id="fp_district_6_01_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">01</field>
+        <field name="name">Puntarenas</field>
+    </record>
+    <record id="fp_district_6_01_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">02</field>
+        <field name="name">Pitahaya</field>
+    </record>
+    <record id="fp_district_6_01_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">03</field>
+        <field name="name">Chomes</field>
+    </record>
+    <record id="fp_district_6_01_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">04</field>
+        <field name="name">Lepanto</field>
+    </record>
+    <record id="fp_district_6_01_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">05</field>
+        <field name="name">Paquera</field>
+    </record>
+    <record id="fp_district_6_01_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">06</field>
+        <field name="name">Manzanillo</field>
+    </record>
+    <record id="fp_district_6_01_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">07</field>
+        <field name="name">Guacimal</field>
+    </record>
+    <record id="fp_district_6_01_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">08</field>
+        <field name="name">Barranca</field>
+    </record>
+    <record id="fp_district_6_01_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">09</field>
+        <field name="name">Monte Verde</field>
+    </record>
+    <record id="fp_district_6_01_10" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">10</field>
+        <field name="name">Isla Del Coco</field>
+    </record>
+    <record id="fp_district_6_01_11" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">11</field>
+        <field name="name">Cóbano</field>
+    </record>
+    <record id="fp_district_6_01_12" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">12</field>
+        <field name="name">Chacarita</field>
+    </record>
+    <record id="fp_district_6_01_13" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">13</field>
+        <field name="name">Chira</field>
+    </record>
+    <record id="fp_district_6_01_14" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">14</field>
+        <field name="name">Acapulco</field>
+    </record>
+    <record id="fp_district_6_01_15" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">15</field>
+        <field name="name">El Roble</field>
+    </record>
+    <record id="fp_district_6_01_16" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_01"/>
+        <field name="code">16</field>
+        <field name="name">Arancibia</field>
+    </record>
+    <record id="fp_canton_6_02" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">02</field>
+        <field name="name">Esparza</field>
+    </record>
+    <record id="fp_district_6_02_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_02"/>
+        <field name="code">01</field>
+        <field name="name">Espíritu Santo</field>
+    </record>
+    <record id="fp_district_6_02_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_02"/>
+        <field name="code">02</field>
+        <field name="name">San Juan Grande</field>
+    </record>
+    <record id="fp_district_6_02_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_02"/>
+        <field name="code">03</field>
+        <field name="name">Macacona</field>
+    </record>
+    <record id="fp_district_6_02_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_02"/>
+        <field name="code">04</field>
+        <field name="name">San Rafael</field>
+    </record>
+    <record id="fp_district_6_02_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_02"/>
+        <field name="code">05</field>
+        <field name="name">San Jerónimo</field>
+    </record>
+    <record id="fp_district_6_02_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_02"/>
+        <field name="code">06</field>
+        <field name="name">Caldera</field>
+    </record>
+    <record id="fp_canton_6_03" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">03</field>
+        <field name="name">Buenos Aires</field>
+    </record>
+    <record id="fp_district_6_03_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_03"/>
+        <field name="code">01</field>
+        <field name="name">Buenos Aires</field>
+    </record>
+    <record id="fp_district_6_03_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_03"/>
+        <field name="code">02</field>
+        <field name="name">Volcán</field>
+    </record>
+    <record id="fp_district_6_03_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_03"/>
+        <field name="code">03</field>
+        <field name="name">Potrero Grande</field>
+    </record>
+    <record id="fp_district_6_03_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_03"/>
+        <field name="code">04</field>
+        <field name="name">Boruca</field>
+    </record>
+    <record id="fp_district_6_03_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_03"/>
+        <field name="code">05</field>
+        <field name="name">Pilas</field>
+    </record>
+    <record id="fp_district_6_03_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_03"/>
+        <field name="code">06</field>
+        <field name="name">Colinas</field>
+    </record>
+    <record id="fp_district_6_03_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_03"/>
+        <field name="code">07</field>
+        <field name="name">Changuena</field>
+    </record>
+    <record id="fp_district_6_03_08" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_03"/>
+        <field name="code">08</field>
+        <field name="name">Biolley</field>
+    </record>
+    <record id="fp_district_6_03_09" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_03"/>
+        <field name="code">09</field>
+        <field name="name">Brunka</field>
+    </record>
+    <record id="fp_canton_6_04" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">04</field>
+        <field name="name">Montes De Oro</field>
+    </record>
+    <record id="fp_district_6_04_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_04"/>
+        <field name="code">01</field>
+        <field name="name">Miramar</field>
+    </record>
+    <record id="fp_district_6_04_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_04"/>
+        <field name="code">02</field>
+        <field name="name">La Unión</field>
+    </record>
+    <record id="fp_district_6_04_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_04"/>
+        <field name="code">03</field>
+        <field name="name">San Isidro</field>
+    </record>
+    <record id="fp_canton_6_05" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">05</field>
+        <field name="name">Osa</field>
+    </record>
+    <record id="fp_district_6_05_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_05"/>
+        <field name="code">01</field>
+        <field name="name">Puerto Cortés</field>
+    </record>
+    <record id="fp_district_6_05_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_05"/>
+        <field name="code">02</field>
+        <field name="name">Palmar</field>
+    </record>
+    <record id="fp_district_6_05_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_05"/>
+        <field name="code">03</field>
+        <field name="name">Sierpe</field>
+    </record>
+    <record id="fp_district_6_05_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_05"/>
+        <field name="code">04</field>
+        <field name="name">Bahía Ballena</field>
+    </record>
+    <record id="fp_district_6_05_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_05"/>
+        <field name="code">05</field>
+        <field name="name">Piedras Blancas</field>
+    </record>
+    <record id="fp_district_6_05_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_05"/>
+        <field name="code">06</field>
+        <field name="name">Bahía Drake</field>
+    </record>
+    <record id="fp_canton_6_06" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">06</field>
+        <field name="name">Quepos</field>
+    </record>
+    <record id="fp_district_6_06_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_06"/>
+        <field name="code">01</field>
+        <field name="name">Quepos</field>
+    </record>
+    <record id="fp_district_6_06_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_06"/>
+        <field name="code">02</field>
+        <field name="name">Savegre</field>
+    </record>
+    <record id="fp_district_6_06_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_06"/>
+        <field name="code">03</field>
+        <field name="name">Naranjito</field>
+    </record>
+    <record id="fp_canton_6_07" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">07</field>
+        <field name="name">Golfito</field>
+    </record>
+    <record id="fp_district_6_07_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_07"/>
+        <field name="code">01</field>
+        <field name="name">Golfito</field>
+    </record>
+    <record id="fp_district_6_07_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_07"/>
+        <field name="code">02</field>
+        <field name="name">Puerto Jiménez</field>
+    </record>
+    <record id="fp_district_6_07_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_07"/>
+        <field name="code">03</field>
+        <field name="name">Guaycara</field>
+    </record>
+    <record id="fp_district_6_07_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_07"/>
+        <field name="code">04</field>
+        <field name="name">Pavón</field>
+    </record>
+    <record id="fp_canton_6_08" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">08</field>
+        <field name="name">Coto Brus</field>
+    </record>
+    <record id="fp_district_6_08_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_08"/>
+        <field name="code">01</field>
+        <field name="name">San Vito</field>
+    </record>
+    <record id="fp_district_6_08_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_08"/>
+        <field name="code">02</field>
+        <field name="name">Sabalito</field>
+    </record>
+    <record id="fp_district_6_08_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_08"/>
+        <field name="code">03</field>
+        <field name="name">Aguabuena</field>
+    </record>
+    <record id="fp_district_6_08_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_08"/>
+        <field name="code">04</field>
+        <field name="name">Limoncito</field>
+    </record>
+    <record id="fp_district_6_08_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_08"/>
+        <field name="code">05</field>
+        <field name="name">Pittier</field>
+    </record>
+    <record id="fp_canton_6_09" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">09</field>
+        <field name="name">Parrita</field>
+    </record>
+    <record id="fp_district_6_09_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_09"/>
+        <field name="code">01</field>
+        <field name="name">Parrita</field>
+    </record>
+    <record id="fp_canton_6_10" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">10</field>
+        <field name="name">Corredores</field>
+    </record>
+    <record id="fp_district_6_10_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_10"/>
+        <field name="code">01</field>
+        <field name="name">Corredor</field>
+    </record>
+    <record id="fp_district_6_10_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_10"/>
+        <field name="code">02</field>
+        <field name="name">La Cuesta</field>
+    </record>
+    <record id="fp_district_6_10_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_10"/>
+        <field name="code">03</field>
+        <field name="name">Canoas</field>
+    </record>
+    <record id="fp_district_6_10_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_10"/>
+        <field name="code">04</field>
+        <field name="name">Laurel</field>
+    </record>
+    <record id="fp_canton_6_11" model="fp.canton">
+        <field name="province_id" ref="fp_province_6"/>
+        <field name="code">11</field>
+        <field name="name">Garabito</field>
+    </record>
+    <record id="fp_district_6_11_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_11"/>
+        <field name="code">01</field>
+        <field name="name">Jacó</field>
+    </record>
+    <record id="fp_district_6_11_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_6_11"/>
+        <field name="code">02</field>
+        <field name="name">Tárcoles</field>
+    </record>
+    <record id="fp_province_7" model="fp.province">
+        <field name="code">7</field>
+        <field name="name">Limón</field>
+    </record>
+    <record id="fp_canton_7_01" model="fp.canton">
+        <field name="province_id" ref="fp_province_7"/>
+        <field name="code">01</field>
+        <field name="name">Central</field>
+    </record>
+    <record id="fp_district_7_01_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_01"/>
+        <field name="code">01</field>
+        <field name="name">Limón</field>
+    </record>
+    <record id="fp_district_7_01_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_01"/>
+        <field name="code">02</field>
+        <field name="name">Valle La Estrella</field>
+    </record>
+    <record id="fp_district_7_01_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_01"/>
+        <field name="code">03</field>
+        <field name="name">Rio Blanco</field>
+    </record>
+    <record id="fp_district_7_01_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_01"/>
+        <field name="code">04</field>
+        <field name="name">Matama</field>
+    </record>
+    <record id="fp_canton_7_02" model="fp.canton">
+        <field name="province_id" ref="fp_province_7"/>
+        <field name="code">02</field>
+        <field name="name">Pococí</field>
+    </record>
+    <record id="fp_district_7_02_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_02"/>
+        <field name="code">01</field>
+        <field name="name">Guapiles</field>
+    </record>
+    <record id="fp_district_7_02_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_02"/>
+        <field name="code">02</field>
+        <field name="name">Jiménez</field>
+    </record>
+    <record id="fp_district_7_02_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_02"/>
+        <field name="code">03</field>
+        <field name="name">Rita</field>
+    </record>
+    <record id="fp_district_7_02_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_02"/>
+        <field name="code">04</field>
+        <field name="name">Roxana</field>
+    </record>
+    <record id="fp_district_7_02_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_02"/>
+        <field name="code">05</field>
+        <field name="name">Cariari</field>
+    </record>
+    <record id="fp_district_7_02_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_02"/>
+        <field name="code">06</field>
+        <field name="name">Colorado</field>
+    </record>
+    <record id="fp_district_7_02_07" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_02"/>
+        <field name="code">07</field>
+        <field name="name">La Colonia</field>
+    </record>
+    <record id="fp_canton_7_03" model="fp.canton">
+        <field name="province_id" ref="fp_province_7"/>
+        <field name="code">03</field>
+        <field name="name">Siquirres</field>
+    </record>
+    <record id="fp_district_7_03_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_03"/>
+        <field name="code">01</field>
+        <field name="name">Siquirres</field>
+    </record>
+    <record id="fp_district_7_03_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_03"/>
+        <field name="code">02</field>
+        <field name="name">Pacuarito</field>
+    </record>
+    <record id="fp_district_7_03_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_03"/>
+        <field name="code">03</field>
+        <field name="name">Florida</field>
+    </record>
+    <record id="fp_district_7_03_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_03"/>
+        <field name="code">04</field>
+        <field name="name">Germania</field>
+    </record>
+    <record id="fp_district_7_03_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_03"/>
+        <field name="code">05</field>
+        <field name="name">El Cairo</field>
+    </record>
+    <record id="fp_district_7_03_06" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_03"/>
+        <field name="code">06</field>
+        <field name="name">Alegría</field>
+    </record>
+    <record id="fp_canton_7_04" model="fp.canton">
+        <field name="province_id" ref="fp_province_7"/>
+        <field name="code">04</field>
+        <field name="name">Talamanca</field>
+    </record>
+    <record id="fp_district_7_04_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_04"/>
+        <field name="code">01</field>
+        <field name="name">Bratsi</field>
+    </record>
+    <record id="fp_district_7_04_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_04"/>
+        <field name="code">02</field>
+        <field name="name">Sixaola</field>
+    </record>
+    <record id="fp_district_7_04_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_04"/>
+        <field name="code">03</field>
+        <field name="name">Cahuita</field>
+    </record>
+    <record id="fp_district_7_04_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_04"/>
+        <field name="code">04</field>
+        <field name="name">Telire</field>
+    </record>
+    <record id="fp_canton_7_05" model="fp.canton">
+        <field name="province_id" ref="fp_province_7"/>
+        <field name="code">05</field>
+        <field name="name">Matina</field>
+    </record>
+    <record id="fp_district_7_05_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_05"/>
+        <field name="code">01</field>
+        <field name="name">Matina</field>
+    </record>
+    <record id="fp_district_7_05_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_05"/>
+        <field name="code">02</field>
+        <field name="name">Batán</field>
+    </record>
+    <record id="fp_district_7_05_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_05"/>
+        <field name="code">03</field>
+        <field name="name">Carrandi</field>
+    </record>
+    <record id="fp_canton_7_06" model="fp.canton">
+        <field name="province_id" ref="fp_province_7"/>
+        <field name="code">06</field>
+        <field name="name">Guácimo</field>
+    </record>
+    <record id="fp_district_7_06_01" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_06"/>
+        <field name="code">01</field>
+        <field name="name">Guácimo</field>
+    </record>
+    <record id="fp_district_7_06_02" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_06"/>
+        <field name="code">02</field>
+        <field name="name">Mercedes</field>
+    </record>
+    <record id="fp_district_7_06_03" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_06"/>
+        <field name="code">03</field>
+        <field name="name">Pocora</field>
+    </record>
+    <record id="fp_district_7_06_04" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_06"/>
+        <field name="code">04</field>
+        <field name="name">Rio Jiménez</field>
+    </record>
+    <record id="fp_district_7_06_05" model="fp.district">
+        <field name="canton_id" ref="fp_canton_7_06"/>
+        <field name="code">05</field>
+        <field name="name">Duacari</field>
+    </record>
+</odoo>

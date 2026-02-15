@@ -53,6 +53,23 @@ El módulo ahora incluye una **lista CABYS base** que se instala automáticament
 
 Si necesitas el catálogo oficial completo, puedes complementar o reemplazar estos registros desde el mismo menú de catálogos.
 
+
+## Catálogos de Provincias, Cantones y Distritos
+
+La lista oficial de **provincias, cantones y distritos de Costa Rica** queda disponible en:
+
+- `Contabilidad > Configuración > Catálogos FE > Provincias`
+- `Contabilidad > Configuración > Catálogos FE > Cantones`
+- `Contabilidad > Configuración > Catálogos FE > Distritos`
+
+Además, en el formulario de **Contacto/Partner** los campos FE se muestran en cascada:
+
+1. Provincia
+2. Cantón (filtrado por provincia)
+3. Distrito (filtrado por cantón)
+
+La carga inicial se instala automáticamente desde `data/fp_cr_locations_data.xml`.
+
 ## Importante para producción
 
 La firma XML se genera dentro de Odoo a partir del certificado configurado por compañía.
