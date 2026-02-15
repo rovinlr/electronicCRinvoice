@@ -11,10 +11,10 @@
             </xpath>
             <xpath expr="//field[@name='invoice_date']" position="after">
                 <field name="fp_is_electronic_invoice" invisible="1"/>
-                <field name="fp_document_type" invisible="not fp_is_electronic_invoice"/>
-                <field name="fp_economic_activity_id" invisible="not fp_is_electronic_invoice"/>
-                <field name="fp_sale_condition" invisible="not fp_is_electronic_invoice"/>
-                <field name="fp_payment_method" invisible="not fp_is_electronic_invoice"/>
+                <field name="fp_document_type" invisible="not fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
+                <field name="fp_economic_activity_id" invisible="not fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
+                <field name="fp_sale_condition" invisible="not fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
+                <field name="fp_payment_method" invisible="not fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
                 <field name="fp_external_id" readonly="1" invisible="not fp_is_electronic_invoice"/>
                 <field name="fp_api_state" readonly="1" invisible="1"/>
                 <label for="fp_consecutive_number" invisible="not fp_is_electronic_invoice"/>

@@ -49,6 +49,41 @@ XADES_SIGNATURE_POLICY_HASH = "DWxin1xWOeI8OuWQXazh4VjLWAaCLAA954em7DMh0h8="
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    _FP_LOCKED_FIELDS_AFTER_SEND = {
+        "fp_document_type",
+        "fp_economic_activity_id",
+        "fp_sale_condition",
+        "fp_payment_method",
+    }
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("move_type") == "out_refund" and not vals.get("fp_document_type"):
+                vals["fp_document_type"] = "NC"
+        return super().create(vals_list)
+
+    def write(self, vals):
+        protected_fields = self._FP_LOCKED_FIELDS_AFTER_SEND.intersection(vals)
+        if protected_fields:
+            locked_moves = self.filtered(lambda move: move.fp_is_electronic_invoice and move.fp_api_state != "pending")
+            if locked_moves:
+                raise UserError(
+                    _(
+                        "No se permite editar Tipo de documento, Actividad económica, "
+                        "Condición de venta o Medio de pago después de enviar a Hacienda."
+                    )
+                )
+        return super().write(vals)
+
+    @api.onchange("move_type")
+    def _onchange_fp_document_type_from_move_type(self):
+        for move in self:
+            if move.move_type == "out_refund" and move.fp_is_electronic_invoice:
+                move.fp_document_type = "NC"
+            elif move.move_type == "out_invoice" and move.fp_document_type == "NC":
+                move.fp_document_type = "FE"
+
     def action_post(self):
         moves = super().action_post()
         electronic_moves = self.filtered(
@@ -468,6 +503,8 @@ class AccountMove(models.Model):
         self._fp_append_location_nodes(receptor, self.partner_id)
         self._fp_append_contact_nodes(receptor, self.partner_id)
 
+        self._fp_append_reference_information(root)
+
         ET.SubElement(root, "CondicionVenta").text = self.fp_sale_condition or "01"
 
         lines = ET.SubElement(root, "DetalleServicio")
@@ -508,6 +545,35 @@ class AccountMove(models.Model):
         ET.register_namespace("", namespace)
         ET.register_namespace("ds", DS_XML_NS)
         return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
+
+    def _fp_append_reference_information(self, root_node):
+        self.ensure_one()
+        if self.fp_document_type not in ("NC", "ND"):
+            return
+
+        referenced_move = self.reversed_entry_id
+        if not referenced_move:
+            raise UserError(
+                _(
+                    "La nota electrónica requiere un documento de referencia. "
+                    "Cree la nota desde una factura para enlazar la referencia automáticamente."
+                )
+            )
+
+        reference_node = ET.SubElement(root_node, "InformacionReferencia")
+        ET.SubElement(reference_node, "TipoDoc").text = referenced_move._fp_get_document_code()
+        ET.SubElement(reference_node, "Numero").text = (
+            referenced_move.fp_external_id
+            or referenced_move.fp_consecutive_number
+            or (referenced_move.name or "")
+        )
+        reference_date = referenced_move.invoice_date or referenced_move.date or fields.Date.context_today(self)
+        ET.SubElement(reference_node, "FechaEmision").text = datetime.combine(
+            reference_date,
+            datetime.now().astimezone().timetz(),
+        ).isoformat(timespec="seconds")
+        ET.SubElement(reference_node, "Codigo").text = "01"
+        ET.SubElement(reference_node, "Razon").text = _("Documento de referencia para nota electrónica")
 
     def _fp_build_detail_lines(self, lines_node):
         totals = {
