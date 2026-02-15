@@ -132,11 +132,6 @@ class ResPartner(models.Model):
         string="Actividad económica principal (FE)",
         help="Actividad económica principal del cliente para facturación electrónica.",
     )
-    fp_economic_activity_code = fields.Char(
-        related="fp_economic_activity_id.code",
-        string="Código actividad económica principal (FE)",
-        readonly=True,
-    )
 
     def action_fp_fetch_hacienda_data(self):
         for partner in self:
