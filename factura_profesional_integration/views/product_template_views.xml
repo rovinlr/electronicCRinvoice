@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='categ_id']" position="after">
-                <group string="Facturación Electrónica CR" col="2" colspan="4">
+                <group string="Facturación Electrónica CR" col="2">
                     <field name="fp_use_exonerations"/>
                     <field name="fp_cabys_code_id"/>
                     <field name="fp_commercial_code_type"/>
@@ -25,7 +25,7 @@
         <field name="inherit_id" ref="product.product_normal_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='categ_id']" position="after">
-                <group string="Facturación Electrónica CR" col="2" colspan="4">
+                <group string="Facturación Electrónica CR" col="2">
                     <field name="fp_use_exonerations"/>
                     <field name="fp_cabys_code_id"/>
                     <field name="fp_commercial_code_type"/>
