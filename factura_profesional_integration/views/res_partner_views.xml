@@ -10,7 +10,7 @@
             </xpath>
 
             <xpath expr="//field[@name='vat']" position="after">
-                <group string="Facturación Electrónica CR" col="2">
+                <group col="2">
                     <field name="fp_identification_type" string="Tipo de identificación"/>
                     <field name="fp_economic_activity_id" string="Actividad económica"/>
                     <field name="fp_use_exonerations"/>
@@ -35,6 +35,8 @@
             </xpath>
 
             <xpath expr="//field[@name='zip']" position="after">
+                <div class="w-100" invisible="not fp_is_costa_rica"/>
+
                 <label for="fp_province_id" string="Provincia" invisible="not fp_is_costa_rica"/>
                 <div class="o_address_state" invisible="not fp_is_costa_rica">
                     <field name="fp_province_id" string="Provincia" options="{'no_create': True}" nolabel="1"/>
