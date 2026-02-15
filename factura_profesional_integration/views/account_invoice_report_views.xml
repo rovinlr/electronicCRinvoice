@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<odoo>
     <template id="report_invoice_document_fp_electronic_header" inherit_id="account.report_invoice_document">
         <xpath expr="//div[hasclass('page')]/h2" position="attributes">
             <attribute name="t-if">not o.fp_is_electronic_invoice</attribute>
@@ -44,3 +45,4 @@
             </t>
         </xpath>
     </template>
+</odoo>
