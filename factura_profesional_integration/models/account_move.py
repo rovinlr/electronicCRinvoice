@@ -11,6 +11,7 @@ import requests
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.serialization import pkcs12
+from lxml import etree as LET
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
@@ -18,6 +19,7 @@ from odoo.exceptions import UserError
 
 FE_XML_NS = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
 DS_XML_NS = "http://www.w3.org/2000/09/xmldsig#"
+XADES_XML_NS = "http://uri.etsi.org/01903/v1.3.2#"
 
 
 class AccountMove(models.Model):
@@ -482,55 +484,127 @@ class AccountMove(models.Model):
         if not private_key or not certificate:
             raise UserError(_("El certificado FE no contiene llave privada o certificado válido."))
 
-        root = ET.fromstring(xml_text.encode("utf-8"))
-        root_digest = hashlib.sha256(xml_text.encode("utf-8")).digest()
+        parser = LET.XMLParser(remove_blank_text=True)
+        root = LET.fromstring(xml_text.encode("utf-8"), parser=parser)
+        canonical_document = LET.tostring(root, method="c14n", exclusive=True, with_comments=False)
+        root_digest = hashlib.sha256(canonical_document).digest()
 
-        signature_node = ET.SubElement(root, ET.QName(DS_XML_NS, "Signature"))
-        signed_info = ET.SubElement(signature_node, ET.QName(DS_XML_NS, "SignedInfo"))
-        ET.SubElement(
+        signature_token = f"{random.getrandbits(128):032x}"
+        signature_id = f"id-{signature_token}"
+        signed_properties_id = f"xades-id-{signature_token}"
+
+        signature_node = LET.SubElement(root, LET.QName(DS_XML_NS, "Signature"), nsmap={"ds": DS_XML_NS, "xades": XADES_XML_NS})
+        signature_node.set("Id", signature_id)
+
+        signed_info = LET.SubElement(signature_node, LET.QName(DS_XML_NS, "SignedInfo"))
+        LET.SubElement(
             signed_info,
-            ET.QName(DS_XML_NS, "CanonicalizationMethod"),
-            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
+            LET.QName(DS_XML_NS, "CanonicalizationMethod"),
+            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
         )
-        ET.SubElement(
+        LET.SubElement(
             signed_info,
-            ET.QName(DS_XML_NS, "SignatureMethod"),
+            LET.QName(DS_XML_NS, "SignatureMethod"),
             {"Algorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"},
         )
-        reference = ET.SubElement(signed_info, ET.QName(DS_XML_NS, "Reference"), {"URI": ""})
-        transforms = ET.SubElement(reference, ET.QName(DS_XML_NS, "Transforms"))
-        ET.SubElement(
+
+        reference_document = LET.SubElement(signed_info, LET.QName(DS_XML_NS, "Reference"), {"Id": "r-id-1", "URI": ""})
+        transforms = LET.SubElement(reference_document, LET.QName(DS_XML_NS, "Transforms"))
+        xpath_transform = LET.SubElement(
             transforms,
-            ET.QName(DS_XML_NS, "Transform"),
-            {"Algorithm": "http://www.w3.org/2000/09/xmldsig#enveloped-signature"},
+            LET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/TR/1999/REC-xpath-19991116"},
         )
-        ET.SubElement(
+        LET.SubElement(xpath_transform, LET.QName(DS_XML_NS, "XPath")).text = "not(ancestor-or-self::ds:Signature)"
+        LET.SubElement(
             transforms,
-            ET.QName(DS_XML_NS, "Transform"),
-            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
+            LET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
         )
-        ET.SubElement(
-            reference,
-            ET.QName(DS_XML_NS, "DigestMethod"),
+        LET.SubElement(
+            reference_document,
+            LET.QName(DS_XML_NS, "DigestMethod"),
             {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
         )
-        ET.SubElement(reference, ET.QName(DS_XML_NS, "DigestValue")).text = base64.b64encode(root_digest).decode("utf-8")
+        LET.SubElement(reference_document, LET.QName(DS_XML_NS, "DigestValue")).text = base64.b64encode(root_digest).decode("utf-8")
 
-        signed_info_xml = ET.tostring(signed_info, encoding="utf-8")
-        signature = private_key.sign(signed_info_xml, padding.PKCS1v15(), hashes.SHA256())
-        ET.SubElement(signature_node, ET.QName(DS_XML_NS, "SignatureValue")).text = base64.b64encode(signature).decode(
-            "utf-8"
+        reference_signed_properties = LET.SubElement(
+            signed_info,
+            LET.QName(DS_XML_NS, "Reference"),
+            {
+                "Type": "http://uri.etsi.org/01903#SignedProperties",
+                "URI": f"#{signed_properties_id}",
+            },
+        )
+        signed_properties_transforms = LET.SubElement(reference_signed_properties, LET.QName(DS_XML_NS, "Transforms"))
+        LET.SubElement(
+            signed_properties_transforms,
+            LET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
+        )
+        LET.SubElement(
+            reference_signed_properties,
+            LET.QName(DS_XML_NS, "DigestMethod"),
+            {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
+        )
+        reference_signed_properties_digest = LET.SubElement(reference_signed_properties, LET.QName(DS_XML_NS, "DigestValue"))
+
+        key_info = LET.SubElement(signature_node, LET.QName(DS_XML_NS, "KeyInfo"))
+        x509_data = LET.SubElement(key_info, LET.QName(DS_XML_NS, "X509Data"))
+        cert_der = certificate.public_bytes(serialization.Encoding.DER)
+        LET.SubElement(x509_data, LET.QName(DS_XML_NS, "X509Certificate")).text = base64.b64encode(cert_der).decode("utf-8")
+
+        object_node = LET.SubElement(signature_node, LET.QName(DS_XML_NS, "Object"))
+        qualifying_properties = LET.SubElement(
+            object_node,
+            LET.QName(XADES_XML_NS, "QualifyingProperties"),
+            {"Target": f"#{signature_id}"},
+        )
+        signed_properties = LET.SubElement(
+            qualifying_properties,
+            LET.QName(XADES_XML_NS, "SignedProperties"),
+            {"Id": signed_properties_id},
+        )
+        signed_signature_properties = LET.SubElement(signed_properties, LET.QName(XADES_XML_NS, "SignedSignatureProperties"))
+        LET.SubElement(signed_signature_properties, LET.QName(XADES_XML_NS, "SigningTime")).text = datetime.utcnow().strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
         )
 
-        key_info = ET.SubElement(signature_node, ET.QName(DS_XML_NS, "KeyInfo"))
-        x509_data = ET.SubElement(key_info, ET.QName(DS_XML_NS, "X509Data"))
-        ET.SubElement(x509_data, ET.QName(DS_XML_NS, "X509Certificate")).text = base64.b64encode(
-            certificate.public_bytes(serialization.Encoding.DER)
+        signing_certificate = LET.SubElement(signed_signature_properties, LET.QName(XADES_XML_NS, "SigningCertificate"))
+        cert_node = LET.SubElement(signing_certificate, LET.QName(XADES_XML_NS, "Cert"))
+        cert_digest_node = LET.SubElement(cert_node, LET.QName(XADES_XML_NS, "CertDigest"))
+        LET.SubElement(
+            cert_digest_node,
+            LET.QName(DS_XML_NS, "DigestMethod"),
+            {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
+        )
+        LET.SubElement(cert_digest_node, LET.QName(DS_XML_NS, "DigestValue")).text = base64.b64encode(
+            hashlib.sha256(cert_der).digest()
         ).decode("utf-8")
+        issuer_serial = LET.SubElement(cert_node, LET.QName(XADES_XML_NS, "IssuerSerial"))
+        LET.SubElement(issuer_serial, LET.QName(DS_XML_NS, "X509IssuerName")).text = certificate.issuer.rfc4514_string()
+        LET.SubElement(issuer_serial, LET.QName(DS_XML_NS, "X509SerialNumber")).text = str(certificate.serial_number)
 
-        ET.register_namespace("", FE_XML_NS)
-        ET.register_namespace("ds", DS_XML_NS)
-        return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
+        signed_data_object_properties = LET.SubElement(signed_properties, LET.QName(XADES_XML_NS, "SignedDataObjectProperties"))
+        data_object_format = LET.SubElement(
+            signed_data_object_properties,
+            LET.QName(XADES_XML_NS, "DataObjectFormat"),
+            {"ObjectReference": "#r-id-1"},
+        )
+        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "application/xml"
+
+        signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=True, with_comments=False)
+        reference_signed_properties_digest.text = base64.b64encode(hashlib.sha256(signed_properties_c14n).digest()).decode("utf-8")
+
+        signed_info_c14n = LET.tostring(signed_info, method="c14n", exclusive=True, with_comments=False)
+        signature = private_key.sign(signed_info_c14n, padding.PKCS1v15(), hashes.SHA256())
+        LET.SubElement(
+            signature_node,
+            LET.QName(DS_XML_NS, "SignatureValue"),
+            {"Id": f"value-{signature_id}"},
+        ).text = base64.b64encode(signature).decode("utf-8")
+
+        return LET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
 
     def _fp_store_hacienda_response_xml(self, response_data):
         self.ensure_one()
