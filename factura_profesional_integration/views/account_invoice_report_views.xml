@@ -15,10 +15,7 @@
                         'RCE': 'Confirmación de Rechazo'
                     }"/>
                     <div class="fp-electronic-title">
-                        <strong>Tipo de documento (FE, TE, NC, ND, FEE)</strong>
-                        <div>
-                            <span t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
-                        </div>
+                        <strong t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
                     </div>
                 </t>
             </t>
@@ -69,25 +66,20 @@
                     }
                     .fp-grid {
                         width: 100%;
-                        border-collapse: separate;
-                        border-spacing: 0 6px;
-                        border: none !important;
                     }
-                    .fp-grid tr,
-                    .fp-grid td {
+                    .fp-grid-row {
+                        display: flex;
+                        gap: 24px;
+                        margin-bottom: 6px;
+                    }
+                    .fp-grid-row:last-child {
+                        margin-bottom: 0;
+                    }
+                    .fp-grid-cell {
+                        flex: 1 1 0;
                         vertical-align: top;
                         font-size: 15px;
                         color: #111827;
-                        padding: 0;
-                        border: none !important;
-                        box-shadow: none !important;
-                        background: transparent !important;
-                    }
-                    .fp-grid td.fp-cell {
-                        padding-right: 24px;
-                    }
-                    .fp-grid td.fp-cell:last-child {
-                        padding-right: 0;
                     }
                     .fp-grid .fp-label {
                         font-weight: 700;
@@ -110,38 +102,18 @@
                 </div>
 
                 <div class="fp-card">
-                    <table class="fp-grid">
-                        <tr>
-                            <td class="fp-cell"><span class="fp-label">Fecha:</span><span t-field="o.invoice_date"/></td>
-                            <td class="fp-cell"><span class="fp-label">Condición de venta:</span><span t-field="o.fp_sale_condition"/></td>
-                            <td class="fp-cell"><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></td>
-                        </tr>
-                        <tr>
-                            <td class="fp-cell"><span class="fp-label">Vencimiento:</span><span t-field="o.invoice_date_due"/></td>
-                            <td class="fp-cell"><span class="fp-label">Medio de pago:</span><span t-field="o.fp_payment_method"/></td>
-                            <td class="fp-cell"><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></td>
-                        </tr>
-                    </table>
-                </div>
-
-                <div class="fp-section-title">Datos del receptor:</div>
-                <div class="fp-card">
-                    <table class="fp-grid">
-                        <tr>
-                            <td class="fp-cell"><span class="fp-label">Cliente:</span><span t-field="o.partner_id"/></td>
-                            <td class="fp-cell"><span class="fp-label">Correo:</span><span t-field="o.partner_id.email"/></td>
-                        </tr>
-                        <tr>
-                            <td class="fp-cell"><span class="fp-label">Identificación:</span><span t-esc="o.partner_id.vat or ''"/></td>
-                            <td class="fp-cell"><span class="fp-label">Teléfono:</span><span t-field="o.partner_id.phone"/></td>
-                        </tr>
-                        <tr>
-                            <td class="fp-cell fp-wide" colspan="2"><span class="fp-label">Dirección:</span>
-                                <span t-if="o.partner_id.country_id.code == 'CR'" t-esc="', '.join([part for part in [o.partner_id.street, o.partner_id.fp_neighborhood_code, o.partner_id.fp_district_code, o.partner_id.city, o.partner_id.state_id.name] if part])"/>
-                                <span t-if="o.partner_id.country_id.code != 'CR'" t-field="o.partner_id.contact_address"/>
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="fp-grid">
+                        <div class="fp-grid-row">
+                            <div class="fp-grid-cell"><span class="fp-label">Fecha:</span><span t-field="o.invoice_date"/></div>
+                            <div class="fp-grid-cell"><span class="fp-label">Condición de venta:</span><span t-field="o.fp_sale_condition"/></div>
+                            <div class="fp-grid-cell"><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></div>
+                        </div>
+                        <div class="fp-grid-row">
+                            <div class="fp-grid-cell"><span class="fp-label">Vencimiento:</span><span t-field="o.invoice_date_due"/></div>
+                            <div class="fp-grid-cell"><span class="fp-label">Medio de pago:</span><span t-field="o.fp_payment_method"/></div>
+                            <div class="fp-grid-cell"><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                        </div>
+                    </div>
                 </div>
             </t>
         </xpath>
