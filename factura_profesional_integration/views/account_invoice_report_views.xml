@@ -27,6 +27,12 @@
             </t>
         </xpath>
 
+        <xpath expr="//t[@t-set='information_block']" position="after">
+            <t t-if="o.fp_is_electronic_invoice" t-set="information_block">
+                <div/>
+            </t>
+        </xpath>
+
         <xpath expr="//div[@id='informations']" position="attributes">
             <attribute name="t-if">not o.fp_is_electronic_invoice</attribute>
         </xpath>
@@ -88,6 +94,9 @@
                     .fp-wide {
                         width: 100%;
                     }
+                    .fp-client-card {
+                        margin-top: 12px;
+                    }
                 </style>
 
                 <div class="fp-doc-heading">Factura Electrónica</div>
@@ -112,6 +121,31 @@
                             <div class="fp-grid-cell"><span class="fp-label">Vencimiento:</span><span t-field="o.invoice_date_due"/></div>
                             <div class="fp-grid-cell"><span class="fp-label">Medio de pago:</span><span t-field="o.fp_payment_method"/></div>
                             <div class="fp-grid-cell"><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fp-section-title">Cliente</div>
+                <div class="fp-card fp-client-card">
+                    <div class="fp-grid">
+                        <div class="fp-grid-row">
+                            <div class="fp-grid-cell fp-wide"><span class="fp-label">Nombre:</span><span t-field="o.partner_id"/></div>
+                        </div>
+                        <div class="fp-grid-row" t-if="o.partner_id.vat">
+                            <div class="fp-grid-cell fp-wide"><span class="fp-label">Identificación:</span><span t-field="o.partner_id.vat"/></div>
+                        </div>
+                        <div class="fp-grid-row" t-if="o.partner_id.street or o.partner_id.street2">
+                            <div class="fp-grid-cell fp-wide">
+                                <span class="fp-label">Dirección:</span>
+                                <span t-esc="', '.join(filter(None, [o.partner_id.street, o.partner_id.street2]))"/>
+                            </div>
+                        </div>
+                        <div class="fp-grid-row" t-if="o.partner_id.phone or o.partner_id.mobile">
+                            <div class="fp-grid-cell"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or o.partner_id.mobile"/></div>
+                            <div class="fp-grid-cell" t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-field="o.partner_id.email"/></div>
+                        </div>
+                        <div class="fp-grid-row" t-if="(not (o.partner_id.phone or o.partner_id.mobile)) and o.partner_id.email">
+                            <div class="fp-grid-cell fp-wide"><span class="fp-label">Correo:</span><span t-field="o.partner_id.email"/></div>
                         </div>
                     </div>
                 </div>
