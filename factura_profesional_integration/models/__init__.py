@@ -1,4 +1,5 @@
 from . import fp_catalogs
+from . import fp_exoneration
 from . import account_journal
 from . import account_move
 from . import account_tax

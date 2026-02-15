@@ -544,6 +544,7 @@ class AccountMove(models.Model):
             ET.SubElement(detail, "NumeroLinea").text = str(idx)
             if line.product_id and line.product_id.fp_cabys_code:
                 ET.SubElement(detail, "CodigoCABYS").text = line.product_id.fp_cabys_code
+            self._fp_append_line_extra_nodes(detail, line)
 
             quantity = line.quantity or 0.0
             ET.SubElement(detail, "Cantidad").text = self._fp_format_decimal(quantity)
@@ -566,6 +567,7 @@ class AccountMove(models.Model):
 
             ET.SubElement(detail, "MontoTotal").text = self._fp_format_decimal(monto_total)
             ET.SubElement(detail, "SubTotal").text = self._fp_format_decimal(subtotal)
+            exoneration_amount = 0.0
             if has_tax:
                 ET.SubElement(detail, "BaseImponible").text = self._fp_format_decimal(subtotal)
                 impuesto = ET.SubElement(detail, "Impuesto")
@@ -573,6 +575,7 @@ class AccountMove(models.Model):
                 ET.SubElement(impuesto, "CodigoTarifaIVA").text = tax_rate_code
                 ET.SubElement(impuesto, "Tarifa").text = self._fp_format_decimal(tax_rate)
                 ET.SubElement(impuesto, "Monto").text = self._fp_format_decimal(total_impuesto_linea)
+                exoneration_amount = self._fp_append_exoneracion_node(impuesto, line, total_impuesto_linea)
                 ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
                 ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(total_impuesto_linea)
                 desglose_key = (tax_code, tax_rate_code)
@@ -584,11 +587,18 @@ class AccountMove(models.Model):
             product_type = line.product_id.product_tmpl_id.type if line.product_id else False
             is_service = product_type == "service"
             if has_tax and total_impuesto_linea > 0:
-                if is_service:
-                    totals["total_serv_gravados"] += subtotal
+                if exoneration_amount > 0:
+                    if is_service:
+                        totals["total_serv_exonerado"] += subtotal
+                    else:
+                        totals["total_merc_exonerada"] += subtotal
+                    totals["total_exonerado"] += subtotal
                 else:
-                    totals["total_mercancias_gravadas"] += subtotal
-                totals["total_gravado"] += subtotal
+                    if is_service:
+                        totals["total_serv_gravados"] += subtotal
+                    else:
+                        totals["total_mercancias_gravadas"] += subtotal
+                    totals["total_gravado"] += subtotal
             elif has_tax and tax_rate_code in ("01", "05", "11"):
                 if is_service:
                     totals["total_serv_no_sujeto"] += subtotal
@@ -615,6 +625,71 @@ class AccountMove(models.Model):
             totals["total_comprobante"] += monto_total_linea
 
         return totals
+
+    def _fp_append_line_extra_nodes(self, detail_node, line):
+        product = line.product_id.product_tmpl_id if line.product_id else False
+        if not product:
+            return
+        if product.fp_commercial_code_type and (line.product_id.default_code or product.default_code):
+            code_node = ET.SubElement(detail_node, "CodigoComercial")
+            ET.SubElement(code_node, "Tipo").text = product.fp_commercial_code_type
+            ET.SubElement(code_node, "Codigo").text = line.product_id.default_code or product.default_code
+        if product.fp_health_registry_number:
+            ET.SubElement(detail_node, "NumeroRegistroMS").text = product.fp_health_registry_number
+        if product.fp_medicine_presentation_code:
+            ET.SubElement(detail_node, "CodigoPresentacionMedicamento").text = product.fp_medicine_presentation_code
+        if product.fp_tariff_heading:
+            ET.SubElement(detail_node, "PartidaArancelaria").text = product.fp_tariff_heading
+        if product.fp_transport_vin_or_series:
+            ET.SubElement(detail_node, "NumeroVINoSerie").text = product.fp_transport_vin_or_series
+
+    def _fp_get_line_exoneration(self, line):
+        self.ensure_one()
+        partner = self.partner_id
+        if not partner.fp_use_exonerations:
+            return self.env["fp.client.exoneration"]
+        invoice_date = self.invoice_date or fields.Date.context_today(self)
+        domain = [
+            ("partner_id", "=", partner.id),
+            ("active", "=", True),
+            ("issue_date", "<=", fields.Datetime.to_string(invoice_date)),
+            "|",
+            ("expiry_date", "=", False),
+            ("expiry_date", ">=", invoice_date),
+        ]
+        exonerations = self.env["fp.client.exoneration"].search(domain, order="issue_date desc")
+        if not exonerations:
+            return self.env["fp.client.exoneration"]
+        product_tmpl = line.product_id.product_tmpl_id if line.product_id else False
+        cabys = product_tmpl.fp_cabys_code_id if product_tmpl else False
+        for exoneration in exonerations:
+            if not exoneration.line_ids:
+                return exoneration
+            for exo_line in exoneration.line_ids:
+                product_match = exo_line.product_id and product_tmpl and exo_line.product_id == product_tmpl
+                cabys_match = exo_line.cabys_code_id and cabys and exo_line.cabys_code_id == cabys
+                if product_match or cabys_match:
+                    return exoneration
+        return self.env["fp.client.exoneration"]
+
+    def _fp_append_exoneracion_node(self, impuesto_node, line, tax_amount):
+        exoneration = self._fp_get_line_exoneration(line)
+        if not exoneration:
+            return 0.0
+        exoneration_node = ET.SubElement(impuesto_node, "Exoneracion")
+        ET.SubElement(exoneration_node, "TipoDocumento").text = exoneration.exoneration_type or "99"
+        ET.SubElement(exoneration_node, "NumeroDocumento").text = (exoneration.exoneration_number or "")[:40]
+        ET.SubElement(exoneration_node, "NombreInstitucion").text = (exoneration.institution_name or "")[:160]
+        ET.SubElement(exoneration_node, "FechaEmision").text = fields.Datetime.to_string(exoneration.issue_date)
+        percentage = max(min(exoneration.exoneration_percentage or 0.0, 100.0), 0.0)
+        tax_discount = tax_amount * (percentage / 100.0)
+        ET.SubElement(exoneration_node, "PorcentajeExoneracion").text = self._fp_format_decimal(percentage)
+        ET.SubElement(exoneration_node, "MontoExoneracion").text = self._fp_format_decimal(tax_discount)
+        if exoneration.article:
+            ET.SubElement(exoneration_node, "Articulo").text = (exoneration.article or "")[:3]
+        if exoneration.incise:
+            ET.SubElement(exoneration_node, "Inciso").text = (exoneration.incise or "")[:3]
+        return tax_discount
 
     def _fp_format_decimal(self, value):
         return f"{(value or 0.0):.5f}"

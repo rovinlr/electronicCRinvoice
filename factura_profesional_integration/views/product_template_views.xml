@@ -6,10 +6,14 @@
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='uom_id']" position="after">
-                <div class="o_row">
-                    <label for="fp_cabys_code_id" string="Código CABYS"/>
-                    <field name="fp_cabys_code_id" nolabel="1"/>
-                </div>
+                <group string="Facturación Electrónica CR" col="2">
+                    <field name="fp_cabys_code_id"/>
+                    <field name="fp_commercial_code_type"/>
+                    <field name="fp_health_registry_number"/>
+                    <field name="fp_medicine_presentation_code"/>
+                    <field name="fp_tariff_heading"/>
+                    <field name="fp_transport_vin_or_series"/>
+                </group>
             </xpath>
         </field>
     </record>
@@ -20,10 +24,14 @@
         <field name="inherit_id" ref="product.product_normal_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='uom_id']" position="after">
-                <div class="o_row">
-                    <label for="fp_cabys_code_id" string="Código CABYS"/>
-                    <field name="fp_cabys_code_id" nolabel="1"/>
-                </div>
+                <group string="Facturación Electrónica CR" col="2">
+                    <field name="fp_cabys_code_id"/>
+                    <field name="fp_commercial_code_type"/>
+                    <field name="fp_health_registry_number"/>
+                    <field name="fp_medicine_presentation_code"/>
+                    <field name="fp_tariff_heading"/>
+                    <field name="fp_transport_vin_or_series"/>
+                </group>
             </xpath>
         </field>
     </record>

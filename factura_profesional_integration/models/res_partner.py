@@ -139,6 +139,16 @@ class ResPartner(models.Model):
         help="Actividad económica principal del cliente para facturación electrónica.",
     )
 
+    fp_use_exonerations = fields.Boolean(
+        string="Usa Exoneraciones",
+        help="Activa el uso de exoneraciones de Hacienda para este cliente.",
+    )
+    fp_exoneration_ids = fields.One2many(
+        "fp.client.exoneration",
+        "partner_id",
+        string="Exoneraciones FE",
+    )
+
 
     @api.onchange("country_id", "city")
     def _onchange_fp_sync_canton_from_city(self):

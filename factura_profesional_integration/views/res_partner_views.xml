@@ -8,6 +8,10 @@
             <xpath expr="//field[@name='vat']" position="after">
                 <field name="fp_identification_type"/>
                 <field name="fp_economic_activity_id"/>
+                <div class="o_row">
+                    <field name="fp_use_exonerations" nolabel="1"/>
+                    <label for="fp_use_exonerations" string="Usa Exoneraciones"/>
+                </div>
                 <button name="action_fp_fetch_hacienda_data" string="Consultar Hacienda" type="object" class="oe_highlight"/>
             </xpath>
 
@@ -28,6 +32,49 @@
             <xpath expr="//field[@name='city']" position="after">
                 <field name="fp_district_code" string="Distrito" placeholder="Distrito" class="o_address_state"/>
                 <field name="fp_neighborhood_code" string="Barrio" placeholder="Barrio" class="o_address_zip"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Exoneraciones" invisible="not fp_use_exonerations">
+                    <field name="fp_exoneration_ids" context="{'default_partner_id': id}">
+                        <list editable="bottom">
+                            <field name="exoneration_number"/>
+                            <field name="institution_name"/>
+                            <field name="exoneration_type"/>
+                            <field name="issue_date"/>
+                            <field name="expiry_date"/>
+                            <field name="exoneration_percentage"/>
+                            <field name="active"/>
+                        </list>
+                        <form>
+                            <sheet>
+                                <group col="2">
+                                    <field name="partner_id" readonly="1"/>
+                                    <field name="exoneration_number"/>
+                                    <field name="institution_name"/>
+                                    <field name="exoneration_type"/>
+                                    <field name="issue_date"/>
+                                    <field name="expiry_date"/>
+                                    <field name="exoneration_percentage"/>
+                                    <field name="article"/>
+                                    <field name="incise"/>
+                                    <field name="active"/>
+                                </group>
+                                <notebook>
+                                    <page string="Códigos CABYS">
+                                        <field name="line_ids">
+                                            <list editable="bottom">
+                                                <field name="product_id"/>
+                                                <field name="cabys_code_id"/>
+                                                <field name="exoneration_code"/>
+                                            </list>
+                                        </field>
+                                    </page>
+                                </notebook>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
             </xpath>
         </field>
     </record>
