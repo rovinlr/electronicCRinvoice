@@ -20,6 +20,8 @@ from odoo.exceptions import UserError
 FE_XML_NS = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
 DS_XML_NS = "http://www.w3.org/2000/09/xmldsig#"
 XADES_XML_NS = "http://uri.etsi.org/01903/v1.3.2#"
+XADES_SIGNATURE_POLICY_IDENTIFIER = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
+XADES_SIGNATURE_POLICY_DESCRIPTION = "Política de firma para comprobantes electrónicos de Costa Rica"
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -583,6 +585,25 @@ class AccountMove(models.Model):
         issuer_serial = LET.SubElement(cert_node, LET.QName(XADES_XML_NS, "IssuerSerial"))
         LET.SubElement(issuer_serial, LET.QName(DS_XML_NS, "X509IssuerName")).text = certificate.issuer.rfc4514_string()
         LET.SubElement(issuer_serial, LET.QName(DS_XML_NS, "X509SerialNumber")).text = str(certificate.serial_number)
+
+        signature_policy_identifier = LET.SubElement(
+            signed_signature_properties,
+            LET.QName(XADES_XML_NS, "SignaturePolicyIdentifier"),
+        )
+        signature_policy_id = LET.SubElement(signature_policy_identifier, LET.QName(XADES_XML_NS, "SignaturePolicyId"))
+        sig_policy_id = LET.SubElement(signature_policy_id, LET.QName(XADES_XML_NS, "SigPolicyId"))
+        LET.SubElement(sig_policy_id, LET.QName(XADES_XML_NS, "Identifier")).text = XADES_SIGNATURE_POLICY_IDENTIFIER
+        LET.SubElement(sig_policy_id, LET.QName(XADES_XML_NS, "Description")).text = XADES_SIGNATURE_POLICY_DESCRIPTION
+
+        sig_policy_hash = LET.SubElement(signature_policy_id, LET.QName(XADES_XML_NS, "SigPolicyHash"))
+        LET.SubElement(
+            sig_policy_hash,
+            LET.QName(DS_XML_NS, "DigestMethod"),
+            {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
+        )
+        LET.SubElement(sig_policy_hash, LET.QName(DS_XML_NS, "DigestValue")).text = base64.b64encode(
+            hashlib.sha256(XADES_SIGNATURE_POLICY_IDENTIFIER.encode("utf-8")).digest()
+        ).decode("utf-8")
 
         signed_data_object_properties = LET.SubElement(signed_properties, LET.QName(XADES_XML_NS, "SignedDataObjectProperties"))
         data_object_format = LET.SubElement(
