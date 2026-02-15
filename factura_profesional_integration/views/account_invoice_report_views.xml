@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_invoice_document_fp_electronic_header" inherit_id="account.report_invoice_document">
-        <xpath expr="//div[hasclass('page')]/h2" position="attributes">
-            <attribute name="t-if">not o.fp_is_electronic_invoice</attribute>
+        <xpath expr="//t[@t-set='layout_document_title']" position="after">
+            <t t-if="o.fp_is_electronic_invoice">
+                <t t-set="layout_document_title">
+                    <t t-set="fp_document_types" t-value="{
+                        'FE': 'Factura Electrónica',
+                        'TE': 'Tiquete Electrónico',
+                        'FEC': 'Factura Electrónica de Compra',
+                        'NC': 'Nota de Crédito Electrónica',
+                        'ND': 'Nota de Débito Electrónica',
+                        'CCE': 'Confirmación de Aceptación',
+                        'CPCE': 'Confirmación Parcial de Aceptación',
+                        'RCE': 'Confirmación de Rechazo'
+                    }"/>
+                    <span t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
+                    <span t-if="o.name and o.name != '/'" t-field="o.name"/>
+                </t>
+            </t>
         </xpath>
 
-        <xpath expr="//div[hasclass('page')]/h2" position="after">
-            <h2 t-if="o.fp_is_electronic_invoice">
-                <t t-set="fp_document_types" t-value="{
-                    'FE': 'Factura Electrónica',
-                    'TE': 'Tiquete Electrónico',
-                    'FEC': 'Factura Electrónica de Compra',
-                    'NC': 'Nota de Crédito Electrónica',
-                    'ND': 'Nota de Débito Electrónica',
-                    'CCE': 'Confirmación de Aceptación',
-                    'CPCE': 'Confirmación Parcial de Aceptación',
-                    'RCE': 'Confirmación de Rechazo'
-                }"/>
-                <span t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
-            </h2>
-        </xpath>
-
-        <xpath expr="//h2[@t-if='o.fp_is_electronic_invoice']" position="after">
+        <xpath expr="//div[@id='informations']" position="before">
             <t t-if="o.fp_is_electronic_invoice">
                 <div class="mt-2 mb-2">
                     <div>
