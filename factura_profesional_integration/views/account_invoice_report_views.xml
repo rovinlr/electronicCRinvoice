@@ -18,11 +18,20 @@
                         <strong>Tipo de documento (FE, TE, NC, ND, FEE)</strong>
                         <div>
                             <span t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
-                            <span t-if="o.name and o.name != '/'" t-field="o.name"/>
                         </div>
                     </div>
                 </t>
             </t>
+        </xpath>
+
+        <xpath expr="//t[@t-set='address']" position="after">
+            <t t-if="o.fp_is_electronic_invoice" t-set="address">
+                <div/>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[@id='informations']" position="attributes">
+            <attribute name="t-if">not o.fp_is_electronic_invoice</attribute>
         </xpath>
 
         <xpath expr="//div[@id='informations']" position="before">
@@ -53,21 +62,26 @@
                     .fp-card {
                         border: 2px solid #1b2c96;
                         border-radius: 18px;
-                        padding: 16px 18px;
-                        margin: 12px 0;
+                        padding: 12px 14px;
+                        margin: 8px 0;
                         background: #f8faff;
                         width: 100%;
                     }
                     .fp-grid {
                         width: 100%;
                         border-collapse: separate;
-                        border-spacing: 0 8px;
+                        border-spacing: 0 6px;
+                        border: none !important;
                     }
+                    .fp-grid tr,
                     .fp-grid td {
                         vertical-align: top;
                         font-size: 15px;
                         color: #111827;
                         padding: 0;
+                        border: none !important;
+                        box-shadow: none !important;
+                        background: transparent !important;
                     }
                     .fp-grid td.fp-cell {
                         padding-right: 24px;
