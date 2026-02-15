@@ -722,9 +722,6 @@ class AccountMove(models.Model):
         LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "text/xml"
         LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "Encoding")).text = "UTF-8"
 
-        key_info_c14n = LET.tostring(key_info, method="c14n", exclusive=False, with_comments=False)
-        reference_key_info_digest.text = base64.b64encode(hashlib.sha256(key_info_c14n).digest()).decode("utf-8")
-
         signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=False, with_comments=False)
         reference_signed_properties_digest.text = base64.b64encode(hashlib.sha256(signed_properties_c14n).digest()).decode("utf-8")
 
