@@ -15,7 +15,7 @@
             </xpath>
 
             <xpath expr="//field[@name='vat']" position="after">
-                <group col="2">
+                <group col="2" colspan="2" class="w-100">
                     <field name="fp_identification_type" string="Tipo de identificación"/>
                     <field name="fp_economic_activity_id" string="Actividad económica"/>
                     <field name="fp_use_exonerations"/>
