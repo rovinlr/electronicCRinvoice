@@ -594,12 +594,12 @@ class AccountMove(models.Model):
             {"Id": reference_id, "URI": ""},
         )
         transforms = LET.SubElement(reference_document, LET.QName(DS_XML_NS, "Transforms"))
-        LET.SubElement(
+        xpath_transform = LET.SubElement(
             transforms,
             LET.QName(DS_XML_NS, "Transform"),
             {"Algorithm": "http://www.w3.org/TR/1999/REC-xpath-19991116"},
         )
-        transforms = LET.SubElement(reference_document, LET.QName(DS_XML_NS, "Transforms"))
+        LET.SubElement(xpath_transform, LET.QName(DS_XML_NS, "XPath")).text = "not(ancestor-or-self::ds:Signature)"
         LET.SubElement(
             transforms,
             LET.QName(DS_XML_NS, "Transform"),
