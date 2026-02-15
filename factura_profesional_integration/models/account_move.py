@@ -179,7 +179,7 @@ class AccountMove(models.Model):
 
             token = move._fp_get_hacienda_access_token()
             response_data = move._fp_call_api(
-                endpoint=f"/recepcion/v1/recepcion/{move.fp_external_id}",
+                endpoint=move._fp_get_hacienda_recepcion_endpoint(clave=move.fp_external_id),
                 payload=None,
                 timeout=move.company_id.fp_api_timeout,
                 token=token,
@@ -239,7 +239,7 @@ class AccountMove(models.Model):
         self.fp_api_state = "sent"
 
         self._fp_call_api(
-            endpoint="/recepcion/v1/recepcion",
+            endpoint=self._fp_get_hacienda_recepcion_endpoint(),
             payload=payload,
             timeout=company.fp_api_timeout,
             token=token,
@@ -270,7 +270,7 @@ class AccountMove(models.Model):
 
         data = {
             "grant_type": "password",
-            "client_id": company.fp_hacienda_client_id or "api-prod",
+            "client_id": company.fp_hacienda_client_id or self._fp_get_hacienda_client_id_default(),
             "username": company.fp_hacienda_username,
             "password": company.fp_hacienda_password,
         }
@@ -287,6 +287,24 @@ class AccountMove(models.Model):
         if not access_token:
             raise UserError(_("Hacienda no devolvió access_token."))
         return access_token
+
+    def _fp_get_hacienda_client_id_default(self):
+        self.ensure_one()
+        token_url = (self.company_id.fp_hacienda_token_url or "").lower()
+        if "rut-stag" in token_url or "sandbox" in token_url:
+            return "api-stag"
+        return "api-prod"
+
+    def _fp_get_hacienda_recepcion_endpoint(self, clave=None):
+        self.ensure_one()
+        company = self.company_id
+        token_url = (company.fp_hacienda_token_url or "").lower()
+        base_url = (company.fp_hacienda_api_base_url or "").lower()
+        is_sandbox = any(flag in token_url or flag in base_url for flag in ("rut-stag", "sandbox", "stag"))
+        endpoint = "/recepcion-sandbox/v1/recepcion" if is_sandbox else "/recepcion/v1/recepcion"
+        if clave:
+            return f"{endpoint}/{clave}"
+        return endpoint
 
     def _fp_build_hacienda_payload(self):
         self.ensure_one()
