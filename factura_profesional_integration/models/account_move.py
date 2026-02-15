@@ -568,8 +568,6 @@ class AccountMove(models.Model):
 
         ET.SubElement(root, "CondicionVenta").text = self.fp_sale_condition or "01"
 
-        self._fp_append_reference_information(root)
-
         lines = ET.SubElement(root, "DetalleServicio")
         detalle_vals = self._fp_build_detail_lines(lines)
         resumen = ET.SubElement(root, "ResumenFactura")
@@ -604,6 +602,8 @@ class AccountMove(models.Model):
         medio_pago = ET.SubElement(resumen, "MedioPago")
         ET.SubElement(medio_pago, "TipoMedioPago").text = self.fp_payment_method or "01"
         ET.SubElement(resumen, "TotalComprobante").text = self._fp_format_decimal(detalle_vals["total_comprobante"])
+
+        self._fp_append_reference_information(root)
 
         ET.register_namespace("", namespace)
         ET.register_namespace("ds", DS_XML_NS)
