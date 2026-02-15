@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_fp_cabys_code_account_manager,access.fp.cabys.code.account.manager,model_fp_cabys_code,account.group_account_manager,1,1,1,1
 access_fp_economic_activity_account_manager,access.fp.economic.activity.account.manager,model_fp_economic_activity,account.group_account_manager,1,1,1,1
+access_fp_client_exoneration_account_manager,access.fp.client.exoneration.account.manager,model_fp_client_exoneration,account.group_account_manager,1,1,1,1
+access_fp_client_exoneration_line_account_manager,access.fp.client.exoneration.line.account.manager,model_fp_client_exoneration_line,account.group_account_manager,1,1,1,1
