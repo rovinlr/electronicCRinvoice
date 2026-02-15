@@ -288,20 +288,28 @@ class AccountMove(models.Model):
             raise UserError(_("Hacienda no devolvió access_token."))
         return access_token
 
+    def _fp_get_hacienda_environment(self):
+        self.ensure_one()
+        company = self.company_id
+        configured_environment = company.fp_hacienda_environment or "auto"
+        if configured_environment in ("prod", "sandbox"):
+            return configured_environment
+
+        token_url = (company.fp_hacienda_token_url or "").lower()
+        base_url = (company.fp_hacienda_api_base_url or "").lower()
+        if any(flag in token_url or flag in base_url for flag in ("rut-stag", "sandbox", "stag")):
+            return "sandbox"
+        return "prod"
+
     def _fp_get_hacienda_client_id_default(self):
         self.ensure_one()
-        token_url = (self.company_id.fp_hacienda_token_url or "").lower()
-        if "rut-stag" in token_url or "sandbox" in token_url:
+        if self._fp_get_hacienda_environment() == "sandbox":
             return "api-stag"
         return "api-prod"
 
     def _fp_get_hacienda_recepcion_endpoint(self, clave=None):
         self.ensure_one()
-        company = self.company_id
-        token_url = (company.fp_hacienda_token_url or "").lower()
-        base_url = (company.fp_hacienda_api_base_url or "").lower()
-        is_sandbox = any(flag in token_url or flag in base_url for flag in ("rut-stag", "sandbox", "stag"))
-        endpoint = "/recepcion-sandbox/v1/recepcion" if is_sandbox else "/recepcion/v1/recepcion"
+        endpoint = "/recepcion-sandbox/v1/recepcion" if self._fp_get_hacienda_environment() == "sandbox" else "/recepcion/v1/recepcion"
         if clave:
             return f"{endpoint}/{clave}"
         return endpoint

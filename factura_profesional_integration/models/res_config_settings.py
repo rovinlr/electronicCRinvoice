@@ -7,6 +7,7 @@ class ResConfigSettings(models.TransientModel):
     fp_hacienda_api_base_url = fields.Char(related="company_id.fp_hacienda_api_base_url", readonly=False)
     fp_hacienda_token_url = fields.Char(related="company_id.fp_hacienda_token_url", readonly=False)
     fp_hacienda_client_id = fields.Char(related="company_id.fp_hacienda_client_id", readonly=False)
+    fp_hacienda_environment = fields.Selection(related="company_id.fp_hacienda_environment", readonly=False)
     fp_hacienda_username = fields.Char(related="company_id.fp_hacienda_username", readonly=False)
     fp_hacienda_password = fields.Char(related="company_id.fp_hacienda_password", readonly=False)
     fp_api_timeout = fields.Integer(related="company_id.fp_api_timeout", readonly=False)

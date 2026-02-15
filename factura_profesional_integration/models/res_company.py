@@ -39,6 +39,17 @@ class ResCompany(models.Model):
     fp_hacienda_client_id = fields.Char(
         string="Hacienda Client ID", company_dependent=True, default="api-prod"
     )
+    fp_hacienda_environment = fields.Selection(
+        [
+            ("auto", "Auto (detectar por URLs)"),
+            ("prod", "Producción"),
+            ("sandbox", "Pruebas / Sandbox"),
+        ],
+        string="Ambiente Hacienda",
+        company_dependent=True,
+        default="auto",
+        help="Define el ambiente para endpoints/client_id de Hacienda. En Auto se detecta según las URLs configuradas.",
+    )
     fp_hacienda_username = fields.Char(string="Hacienda Username", company_dependent=True)
     fp_hacienda_password = fields.Char(string="Hacienda Password", company_dependent=True)
     fp_api_timeout = fields.Integer(

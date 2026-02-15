@@ -17,6 +17,9 @@
                         <setting string="Client ID">
                             <field name="fp_hacienda_client_id"/>
                         </setting>
+                        <setting string="Ambiente Hacienda">
+                            <field name="fp_hacienda_environment"/>
+                        </setting>
                         <setting string="Usuario Hacienda">
                             <field name="fp_hacienda_username"/>
                         </setting>
