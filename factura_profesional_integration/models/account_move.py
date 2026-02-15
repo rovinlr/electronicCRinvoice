@@ -2,6 +2,7 @@ import base64
 import hashlib
 import json
 import random
+import uuid
 from datetime import datetime
 from json import JSONDecodeError
 from urllib.parse import urlparse
@@ -556,9 +557,14 @@ class AccountMove(models.Model):
         canonical_document = LET.tostring(root, method="c14n", exclusive=False, with_comments=False)
         root_digest = hashlib.sha256(canonical_document).digest()
 
-        signature_token = f"{random.getrandbits(128):032x}"
-        signature_id = f"id-{signature_token}"
-        signed_properties_id = f"xades-id-{signature_token}"
+        signature_token = str(uuid.uuid4())
+        reference_document_id = f"Reference-{uuid.uuid4()}"
+        signature_id = f"Signature-{signature_token}"
+        signature_value_id = f"SignatureValue-{signature_token}"
+        signed_properties_id = f"SignedProperties-{signature_id}"
+        xades_object_id = f"XadesObjectId-{uuid.uuid4()}"
+        qualifying_properties_id = f"QualifyingProperties-{uuid.uuid4()}"
+        key_info_id = f"KeyInfoId-{signature_id}"
 
         signature_node = LET.SubElement(root, LET.QName(DS_XML_NS, "Signature"), nsmap={"ds": DS_XML_NS, "xades": XADES_XML_NS})
         signature_node.set("Id", signature_id)
@@ -567,7 +573,7 @@ class AccountMove(models.Model):
         LET.SubElement(
             signed_info,
             LET.QName(DS_XML_NS, "CanonicalizationMethod"),
-            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
+            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
         )
         LET.SubElement(
             signed_info,
@@ -575,7 +581,11 @@ class AccountMove(models.Model):
             {"Algorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"},
         )
 
-        reference_document = LET.SubElement(signed_info, LET.QName(DS_XML_NS, "Reference"), {"Id": "r-id-1", "URI": ""})
+        reference_document = LET.SubElement(
+            signed_info,
+            LET.QName(DS_XML_NS, "Reference"),
+            {"Id": reference_document_id, "URI": ""},
+        )
         transforms = LET.SubElement(reference_document, LET.QName(DS_XML_NS, "Transforms"))
         LET.SubElement(
             transforms,
@@ -588,6 +598,18 @@ class AccountMove(models.Model):
             {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
         )
         LET.SubElement(reference_document, LET.QName(DS_XML_NS, "DigestValue")).text = base64.b64encode(root_digest).decode("utf-8")
+
+        reference_key_info = LET.SubElement(
+            signed_info,
+            LET.QName(DS_XML_NS, "Reference"),
+            {"Id": "ReferenceKeyInfo", "URI": f"#{key_info_id}"},
+        )
+        LET.SubElement(
+            reference_key_info,
+            LET.QName(DS_XML_NS, "DigestMethod"),
+            {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
+        )
+        reference_key_info_digest = LET.SubElement(reference_key_info, LET.QName(DS_XML_NS, "DigestValue"))
 
         reference_signed_properties = LET.SubElement(
             signed_info,
@@ -602,43 +624,33 @@ class AccountMove(models.Model):
             LET.QName(DS_XML_NS, "DigestMethod"),
             {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
         )
-        signed_properties_transforms = LET.SubElement(reference_signed_properties, LET.QName(DS_XML_NS, "Transforms"))
-        LET.SubElement(
-            signed_properties_transforms,
-            LET.QName(DS_XML_NS, "Transform"),
-            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
-        )
         reference_signed_properties_digest = LET.SubElement(reference_signed_properties, LET.QName(DS_XML_NS, "DigestValue"))
-
-        key_info_id = f"KeyInfoId-{signature_id}"
-        reference_key_info = LET.SubElement(
-            signed_info,
-            LET.QName(DS_XML_NS, "Reference"),
-            {"Id": "ReferenceKeyInfo", "URI": f"#{key_info_id}"},
-        )
-        key_info_transforms = LET.SubElement(reference_key_info, LET.QName(DS_XML_NS, "Transforms"))
-        LET.SubElement(
-            key_info_transforms,
-            LET.QName(DS_XML_NS, "Transform"),
-            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
-        )
-        LET.SubElement(
-            reference_key_info,
-            LET.QName(DS_XML_NS, "DigestMethod"),
-            {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
-        )
-        reference_key_info_digest = LET.SubElement(reference_key_info, LET.QName(DS_XML_NS, "DigestValue"))
 
         key_info = LET.SubElement(signature_node, LET.QName(DS_XML_NS, "KeyInfo"), {"Id": key_info_id})
         x509_data = LET.SubElement(key_info, LET.QName(DS_XML_NS, "X509Data"))
         cert_der = certificate.public_bytes(serialization.Encoding.DER)
         LET.SubElement(x509_data, LET.QName(DS_XML_NS, "X509Certificate")).text = base64.b64encode(cert_der).decode("utf-8")
 
-        object_node = LET.SubElement(signature_node, LET.QName(DS_XML_NS, "Object"))
+        public_numbers = certificate.public_key().public_numbers()
+
+        def _int_to_bytes(value):
+            byte_length = max(1, (value.bit_length() + 7) // 8)
+            return value.to_bytes(byte_length, "big")
+
+        key_value = LET.SubElement(key_info, LET.QName(DS_XML_NS, "KeyValue"))
+        rsa_key_value = LET.SubElement(key_value, LET.QName(DS_XML_NS, "RSAKeyValue"))
+        LET.SubElement(rsa_key_value, LET.QName(DS_XML_NS, "Modulus")).text = base64.b64encode(
+            _int_to_bytes(public_numbers.n)
+        ).decode("utf-8")
+        LET.SubElement(rsa_key_value, LET.QName(DS_XML_NS, "Exponent")).text = base64.b64encode(
+            _int_to_bytes(public_numbers.e)
+        ).decode("utf-8")
+
+        object_node = LET.SubElement(signature_node, LET.QName(DS_XML_NS, "Object"), {"Id": xades_object_id})
         qualifying_properties = LET.SubElement(
             object_node,
             LET.QName(XADES_XML_NS, "QualifyingProperties"),
-            {"Target": f"#{signature_id}"},
+            {"Id": qualifying_properties_id, "Target": f"#{signature_id}"},
         )
         signed_properties = LET.SubElement(
             qualifying_properties,
@@ -686,23 +698,23 @@ class AccountMove(models.Model):
         data_object_format = LET.SubElement(
             signed_data_object_properties,
             LET.QName(XADES_XML_NS, "DataObjectFormat"),
-            {"ObjectReference": "#r-id-1"},
+            {"ObjectReference": f"#{reference_document_id}"},
         )
         LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "text/xml"
         LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "Encoding")).text = "UTF-8"
 
-        key_info_c14n = LET.tostring(key_info, method="c14n", exclusive=True, with_comments=False)
+        key_info_c14n = LET.tostring(key_info, method="c14n", exclusive=False, with_comments=False)
         reference_key_info_digest.text = base64.b64encode(hashlib.sha256(key_info_c14n).digest()).decode("utf-8")
 
-        signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=True, with_comments=False)
+        signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=False, with_comments=False)
         reference_signed_properties_digest.text = base64.b64encode(hashlib.sha256(signed_properties_c14n).digest()).decode("utf-8")
 
-        signed_info_c14n = LET.tostring(signed_info, method="c14n", exclusive=True, with_comments=False)
+        signed_info_c14n = LET.tostring(signed_info, method="c14n", exclusive=False, with_comments=False)
         signature = private_key.sign(signed_info_c14n, padding.PKCS1v15(), hashes.SHA256())
         LET.SubElement(
             signature_node,
             LET.QName(DS_XML_NS, "SignatureValue"),
-            {"Id": f"value-{signature_id}"},
+            {"Id": signature_value_id},
         ).text = base64.b64encode(signature).decode("utf-8")
 
         return LET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
