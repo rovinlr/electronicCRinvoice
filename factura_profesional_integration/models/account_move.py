@@ -474,14 +474,29 @@ class AccountMove(models.Model):
         ET.SubElement(currency_node, "TipoCambio").text = f"{self.currency_id.rate or 1:.5f}"
         ET.SubElement(resumen, "TotalServGravados").text = self._fp_format_decimal(detalle_vals["total_serv_gravados"])
         ET.SubElement(resumen, "TotalServExentos").text = self._fp_format_decimal(detalle_vals["total_serv_exentos"])
+        ET.SubElement(resumen, "TotalServExonerado").text = self._fp_format_decimal(detalle_vals["total_serv_exonerado"])
+        ET.SubElement(resumen, "TotalServNoSujeto").text = self._fp_format_decimal(detalle_vals["total_serv_no_sujeto"])
         ET.SubElement(resumen, "TotalMercanciasGravadas").text = self._fp_format_decimal(detalle_vals["total_mercancias_gravadas"])
         ET.SubElement(resumen, "TotalMercanciasExentas").text = self._fp_format_decimal(detalle_vals["total_mercancias_exentas"])
+        ET.SubElement(resumen, "TotalMercExonerada").text = self._fp_format_decimal(detalle_vals["total_merc_exonerada"])
+        ET.SubElement(resumen, "TotalMercNoSujeta").text = self._fp_format_decimal(detalle_vals["total_merc_no_sujeta"])
         ET.SubElement(resumen, "TotalGravado").text = self._fp_format_decimal(detalle_vals["total_gravado"])
         ET.SubElement(resumen, "TotalExento").text = self._fp_format_decimal(detalle_vals["total_exento"])
+        ET.SubElement(resumen, "TotalExonerado").text = self._fp_format_decimal(detalle_vals["total_exonerado"])
+        ET.SubElement(resumen, "TotalNoSujeto").text = self._fp_format_decimal(detalle_vals["total_no_sujeto"])
         ET.SubElement(resumen, "TotalVenta").text = self._fp_format_decimal(detalle_vals["total_venta"])
         ET.SubElement(resumen, "TotalDescuentos").text = self._fp_format_decimal(detalle_vals["total_descuentos"])
         ET.SubElement(resumen, "TotalVentaNeta").text = self._fp_format_decimal(detalle_vals["total_venta_neta"])
+        for (tax_code, tax_rate_code), tax_amount in sorted(detalle_vals["total_desglose_impuesto"].items()):
+            desglose = ET.SubElement(resumen, "TotalDesgloseImpuesto")
+            ET.SubElement(desglose, "Codigo").text = tax_code
+            ET.SubElement(desglose, "CodigoTarifaIVA").text = tax_rate_code
+            ET.SubElement(desglose, "TotalMontoImpuesto").text = self._fp_format_decimal(tax_amount)
         ET.SubElement(resumen, "TotalImpuesto").text = self._fp_format_decimal(detalle_vals["total_impuesto"])
+        ET.SubElement(resumen, "TotalImpAsumEmisorFabrica").text = self._fp_format_decimal(
+            detalle_vals["total_imp_asum_emisor_fabrica"]
+        )
+        ET.SubElement(resumen, "TotalIVADevuelto").text = self._fp_format_decimal(detalle_vals["total_iva_devuelto"])
         medio_pago = ET.SubElement(resumen, "MedioPago")
         ET.SubElement(medio_pago, "TipoMedioPago").text = self.fp_payment_method or "01"
         ET.SubElement(resumen, "TotalComprobante").text = self._fp_format_decimal(detalle_vals["total_comprobante"])
@@ -494,14 +509,23 @@ class AccountMove(models.Model):
         totals = {
             "total_serv_gravados": 0.0,
             "total_serv_exentos": 0.0,
+            "total_serv_exonerado": 0.0,
+            "total_serv_no_sujeto": 0.0,
             "total_mercancias_gravadas": 0.0,
             "total_mercancias_exentas": 0.0,
+            "total_merc_exonerada": 0.0,
+            "total_merc_no_sujeta": 0.0,
             "total_gravado": 0.0,
             "total_exento": 0.0,
+            "total_exonerado": 0.0,
+            "total_no_sujeto": 0.0,
             "total_venta": 0.0,
             "total_descuentos": 0.0,
             "total_venta_neta": 0.0,
+            "total_desglose_impuesto": {},
             "total_impuesto": 0.0,
+            "total_imp_asum_emisor_fabrica": 0.0,
+            "total_iva_devuelto": 0.0,
             "total_comprobante": 0.0,
         }
 
@@ -530,25 +554,49 @@ class AccountMove(models.Model):
             total_impuesto_linea = max(line.price_total - line.price_subtotal, 0.0)
             monto_total_linea = subtotal + total_impuesto_linea
 
+            tax = line.tax_ids[:1]
+            tax_code = (tax.fp_tax_type or tax.fp_tax_code or "01") if tax else "01"
+            tax_rate_code = (tax.fp_tax_rate_code_iva or "08") if tax else "08"
+            tax_rate = (tax.amount if tax else 0.0)
+            has_tax = bool(tax)
+
             ET.SubElement(detail, "MontoTotal").text = self._fp_format_decimal(monto_total)
             ET.SubElement(detail, "SubTotal").text = self._fp_format_decimal(subtotal)
-            if total_impuesto_linea > 0:
+            if has_tax:
                 impuesto = ET.SubElement(detail, "Impuesto")
-                tax = line.tax_ids[:1]
-                ET.SubElement(impuesto, "Codigo").text = (tax.fp_tax_type or tax.fp_tax_code or "01") if tax else "01"
-                ET.SubElement(impuesto, "CodigoTarifaIVA").text = (tax.fp_tax_rate_code_iva or "08") if tax else "08"
-                ET.SubElement(impuesto, "Tarifa").text = self._fp_format_decimal((tax.amount if tax else 13.0))
+                ET.SubElement(impuesto, "Codigo").text = tax_code
+                ET.SubElement(impuesto, "BaseImponible").text = self._fp_format_decimal(subtotal)
+                ET.SubElement(impuesto, "CodigoTarifaIVA").text = tax_rate_code
+                ET.SubElement(impuesto, "Tarifa").text = self._fp_format_decimal(tax_rate)
                 ET.SubElement(impuesto, "Monto").text = self._fp_format_decimal(total_impuesto_linea)
+                ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
+                ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(total_impuesto_linea)
+                desglose_key = (tax_code, tax_rate_code)
+                totals["total_desglose_impuesto"][desglose_key] = (
+                    totals["total_desglose_impuesto"].get(desglose_key, 0.0) + total_impuesto_linea
+                )
             ET.SubElement(detail, "MontoTotalLinea").text = self._fp_format_decimal(monto_total_linea)
 
             product_type = line.product_id.product_tmpl_id.type if line.product_id else False
             is_service = product_type == "service"
-            if total_impuesto_linea > 0:
+            if has_tax and total_impuesto_linea > 0:
                 if is_service:
                     totals["total_serv_gravados"] += subtotal
                 else:
                     totals["total_mercancias_gravadas"] += subtotal
                 totals["total_gravado"] += subtotal
+            elif has_tax and tax_rate_code in ("01", "05", "11"):
+                if is_service:
+                    totals["total_serv_no_sujeto"] += subtotal
+                else:
+                    totals["total_merc_no_sujeta"] += subtotal
+                totals["total_no_sujeto"] += subtotal
+            elif has_tax and tax_rate_code == "10":
+                if is_service:
+                    totals["total_serv_exentos"] += subtotal
+                else:
+                    totals["total_mercancias_exentas"] += subtotal
+                totals["total_exento"] += subtotal
             else:
                 if is_service:
                     totals["total_serv_exentos"] += subtotal
