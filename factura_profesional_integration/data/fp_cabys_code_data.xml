@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="fp_cabys_code_0101010101000" model="fp.cabys.code">
+        <field name="code">0101010101000</field>
+        <field name="name">Arroz pilado</field>
+    </record>
+    <record id="fp_cabys_code_0101010201000" model="fp.cabys.code">
+        <field name="code">0101010201000</field>
+        <field name="name">Frijol seco</field>
+    </record>
+    <record id="fp_cabys_code_0101010301000" model="fp.cabys.code">
+        <field name="code">0101010301000</field>
+        <field name="name">Azúcar blanca</field>
+    </record>
+    <record id="fp_cabys_code_0101020101000" model="fp.cabys.code">
+        <field name="code">0101020101000</field>
+        <field name="name">Leche fluida pasteurizada</field>
+    </record>
+    <record id="fp_cabys_code_0101020201000" model="fp.cabys.code">
+        <field name="code">0101020201000</field>
+        <field name="name">Queso fresco</field>
+    </record>
+    <record id="fp_cabys_code_0101030101000" model="fp.cabys.code">
+        <field name="code">0101030101000</field>
+        <field name="name">Pan cuadrado</field>
+    </record>
+    <record id="fp_cabys_code_0101040101000" model="fp.cabys.code">
+        <field name="code">0101040101000</field>
+        <field name="name">Carne de res fresca</field>
+    </record>
+    <record id="fp_cabys_code_0101040201000" model="fp.cabys.code">
+        <field name="code">0101040201000</field>
+        <field name="name">Carne de pollo fresca</field>
+    </record>
+    <record id="fp_cabys_code_0101050101000" model="fp.cabys.code">
+        <field name="code">0101050101000</field>
+        <field name="name">Huevo de gallina</field>
+    </record>
+    <record id="fp_cabys_code_0101060101000" model="fp.cabys.code">
+        <field name="code">0101060101000</field>
+        <field name="name">Café tostado molido</field>
+    </record>
+    <record id="fp_cabys_code_0101070101000" model="fp.cabys.code">
+        <field name="code">0101070101000</field>
+        <field name="name">Aceite vegetal comestible</field>
+    </record>
+    <record id="fp_cabys_code_0101080101000" model="fp.cabys.code">
+        <field name="code">0101080101000</field>
+        <field name="name">Sal de mesa</field>
+    </record>
+    <record id="fp_cabys_code_0201010101000" model="fp.cabys.code">
+        <field name="code">0201010101000</field>
+        <field name="name">Jabón para ropa</field>
+    </record>
+    <record id="fp_cabys_code_0201010201000" model="fp.cabys.code">
+        <field name="code">0201010201000</field>
+        <field name="name">Detergente líquido</field>
+    </record>
+    <record id="fp_cabys_code_0201020101000" model="fp.cabys.code">
+        <field name="code">0201020101000</field>
+        <field name="name">Papel higiénico</field>
+    </record>
+    <record id="fp_cabys_code_0201020201000" model="fp.cabys.code">
+        <field name="code">0201020201000</field>
+        <field name="name">Toalla de cocina de papel</field>
+    </record>
+    <record id="fp_cabys_code_0301010101000" model="fp.cabys.code">
+        <field name="code">0301010101000</field>
+        <field name="name">Camisa de algodón</field>
+    </record>
+    <record id="fp_cabys_code_0301010201000" model="fp.cabys.code">
+        <field name="code">0301010201000</field>
+        <field name="name">Pantalón de mezclilla</field>
+    </record>
+    <record id="fp_cabys_code_0401010101000" model="fp.cabys.code">
+        <field name="code">0401010101000</field>
+        <field name="name">Servicio de consultoría empresarial</field>
+    </record>
+    <record id="fp_cabys_code_0401010201000" model="fp.cabys.code">
+        <field name="code">0401010201000</field>
+        <field name="name">Servicio de desarrollo de software</field>
+    </record>
+</odoo>
