@@ -626,8 +626,10 @@ class AccountMove(models.Model):
         return consecutive
 
     def _fp_extract_consecutive_from_clave(self, clave):
-        if len(clave or "") >= 43:
-            return clave[23:43]
+        # Estructura clave CR (50 dígitos):
+        # país(3) + fecha(6) + identificación(12) + consecutivo(20) + situación(1) + seguridad(8)
+        if len(clave or "") >= 41:
+            return clave[21:41]
         return (clave or "").zfill(20)[-20:]
 
     def _fp_build_clave(self):
@@ -639,11 +641,12 @@ class AccountMove(models.Model):
         invoice_date = fields.Date.context_today(self)
         date_token = invoice_date.strftime("%d%m%y")
         company_vat = "".join(ch for ch in (self.company_id.vat or "") if ch.isdigit()).zfill(12)[-12:]
-        document_code = self._fp_get_document_code()
         consecutive = self.fp_consecutive_number or self._fp_get_company_consecutive()
         situation = "1"
         security_code = f"{random.SystemRandom().randrange(0, 100000000):08d}"
-        clave = f"{country_code}{date_token}{company_vat}{document_code}{consecutive}{situation}{security_code}"
+        # El tipo de documento ya viene embebido en el consecutivo (20 dígitos),
+        # no debe duplicarse dentro de la clave.
+        clave = f"{country_code}{date_token}{company_vat}{consecutive}{situation}{security_code}"
         # Persistimos la clave al primer cálculo para reutilizar exactamente el
         # mismo valor en XML, payload y reintentos de envío.
         self.fp_external_id = clave
