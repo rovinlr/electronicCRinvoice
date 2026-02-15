@@ -99,8 +99,6 @@
                     }
                 </style>
 
-                <div class="fp-doc-heading">Factura Electrónica</div>
-
                 <div class="fp-reference-line">
                     <span class="fp-label-inline">Consecutivo:</span>
                     <span t-field="o.fp_consecutive_number"/>
@@ -125,14 +123,16 @@
                     </div>
                 </div>
 
-                <div class="fp-section-title">Cliente</div>
+                <div class="fp-section-title">Datos del receptor:</div>
                 <div class="fp-card fp-client-card">
                     <div class="fp-grid">
                         <div class="fp-grid-row">
-                            <div class="fp-grid-cell fp-wide"><span class="fp-label">Nombre:</span><span t-field="o.partner_id"/></div>
+                            <div class="fp-grid-cell"><span class="fp-label">Cliente:</span><span t-field="o.partner_id"/></div>
+                            <div class="fp-grid-cell" t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-field="o.partner_id.email"/></div>
                         </div>
                         <div class="fp-grid-row" t-if="o.partner_id.vat">
-                            <div class="fp-grid-cell fp-wide"><span class="fp-label">Identificación:</span><span t-field="o.partner_id.vat"/></div>
+                            <div class="fp-grid-cell"><span class="fp-label">Identificación:</span><span t-field="o.partner_id.vat"/></div>
+                            <div class="fp-grid-cell" t-if="o.partner_id.phone or o.partner_id.mobile"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or o.partner_id.mobile"/></div>
                         </div>
                         <div class="fp-grid-row" t-if="o.partner_id.street or o.partner_id.street2">
                             <div class="fp-grid-cell fp-wide">
@@ -140,11 +140,10 @@
                                 <span t-esc="', '.join(filter(None, [o.partner_id.street, o.partner_id.street2]))"/>
                             </div>
                         </div>
-                        <div class="fp-grid-row" t-if="o.partner_id.phone or o.partner_id.mobile">
-                            <div class="fp-grid-cell"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or o.partner_id.mobile"/></div>
-                            <div class="fp-grid-cell" t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-field="o.partner_id.email"/></div>
+                        <div class="fp-grid-row" t-if="(not o.partner_id.vat) and (o.partner_id.phone or o.partner_id.mobile)">
+                            <div class="fp-grid-cell fp-wide"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or o.partner_id.mobile"/></div>
                         </div>
-                        <div class="fp-grid-row" t-if="(not (o.partner_id.phone or o.partner_id.mobile)) and o.partner_id.email">
+                        <div class="fp-grid-row" t-if="(not o.partner_id.vat) and (not (o.partner_id.phone or o.partner_id.mobile)) and o.partner_id.email">
                             <div class="fp-grid-cell fp-wide"><span class="fp-label">Correo:</span><span t-field="o.partner_id.email"/></div>
                         </div>
                     </div>
