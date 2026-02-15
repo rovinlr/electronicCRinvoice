@@ -309,10 +309,18 @@ class AccountMove(models.Model):
 
     def _fp_get_hacienda_recepcion_endpoint(self, clave=None):
         self.ensure_one()
-        endpoint = "/recepcion-sandbox/v1/recepcion" if self._fp_get_hacienda_environment() == "sandbox" else "/recepcion/v1/recepcion"
+        base_path = (urlparse(self.company_id.fp_hacienda_api_base_url or "").path or "").rstrip("/")
+
+        if base_path.endswith("/recepcion/v1") or base_path.endswith("/recepcion-sandbox/v1"):
+            endpoint = "/recepcion"
+        elif base_path.endswith("/recepcion/v1/recepcion") or base_path.endswith("/recepcion-sandbox/v1/recepcion"):
+            endpoint = ""
+        else:
+            endpoint = "/recepcion-sandbox/v1/recepcion" if self._fp_get_hacienda_environment() == "sandbox" else "/recepcion/v1/recepcion"
+
         if clave:
             return f"{endpoint}/{clave}"
-        return endpoint
+        return endpoint or "/"
 
     def _fp_build_hacienda_payload(self):
         self.ensure_one()
