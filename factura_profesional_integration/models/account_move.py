@@ -638,10 +638,14 @@ class AccountMove(models.Model):
             ET.SubElement(detail_node, "NumeroRegistroMS").text = product.fp_health_registry_number
         if product.fp_medicine_presentation_code:
             ET.SubElement(detail_node, "CodigoPresentacionMedicamento").text = product.fp_medicine_presentation_code
-        if product.fp_tariff_heading:
+        if product.fp_tariff_heading and self._fp_is_export_invoice():
             ET.SubElement(detail_node, "PartidaArancelaria").text = product.fp_tariff_heading
         if product.fp_transport_vin_or_series:
             ET.SubElement(detail_node, "NumeroVINoSerie").text = product.fp_transport_vin_or_series
+
+    def _fp_is_export_invoice(self):
+        self.ensure_one()
+        return (self.partner_id.country_id.code or "CR") != "CR"
 
     def _fp_get_line_exoneration(self, line):
         self.ensure_one()
