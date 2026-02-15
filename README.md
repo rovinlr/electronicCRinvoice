@@ -15,7 +15,7 @@ Conector para integrar **Odoo 19** con **Hacienda Costa Rica** de forma directa 
 
 En **Ajustes > Contabilidad**:
 
-- URL API Hacienda
+- URL API Hacienda (puede ser dominio base o la URL completa de recepción de Hacienda, por ejemplo `https://api-sandbox.comprobanteselectronicos.go.cr/recepcion/v1`)
 - URL OAuth Hacienda
 - Client ID
 - Usuario Hacienda
