@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_fp_electronic_header" inherit_id="account.report_invoice_document">
+        <xpath expr="//h2/span[@t-field='o.name']" position="replace">
+            <t t-if="not o.fp_is_electronic_invoice">
+                <span t-field="o.name"/>
+            </t>
+            <t t-else="">
+                <t t-set="fp_document_types" t-value="{
+                    'FE': 'Factura Electrónica',
+                    'TE': 'Tiquete Electrónico',
+                    'FEC': 'Factura Electrónica de Compra',
+                    'NC': 'Nota de Crédito Electrónica',
+                    'ND': 'Nota de Débito Electrónica',
+                    'CCE': 'Confirmación de Aceptación',
+                    'CPCE': 'Confirmación Parcial de Aceptación',
+                    'RCE': 'Confirmación de Rechazo'
+                }"/>
+                <span t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
+            </t>
+        </xpath>
+
+        <xpath expr="//h2" position="after">
+            <t t-if="o.fp_is_electronic_invoice">
+                <div class="mt-2 mb-2">
+                    <div>
+                        <strong>Consecutivo:</strong>
+                        <span t-field="o.fp_consecutive_number"/>
+                    </div>
+                    <div>
+                        <strong>Clave:</strong>
+                        <span t-field="o.fp_external_id"/>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[contains(@class, 'page')]" position="inside">
+            <t t-if="o.fp_is_electronic_invoice">
+                <div class="mt-4 text-muted" style="font-size: 11px;">
+                    Emitida conforme lo establecido en la resolución de Facturación Electrónica,
+                    MH-DGT-RES-0027-2024 del 19 de noviembre de 2024 de la Dirección General de Tributación Directa.
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>
