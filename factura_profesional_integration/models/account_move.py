@@ -84,6 +84,12 @@ class AccountMove(models.Model):
             elif move.move_type == "out_invoice" and move.fp_document_type == "NC":
                 move.fp_document_type = "FE"
 
+    @api.onchange("reversed_entry_id", "fp_document_type")
+    def _onchange_fp_reference_defaults(self):
+        for move in self:
+            move._fp_populate_reference_from_reversed_entry(force=False)
+
+
     def action_post(self):
         moves = super().action_post()
         electronic_moves = self.filtered(
@@ -105,6 +111,7 @@ class AccountMove(models.Model):
         )
         if electronic_refunds:
             electronic_refunds.write({"fp_document_type": "NC"})
+        reversed_moves._fp_populate_reference_from_reversed_entry(force=True)
         return reversed_moves
 
     @api.model
@@ -193,6 +200,51 @@ class AccountMove(models.Model):
         string="Medio de pago (FE)",
         default="01",
         help="Medio de pago según nota 6 de Anexos y Estructuras v4.4.",
+    )
+    fp_reference_document_type = fields.Selection(
+        [
+            ("01", "01 - Factura Electrónica"),
+            ("02", "02 - Nota de Débito Electrónica"),
+            ("03", "03 - Nota de Crédito Electrónica"),
+            ("04", "04 - Tiquete Electrónico"),
+            ("05", "05 - Nota de Despacho"),
+            ("06", "06 - Contrato"),
+            ("07", "07 - Procedimiento"),
+            ("08", "08 - Comprobante emitido en contingencia"),
+            ("99", "99 - Otros"),
+        ],
+        string="Tipo de documento de referencia (FE)",
+        help="Código de TipoDocIR para notas electrónicas en v4.4.",
+        copy=False,
+    )
+    fp_reference_number = fields.Char(
+        string="Clave numérica de referencia (FE)",
+        help="Número o clave del documento que se referencia.",
+        copy=False,
+    )
+    fp_reference_issue_datetime = fields.Datetime(
+        string="Fecha emisión documento de referencia (FE)",
+        help="Fecha y hora del documento de referencia (FechaEmisionIR).",
+        copy=False,
+    )
+    fp_reference_code = fields.Selection(
+        [
+            ("01", "01 - Anula documento de referencia"),
+            ("02", "02 - Corrige texto del documento de referencia"),
+            ("03", "03 - Corrige monto"),
+            ("04", "04 - Referencia a otro documento"),
+            ("05", "05 - Sustituye comprobante provisional por contingencia"),
+            ("99", "99 - Otros"),
+        ],
+        string="Código de referencia (FE)",
+        default="01",
+        help="Código del motivo de referencia según Anexos y Estructuras v4.4.",
+        copy=False,
+    )
+    fp_reference_reason = fields.Char(
+        string="Razón de referencia (FE)",
+        help="Detalle del motivo de referencia (Razon).",
+        copy=False,
     )
     fp_external_id = fields.Char(string="Clave Hacienda", copy=False)
     fp_consecutive_number = fields.Char(string="Consecutivo Hacienda", copy=False, readonly=True)
@@ -514,9 +566,9 @@ class AccountMove(models.Model):
         self._fp_append_location_nodes(receptor, self.partner_id)
         self._fp_append_contact_nodes(receptor, self.partner_id)
 
-        self._fp_append_reference_information(root)
-
         ET.SubElement(root, "CondicionVenta").text = self.fp_sale_condition or "01"
+
+        self._fp_append_reference_information(root)
 
         lines = ET.SubElement(root, "DetalleServicio")
         detalle_vals = self._fp_build_detail_lines(lines)
@@ -562,29 +614,53 @@ class AccountMove(models.Model):
         if self.fp_document_type not in ("NC", "ND"):
             return
 
-        referenced_move = self.reversed_entry_id
-        if not referenced_move:
+        self._fp_populate_reference_from_reversed_entry(force=False)
+        if not self.fp_reference_document_type or not self.fp_reference_number or not self.fp_reference_issue_datetime:
             raise UserError(
                 _(
-                    "La nota electrónica requiere un documento de referencia. "
-                    "Cree la nota desde una factura para enlazar la referencia automáticamente."
+                    "La nota electrónica requiere información de referencia. "
+                    "Complete Tipo de documento, Número y Fecha de emisión del documento de referencia."
                 )
             )
 
         reference_node = ET.SubElement(root_node, "InformacionReferencia")
-        ET.SubElement(reference_node, "TipoDoc").text = referenced_move._fp_get_document_code()
-        ET.SubElement(reference_node, "Numero").text = (
-            referenced_move.fp_external_id
-            or referenced_move.fp_consecutive_number
-            or (referenced_move.name or "")
-        )
-        reference_date = referenced_move.invoice_date or referenced_move.date or fields.Date.context_today(self)
-        ET.SubElement(reference_node, "FechaEmision").text = datetime.combine(
-            reference_date,
-            datetime.now().astimezone().timetz(),
-        ).isoformat(timespec="seconds")
-        ET.SubElement(reference_node, "Codigo").text = "01"
-        ET.SubElement(reference_node, "Razon").text = _("Documento de referencia para nota electrónica")
+        ET.SubElement(reference_node, "TipoDocIR").text = self.fp_reference_document_type
+        ET.SubElement(reference_node, "Numero").text = self.fp_reference_number
+        reference_issue_datetime = fields.Datetime.context_timestamp(self, self.fp_reference_issue_datetime)
+        ET.SubElement(reference_node, "FechaEmisionIR").text = reference_issue_datetime.isoformat(timespec="seconds")
+        ET.SubElement(reference_node, "Codigo").text = self.fp_reference_code or "01"
+        ET.SubElement(reference_node, "Razon").text = self.fp_reference_reason or _("Documento de referencia")
+
+    def _fp_populate_reference_from_reversed_entry(self, force=False):
+        for move in self:
+            if move.fp_document_type not in ("NC", "ND"):
+                continue
+
+            referenced_move = move.reversed_entry_id
+            if not referenced_move:
+                continue
+
+            should_set_type = force or not move.fp_reference_document_type
+            should_set_number = force or not move.fp_reference_number
+            should_set_date = force or not move.fp_reference_issue_datetime
+
+            if should_set_type:
+                move.fp_reference_document_type = referenced_move._fp_get_document_code()
+            if should_set_number:
+                move.fp_reference_number = (
+                    referenced_move.fp_external_id
+                    or referenced_move.fp_consecutive_number
+                    or (referenced_move.name or "")
+                )
+            if should_set_date:
+                reference_date = referenced_move.invoice_date or referenced_move.date or fields.Date.context_today(move)
+                move.fp_reference_issue_datetime = datetime.combine(
+                    reference_date,
+                    datetime.now().astimezone().timetz(),
+                ).replace(tzinfo=None)
+
+            if force and not move.fp_reference_reason:
+                move.fp_reference_reason = _("Documento de referencia para nota electrónica")
 
     def _fp_build_detail_lines(self, lines_node):
         totals = {
