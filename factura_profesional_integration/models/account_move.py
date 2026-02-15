@@ -673,16 +673,15 @@ class AccountMove(models.Model):
             {"Id": reference_id, "URI": ""},
         )
         transforms = LET.SubElement(reference_document, LET.QName(DS_XML_NS, "Transforms"))
-        xpath_transform = LET.SubElement(
-            transforms,
-            LET.QName(DS_XML_NS, "Transform"),
-            {"Algorithm": "http://www.w3.org/TR/1999/REC-xpath-19991116"},
-        )
-        LET.SubElement(xpath_transform, LET.QName(DS_XML_NS, "XPath")).text = "not(ancestor-or-self::ds:Signature)"
         LET.SubElement(
             transforms,
             LET.QName(DS_XML_NS, "Transform"),
             {"Algorithm": "http://www.w3.org/2000/09/xmldsig#enveloped-signature"},
+        )
+        LET.SubElement(
+            transforms,
+            LET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
         )
         LET.SubElement(
             reference_document,
@@ -714,6 +713,12 @@ class AccountMove(models.Model):
             LET.QName(DS_XML_NS, "Reference"),
             {"Id": "ReferenceKeyInfo", "URI": f"#{key_info_id}"},
         )
+        key_info_transforms = LET.SubElement(reference_key_info, LET.QName(DS_XML_NS, "Transforms"))
+        LET.SubElement(
+            key_info_transforms,
+            LET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
+        )
         LET.SubElement(
             reference_key_info,
             LET.QName(DS_XML_NS, "DigestMethod"),
@@ -731,6 +736,12 @@ class AccountMove(models.Model):
                 "Type": "http://uri.etsi.org/01903#SignedProperties",
                 "URI": f"#{signed_properties_id}",
             },
+        )
+        signed_properties_transforms = LET.SubElement(reference_signed_properties, LET.QName(DS_XML_NS, "Transforms"))
+        LET.SubElement(
+            signed_properties_transforms,
+            LET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
         )
         LET.SubElement(
             reference_signed_properties,
@@ -806,11 +817,13 @@ class AccountMove(models.Model):
 
         signed_info_c14n = LET.tostring(signed_info, method="c14n", exclusive=False, with_comments=False)
         signature = private_key.sign(signed_info_c14n, padding.PKCS1v15(), hashes.SHA256())
-        LET.SubElement(
+        signature_value_node = LET.SubElement(
             signature_node,
             LET.QName(DS_XML_NS, "SignatureValue"),
             {"Id": f"SignatureValue-{signature_token}"},
-        ).text = base64.b64encode(signature).decode("utf-8")
+        )
+        signature_value_node.text = base64.b64encode(signature).decode("utf-8")
+        signature_node.insert(1, signature_value_node)
 
         return LET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
 
