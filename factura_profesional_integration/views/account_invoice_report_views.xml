@@ -37,7 +37,7 @@
 
 
 
-        <xpath expr="//*[@name='partner_address']//*[@t-field='o.partner_id'][1]" position="replace">
+        <xpath expr="//*[@t-field='o.partner_id' and contains(@t-options, '&quot;widget&quot;: &quot;contact&quot;')][1]" position="replace">
             <t t-if="o.partner_id.country_id.code == 'CR'">
                 <div>
                     <strong>Provincia:</strong>
