@@ -20,9 +20,13 @@ from odoo.exceptions import UserError
 FE_XML_NS = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
 DS_XML_NS = "http://www.w3.org/2000/09/xmldsig#"
 XADES_XML_NS = "http://uri.etsi.org/01903/v1.3.2#"
-XADES_SIGNATURE_POLICY_IDENTIFIER = "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica"
+XADES_SIGNATURE_POLICY_IDENTIFIER = (
+    "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/"
+    "Resoluci%C3%B3n_General_sobre_disposiciones_t%C3%A9cnicas_comprobantes_electr%C3%B3nicos_para_efectos_tributarios.pdf"
+)
 XADES_SIGNATURE_POLICY_DESCRIPTION = "Política de firma para comprobantes electrónicos de Costa Rica"
-XADES_SIGNATURE_POLICY_HASH = "Ohixl6upD6av8N7pEvDABhEL6hM="
+XADES_SIGNATURE_POLICY_HASH_ALGORITHM = "http://www.w3.org/2001/04/xmlenc#sha256"
+XADES_SIGNATURE_POLICY_HASH = "DWxin1xWOeI8OuWQXazh4VjLWAaCLAA954em7DMh0h8="
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -334,7 +338,7 @@ class AccountMove(models.Model):
                 "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
                 "xsi:schemaLocation": (
                     "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica "
-                    "FacturaElectronica_V4.4.xsd"
+                    "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronica.xsd"
                 ),
             },
         )
@@ -564,6 +568,12 @@ class AccountMove(models.Model):
             LET.QName(DS_XML_NS, "DigestMethod"),
             {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
         )
+        signed_properties_transforms = LET.SubElement(reference_signed_properties, LET.QName(DS_XML_NS, "Transforms"))
+        LET.SubElement(
+            signed_properties_transforms,
+            LET.QName(DS_XML_NS, "Transform"),
+            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
+        )
         reference_signed_properties_digest = LET.SubElement(reference_signed_properties, LET.QName(DS_XML_NS, "DigestValue"))
 
         key_info_id = f"KeyInfoId-{signature_id}"
@@ -628,7 +638,7 @@ class AccountMove(models.Model):
         LET.SubElement(
             sig_policy_hash,
             LET.QName(DS_XML_NS, "DigestMethod"),
-            {"Algorithm": "http://www.w3.org/2000/09/xmldsig#sha1"},
+            {"Algorithm": XADES_SIGNATURE_POLICY_HASH_ALGORITHM},
         )
         LET.SubElement(sig_policy_hash, LET.QName(DS_XML_NS, "DigestValue")).text = XADES_SIGNATURE_POLICY_HASH
 
@@ -644,7 +654,7 @@ class AccountMove(models.Model):
         key_info_c14n = LET.tostring(key_info, method="c14n", exclusive=False, with_comments=False)
         reference_key_info_digest.text = base64.b64encode(hashlib.sha256(key_info_c14n).digest()).decode("utf-8")
 
-        signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=False, with_comments=False)
+        signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=True, with_comments=False)
         reference_signed_properties_digest.text = base64.b64encode(hashlib.sha256(signed_properties_c14n).digest()).decode("utf-8")
 
         signed_info_c14n = LET.tostring(signed_info, method="c14n", exclusive=False, with_comments=False)
