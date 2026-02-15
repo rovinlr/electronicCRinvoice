@@ -113,18 +113,35 @@ class ResPartner(models.Model):
         string="Tipo de identificación (FE)",
         help="Catálogo de tipo de identificación para facturación electrónica.",
     )
-    fp_canton_code = fields.Char(
+    fp_province_id = fields.Many2one(
+        "fp.province",
+        string="Provincia (FE)",
+        help="Provincia para facturación electrónica según catálogo FE.",
+    )
+    fp_canton_id = fields.Many2one(
+        "fp.canton",
         string="Cantón (FE)",
+        domain="[('province_id', '=', fp_province_id)]",
+        help="Cantón para facturación electrónica según catálogo FE.",
+    )
+    fp_district_id = fields.Many2one(
+        "fp.district",
+        string="Distrito (FE)",
+        domain="[('canton_id', '=', fp_canton_id)]",
+        help="Distrito para facturación electrónica según catálogo FE.",
+    )
+    fp_canton_code = fields.Char(
+        string="Cantón código (FE)",
         size=2,
         help="Código de cantón según Anexos y Estructuras v4.4 (2 dígitos).",
     )
     fp_province_code = fields.Char(
-        string="Provincia (FE)",
+        string="Provincia código (FE)",
         size=1,
         help="Código de provincia según Anexos y Estructuras v4.4 (1 dígito).",
     )
     fp_district_code = fields.Char(
-        string="Distrito (FE)",
+        string="Distrito código (FE)",
         size=2,
         help="Código de distrito según Anexos y Estructuras v4.4 (2 dígitos).",
     )
@@ -150,23 +167,47 @@ class ResPartner(models.Model):
     )
 
 
-    @api.onchange("country_id", "city")
-    def _onchange_fp_sync_canton_from_city(self):
+    @api.onchange("fp_province_id")
+    def _onchange_fp_province_id(self):
         for partner in self:
-            if partner.country_id.code == "CR" and partner.city:
-                partner.fp_canton_code = partner.city
+            if partner.fp_canton_id and partner.fp_canton_id.province_id != partner.fp_province_id:
+                partner.fp_canton_id = False
+            if partner.fp_district_id and partner.fp_district_id.province_id != partner.fp_province_id:
+                partner.fp_district_id = False
+            partner.fp_province_code = partner.fp_province_id.code or False
 
-    @api.onchange("country_id", "fp_canton_code")
-    def _onchange_fp_sync_city_from_canton(self):
+    @api.onchange("fp_canton_id")
+    def _onchange_fp_canton_id(self):
         for partner in self:
-            if partner.country_id.code == "CR" and partner.fp_canton_code:
-                partner.city = partner.fp_canton_code
+            if partner.fp_district_id and partner.fp_district_id.canton_id != partner.fp_canton_id:
+                partner.fp_district_id = False
+            if partner.fp_canton_id:
+                partner.fp_province_id = partner.fp_canton_id.province_id
+                partner.fp_canton_code = partner.fp_canton_id.code
+                partner.city = partner.fp_canton_id.name
+            else:
+                partner.fp_canton_code = False
+                if partner.country_id.code == "CR":
+                    partner.city = False
+
+    @api.onchange("fp_district_id")
+    def _onchange_fp_district_id(self):
+        for partner in self:
+            if partner.fp_district_id:
+                partner.fp_canton_id = partner.fp_district_id.canton_id
+                partner.fp_province_id = partner.fp_district_id.province_id
+                partner.fp_district_code = partner.fp_district_id.code
+            else:
+                partner.fp_district_code = False
 
     @api.onchange("country_id", "state_id")
     def _onchange_fp_sync_province_from_state(self):
         for partner in self:
-            if partner.country_id.code == "CR" and partner.state_id and partner.state_id.code:
-                partner.fp_province_code = "".join(ch for ch in partner.state_id.code if ch.isdigit())[:1]
+            if partner.country_id.code == "CR" and partner.state_id and partner.state_id.code and not partner.fp_province_id:
+                province_code = "".join(ch for ch in partner.state_id.code if ch.isdigit())[:1]
+                if province_code:
+                    partner.fp_province_id = self.env["fp.province"].search([("code", "=", province_code)], limit=1)
+                partner.fp_province_code = province_code
 
     def action_fp_fetch_hacienda_data(self):
         for partner in self:
