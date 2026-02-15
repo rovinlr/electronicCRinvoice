@@ -4,6 +4,11 @@ from odoo import fields, models
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
+    fp_use_exonerations = fields.Boolean(
+        string="Usa exoneración",
+        help="Indica si el producto aplica para gestión de exoneraciones en FE.",
+    )
+
     fp_cabys_code_id = fields.Many2one(
         "fp.cabys.code",
         string="Código CABYS",
