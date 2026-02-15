@@ -25,9 +25,15 @@ class ProductTemplate(models.Model):
         help="Código de presentación del medicamento cuando aplique.",
     )
     fp_commercial_code_type = fields.Selection(
-        [("01", "01 - Código del producto"), ("02", "02 - Código del fabricante"), ("03", "03 - Código del sistema")],
+        [
+            ("01", "01 - Código del producto del vendedor"),
+            ("02", "02 - Código del producto del comprador"),
+            ("03", "03 - Código del producto asignado por el fabricante (industriales o importadores)"),
+            ("04", "04 - Código uso interno"),
+            ("99", "99 - Otros"),
+        ],
         string="Tipo de código",
-        help="Tipo de código comercial para el nodo CodigoComercial del XML.",
+        help="Tipo de código de producto/servicio según Nota 12 de Anexos y Estructuras v4.4.",
     )
     fp_tariff_heading = fields.Char(
         string="Partida arancelaria",
