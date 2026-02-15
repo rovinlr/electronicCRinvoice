@@ -17,6 +17,8 @@
 
             <xpath expr="//field[@name='city']" position="attributes">
                 <attribute name="string">Cantón</attribute>
+                <attribute name="placeholder">Cantón</attribute>
+                <attribute name="class">o_address_city</attribute>
             </xpath>
 
             <xpath expr="//field[@name='street']" position="attributes">
@@ -24,8 +26,8 @@
             </xpath>
 
             <xpath expr="//field[@name='city']" position="after">
-                <field name="fp_district_code" string="Distrito"/>
-                <field name="fp_neighborhood_code" string="Barrio"/>
+                <field name="fp_district_code" string="Distrito" placeholder="Distrito" class="o_address_state"/>
+                <field name="fp_neighborhood_code" string="Barrio" placeholder="Barrio" class="o_address_zip"/>
             </xpath>
         </field>
     </record>
