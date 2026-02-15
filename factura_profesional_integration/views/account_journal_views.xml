@@ -6,7 +6,10 @@
         <field name="inherit_id" ref="account.view_account_journal_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet//group" position="inside">
-                <field name="fp_is_electronic_invoice"/>
+                <label for="fp_is_electronic_invoice" string="FE 4.4"/>
+                <div>
+                    <field name="fp_is_electronic_invoice" nolabel="1"/>
+                </div>
             </xpath>
         </field>
     </record>
