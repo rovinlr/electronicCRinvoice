@@ -155,6 +155,10 @@ class ResPartner(models.Model):
         string="Actividad económica principal (FE)",
         help="Actividad económica principal del cliente para facturación electrónica.",
     )
+    fp_is_costa_rica = fields.Boolean(
+        string="Es Costa Rica",
+        compute="_compute_fp_is_costa_rica",
+    )
 
     fp_use_exonerations = fields.Boolean(
         string="Usa Exoneraciones",
@@ -165,6 +169,11 @@ class ResPartner(models.Model):
         "partner_id",
         string="Exoneraciones FE",
     )
+
+    @api.depends("country_id")
+    def _compute_fp_is_costa_rica(self):
+        for partner in self:
+            partner.fp_is_costa_rica = partner.country_id.code == "CR"
 
 
     @api.onchange("fp_province_id")
