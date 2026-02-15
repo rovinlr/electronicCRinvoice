@@ -312,6 +312,8 @@ class AccountMove(models.Model):
             ET.SubElement(root, "ProveedorSistemas").text = "".join(ch for ch in self.company_id.vat if ch.isdigit())
         if self.fp_economic_activity_code:
             ET.SubElement(root, "CodigoActividadEmisor").text = self.fp_economic_activity_code
+        if self.partner_id.fp_economic_activity_id and self.partner_id.fp_economic_activity_id.code:
+            ET.SubElement(root, "CodigoActividadReceptor").text = self.partner_id.fp_economic_activity_id.code
         ET.SubElement(root, "NumeroConsecutivo").text = self._fp_extract_consecutive_from_clave(clave)
         ET.SubElement(root, "FechaEmision").text = datetime.now().astimezone().isoformat()
 
