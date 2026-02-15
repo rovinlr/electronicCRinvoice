@@ -129,6 +129,7 @@ class AccountMove(models.Model):
     fp_external_id = fields.Char(string="Clave Hacienda", copy=False)
     fp_consecutive_number = fields.Char(string="Consecutivo Hacienda", copy=False, readonly=True)
     fp_xml_attachment_id = fields.Many2one("ir.attachment", string="Factura XML", copy=False)
+    fp_xml_signed_digest = fields.Char(string="Digest XML firmado", copy=False, readonly=True)
     fp_response_xml_attachment_id = fields.Many2one("ir.attachment", string="XML Respuesta Hacienda", copy=False)
     fp_xml_attachment_name = fields.Char(related="fp_xml_attachment_id.name", string="Nombre XML Factura", readonly=True)
     fp_response_xml_attachment_name = fields.Char(
@@ -260,17 +261,18 @@ class AccountMove(models.Model):
         if not self.fp_xml_attachment_id or not self.fp_xml_attachment_id.datas:
             self._fp_generate_and_sign_xml_attachment()
 
+        signed_xml_b64 = self._fp_get_signed_xml_payload_base64()
         clave = self._fp_build_clave()
         partner_vat = "".join(ch for ch in (self.partner_id.vat or "") if ch.isdigit())
 
         payload = {
             "clave": clave,
-            "fecha": datetime.now().astimezone().isoformat(),
+            "fecha": datetime.now().astimezone().isoformat(timespec="seconds"),
             "emisor": {
                 "tipoIdentificacion": self.company_id.partner_id.fp_identification_type or "02",
                 "numeroIdentificacion": "".join(ch for ch in (self.company_id.vat or "") if ch.isdigit()),
             },
-            "comprobanteXml": self.fp_xml_attachment_id.datas.decode("utf-8"),
+            "comprobanteXml": signed_xml_b64,
         }
         if partner_vat and self.partner_id.fp_identification_type:
             payload["receptor"] = {
@@ -283,17 +285,42 @@ class AccountMove(models.Model):
         self.ensure_one()
         xml_text = self._fp_generate_invoice_xml()
         signed_xml_text = self._fp_sign_xml(xml_text)
+        signed_xml_bytes = signed_xml_text.encode("utf-8")
+        signed_xml_b64 = base64.b64encode(signed_xml_bytes)
         attachment = self.env["ir.attachment"].create(
             {
                 "name": f"{self.name or 'factura'}-firmado.xml",
                 "type": "binary",
-                "datas": base64.b64encode(signed_xml_text.encode("utf-8")),
+                "datas": signed_xml_b64,
                 "res_model": "account.move",
                 "res_id": self.id,
                 "mimetype": "application/xml",
             }
         )
         self.fp_xml_attachment_id = attachment
+        self.fp_xml_signed_digest = hashlib.sha256(signed_xml_bytes).hexdigest()
+
+    def _fp_get_signed_xml_payload_base64(self):
+        self.ensure_one()
+        attachment = self.fp_xml_attachment_id
+        if not attachment or not attachment.datas:
+            raise UserError(_("La factura no tiene XML firmado adjunto."))
+
+        xml_bytes = base64.b64decode(attachment.datas)
+        current_digest = hashlib.sha256(xml_bytes).hexdigest()
+        if self.fp_xml_signed_digest and current_digest != self.fp_xml_signed_digest:
+            raise UserError(
+                _(
+                    "El XML firmado fue alterado luego de la firma digital. "
+                    "Genere y firme nuevamente antes de enviar a Hacienda."
+                )
+            )
+
+        if not self.fp_xml_signed_digest:
+            # Backward compatibility for documents signed before this guard existed.
+            self.fp_xml_signed_digest = current_digest
+
+        return base64.b64encode(xml_bytes).decode("utf-8")
 
     def _fp_generate_invoice_xml(self):
         self.ensure_one()
@@ -319,7 +346,7 @@ class AccountMove(models.Model):
         if self.partner_id.fp_economic_activity_id and self.partner_id.fp_economic_activity_id.code:
             ET.SubElement(root, "CodigoActividadReceptor").text = self.partner_id.fp_economic_activity_id.code
         ET.SubElement(root, "NumeroConsecutivo").text = self._fp_extract_consecutive_from_clave(clave)
-        ET.SubElement(root, "FechaEmision").text = datetime.now().astimezone().isoformat()
+        ET.SubElement(root, "FechaEmision").text = datetime.now().astimezone().isoformat(timespec="seconds")
 
         emisor = ET.SubElement(root, "Emisor")
         ET.SubElement(emisor, "Nombre").text = self.company_id.name or ""
@@ -488,7 +515,7 @@ class AccountMove(models.Model):
 
         parser = LET.XMLParser(remove_blank_text=True)
         root = LET.fromstring(xml_text.encode("utf-8"), parser=parser)
-        canonical_document = LET.tostring(root, method="c14n", exclusive=True, with_comments=False)
+        canonical_document = LET.tostring(root, method="c14n", exclusive=False, with_comments=False)
         root_digest = hashlib.sha256(canonical_document).digest()
 
         signature_token = f"{random.getrandbits(128):032x}"
@@ -502,7 +529,7 @@ class AccountMove(models.Model):
         LET.SubElement(
             signed_info,
             LET.QName(DS_XML_NS, "CanonicalizationMethod"),
-            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
+            {"Algorithm": "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"},
         )
         LET.SubElement(
             signed_info,
@@ -515,13 +542,7 @@ class AccountMove(models.Model):
         LET.SubElement(
             transforms,
             LET.QName(DS_XML_NS, "Transform"),
-            {"Algorithm": "http://www.w3.org/TR/1999/REC-xpath-19991116"},
-        )
-        LET.SubElement(transforms[-1], LET.QName(DS_XML_NS, "XPath")).text = "not(ancestor-or-self::ds:Signature)"
-        LET.SubElement(
-            transforms,
-            LET.QName(DS_XML_NS, "Transform"),
-            {"Algorithm": "http://www.w3.org/2001/10/xml-exc-c14n#"},
+            {"Algorithm": "http://www.w3.org/2000/09/xmldsig#enveloped-signature"},
         )
         LET.SubElement(
             reference_document,
@@ -545,7 +566,20 @@ class AccountMove(models.Model):
         )
         reference_signed_properties_digest = LET.SubElement(reference_signed_properties, LET.QName(DS_XML_NS, "DigestValue"))
 
-        key_info = LET.SubElement(signature_node, LET.QName(DS_XML_NS, "KeyInfo"))
+        key_info_id = f"KeyInfoId-{signature_id}"
+        reference_key_info = LET.SubElement(
+            signed_info,
+            LET.QName(DS_XML_NS, "Reference"),
+            {"Id": "ReferenceKeyInfo", "URI": f"#{key_info_id}"},
+        )
+        LET.SubElement(
+            reference_key_info,
+            LET.QName(DS_XML_NS, "DigestMethod"),
+            {"Algorithm": "http://www.w3.org/2001/04/xmlenc#sha256"},
+        )
+        reference_key_info_digest = LET.SubElement(reference_key_info, LET.QName(DS_XML_NS, "DigestValue"))
+
+        key_info = LET.SubElement(signature_node, LET.QName(DS_XML_NS, "KeyInfo"), {"Id": key_info_id})
         x509_data = LET.SubElement(key_info, LET.QName(DS_XML_NS, "X509Data"))
         cert_der = certificate.public_bytes(serialization.Encoding.DER)
         LET.SubElement(x509_data, LET.QName(DS_XML_NS, "X509Certificate")).text = base64.b64encode(cert_der).decode("utf-8")
@@ -604,12 +638,16 @@ class AccountMove(models.Model):
             LET.QName(XADES_XML_NS, "DataObjectFormat"),
             {"ObjectReference": "#r-id-1"},
         )
-        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "application/octet-stream"
+        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "MimeType")).text = "text/xml"
+        LET.SubElement(data_object_format, LET.QName(XADES_XML_NS, "Encoding")).text = "UTF-8"
 
-        signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=True, with_comments=False)
+        key_info_c14n = LET.tostring(key_info, method="c14n", exclusive=False, with_comments=False)
+        reference_key_info_digest.text = base64.b64encode(hashlib.sha256(key_info_c14n).digest()).decode("utf-8")
+
+        signed_properties_c14n = LET.tostring(signed_properties, method="c14n", exclusive=False, with_comments=False)
         reference_signed_properties_digest.text = base64.b64encode(hashlib.sha256(signed_properties_c14n).digest()).decode("utf-8")
 
-        signed_info_c14n = LET.tostring(signed_info, method="c14n", exclusive=True, with_comments=False)
+        signed_info_c14n = LET.tostring(signed_info, method="c14n", exclusive=False, with_comments=False)
         signature = private_key.sign(signed_info_c14n, padding.PKCS1v15(), hashes.SHA256())
         LET.SubElement(
             signature_node,
