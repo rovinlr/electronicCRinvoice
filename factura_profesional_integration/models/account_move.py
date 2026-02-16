@@ -518,9 +518,10 @@ class AccountMove(models.Model):
         signed_xml_text = self._fp_sign_xml(xml_text)
         signed_xml_bytes = signed_xml_text.encode("utf-8")
         signed_xml_b64 = base64.b64encode(signed_xml_bytes)
+        xml_filename_prefix = self._fp_get_xml_filename_prefix(clave=clave)
         attachment = self.env["ir.attachment"].create(
             {
-                "name": f"{self.name or 'factura'}-firmado.xml",
+                "name": f"{xml_filename_prefix}-firmado.xml",
                 "type": "binary",
                 "datas": signed_xml_b64,
                 "res_model": "account.move",
@@ -1211,9 +1212,10 @@ class AccountMove(models.Model):
             except Exception:
                 xml_text = xml_payload
 
+        xml_filename_prefix = self._fp_get_xml_filename_prefix(clave=self.fp_external_id)
         attachment = self.env["ir.attachment"].create(
             {
-                "name": f"{self.name or 'factura'}-respuesta-hacienda.xml",
+                "name": f"{xml_filename_prefix}-respuesta-hacienda.xml",
                 "type": "binary",
                 "datas": base64.b64encode(xml_text.encode("utf-8")),
                 "res_model": "account.move",
@@ -1297,6 +1299,12 @@ class AccountMove(models.Model):
         if len(clave or "") >= 41:
             return clave[21:41]
         return (clave or "").zfill(20)[-20:]
+
+    def _fp_get_xml_filename_prefix(self, clave=None):
+        self.ensure_one()
+        clave_value = clave or self.fp_external_id or self._fp_build_clave()
+        consecutive = self._fp_extract_consecutive_from_clave(clave_value)
+        return f"{self.name or 'factura'}-{consecutive}"
 
     def _fp_build_clave(self):
         self.ensure_one()
