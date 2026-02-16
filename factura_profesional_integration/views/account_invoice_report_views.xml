@@ -236,7 +236,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="o.invoice_line_ids" t-as="line" t-if="not line.display_type">
+                            <tr t-foreach="o.invoice_line_ids" t-as="line" t-if="line.display_type in (False, 'product') and not line.exclude_from_invoice_tab">
                                 <td t-esc="line.product_id.fp_cabys_code or '-'"/>
                                 <td><span t-field="line.name"/></td>
                                 <td class="text-end" t-esc="line.quantity"/>
