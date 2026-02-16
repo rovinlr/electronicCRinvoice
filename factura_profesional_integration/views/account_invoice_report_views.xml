@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="report_invoice_with_payments_fp_template_router" inherit_id="account.report_invoice_with_payments">
-        <xpath expr="//t[contains(@t-call, 'report_invoice_document')][1]" position="before">
+    <template id="report_invoice_document_fp_template_router" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-call='web.external_layout']" position="before">
             <t t-if="o.fp_is_electronic_invoice and o.company_id.fp_invoice_template_style" t-call="factura_profesional_integration.report_invoice_document_fp_custom" t-lang="lang"/>
         </xpath>
-        <xpath expr="//t[contains(@t-call, 'report_invoice_document')][1]" position="attributes">
+        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
             <attribute name="t-if">not (o.fp_is_electronic_invoice and o.company_id.fp_invoice_template_style)</attribute>
         </xpath>
     </template>
