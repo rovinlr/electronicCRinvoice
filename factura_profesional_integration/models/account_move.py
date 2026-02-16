@@ -180,16 +180,24 @@ class AccountMove(models.Model):
         context = dict(action.get("context") or {})
         existing_attachment_ids = context.get("default_attachment_ids") or []
 
-        existing_ids = set()
+        all_attachment_ids = set()
         if isinstance(existing_attachment_ids, list):
             for value in existing_attachment_ids:
                 if isinstance(value, int):
-                    existing_ids.add(value)
-                elif isinstance(value, (tuple, list)) and value and value[0] == 6 and len(value) >= 3:
-                    existing_ids.update(value[2] or [])
+                    all_attachment_ids.add(value)
+                elif isinstance(value, (tuple, list)) and value:
+                    command = value[0]
+                    if command == 6 and len(value) >= 3:
+                        all_attachment_ids.update(value[2] or [])
+                    elif command == 4 and len(value) >= 2:
+                        all_attachment_ids.add(value[1])
+                    elif command == 3 and len(value) >= 2 and value[1] in all_attachment_ids:
+                        all_attachment_ids.remove(value[1])
+                    elif command == 5:
+                        all_attachment_ids.clear()
 
-        all_attachment_ids = sorted(existing_ids.union(attachment_ids))
-        context["default_attachment_ids"] = [(6, 0, all_attachment_ids)]
+        all_attachment_ids.update(attachment_ids)
+        context["default_attachment_ids"] = sorted(all_attachment_ids)
         action["context"] = context
         return action
 
@@ -214,9 +222,19 @@ class AccountMove(models.Model):
             return False
 
         email_values = {
-            "attachment_ids": [(6, 0, self._fp_get_hacienda_attachment_ids())],
+            "subject": _("%(company)s Factura (Ref %(reference)s)")
+            % {
+                "company": self.company_id.name or "",
+                "reference": self.fp_consecutive_number or self.name or "n/a",
+            }
         }
-        template.send_mail(self.id, force_send=True, email_values=email_values)
+        mail_id = template.send_mail(self.id, force_send=False, email_values=email_values)
+        attachment_ids = self._fp_get_hacienda_attachment_ids()
+        if mail_id:
+            mail = self.env["mail.mail"].browse(mail_id)
+            if attachment_ids:
+                mail.write({"attachment_ids": [(4, attachment_id) for attachment_id in attachment_ids]})
+            mail.send()
         self.fp_email_sent = True
         return True
 

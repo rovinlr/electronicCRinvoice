@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account.email_template_edi_invoice" model="mail.template">
+        <field name="subject">{{ object.company_id.name }} Factura (Ref {{ object.fp_consecutive_number or object.name or 'n/a' }})</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                    Estimado/a
+                    <t t-if="object.partner_id.parent_id">
+                        <t t-out="object.partner_id.name or ''">Brandon Freeman</t>
+                        (
+                        <t t-out="object.partner_id.parent_id.name or ''">Azure Interior</t>
+                        )
+                    </t>
+                    <t t-else="">
+                        <t t-out="object.partner_id.name or ''">Brandon Freeman</t>
+                    </t>
+                    <br /><br />
+                    Aquí encontrará su factura
+                    <strong>
+                        <t t-out="object.fp_consecutive_number or object.name or ''">00100001010000000001</t>
+                    </strong>
+                    <t t-if="object.ref">
+                        (con referencia: <t t-out="object.ref or ''">SUB003</t>)
+                    </t>
+                    por un importe de
+                    <strong>
+                        <t t-out="format_amount(object.amount_total, object.currency_id)">143.750,00 €</t>
+                    </strong>
+                    de <t t-out="object.company_id.name or ''">YourCompany</t>.
+                    <t t-if="object.invoice_user_id.signature">
+                        <br /><br />
+                        <t t-out="object.invoice_user_id.signature or ''">--<br/>Mitchell Admin</t>
+                    </t>
+                    <br /><br />
+                </p>
+            </div>
+        </field>
+    </record>
+</odoo>
