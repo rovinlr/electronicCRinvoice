@@ -368,9 +368,12 @@ class AccountMove(models.Model):
         if not company.fp_hacienda_api_base_url or not company.fp_hacienda_token_url:
             raise UserError(_("Configure URLs de Hacienda en Ajustes > Contabilidad."))
 
-        self._fp_refresh_signed_xml_if_outdated()
-        if not self.fp_xml_attachment_id:
-            self._fp_generate_and_sign_xml_attachment()
+        if not self.fp_xml_attachment_id or not self.fp_xml_attachment_id.datas:
+            raise UserError(
+                _(
+                    "La factura no tiene XML firmado generado. Confirme el documento para generar el XML antes de enviar a Hacienda."
+                )
+            )
 
         self._fp_ensure_signed_xml_integrity()
         payload = self._fp_build_hacienda_payload()
@@ -489,7 +492,11 @@ class AccountMove(models.Model):
     def _fp_build_hacienda_payload(self):
         self.ensure_one()
         if not self.fp_xml_attachment_id or not self.fp_xml_attachment_id.datas:
-            self._fp_generate_and_sign_xml_attachment()
+            raise UserError(
+                _(
+                    "La factura no tiene XML firmado generado. Confirme el documento para generar el XML antes de enviar a Hacienda."
+                )
+            )
 
         signed_xml_b64 = self._fp_get_signed_xml_payload_base64()
         clave = self._fp_build_clave()
