@@ -108,10 +108,10 @@ class AccountMove(models.Model):
         for move in self:
             move._fp_populate_reference_from_reversed_entry(force=False)
 
-    @api.onchange("invoice_payment_term_id", "payment_term_id")
+    @api.onchange("invoice_payment_term_id")
     def _onchange_fp_sale_condition_from_payment_term(self):
         for move in self:
-            payment_term = move.invoice_payment_term_id or move.payment_term_id
+            payment_term = move.invoice_payment_term_id or getattr(move, "payment_term_id", False)
             if payment_term and payment_term.fp_sale_condition:
                 move.fp_sale_condition = payment_term.fp_sale_condition
 
