@@ -924,7 +924,11 @@ class AccountMove(models.Model):
         exoneration_issue_dt = fields.Datetime.to_datetime(exoneration.issue_date)
         ET.SubElement(exoneration_node, "FechaEmisionEX").text = exoneration_issue_dt.strftime("%Y-%m-%dT%H:%M:%S") if exoneration_issue_dt else ""
 
-        # Hacienda exige Articulo para tipos de exoneración específicos.
+        percentage = max(min(exoneration.exoneration_percentage or 0.0, 100.0), 0.0)
+        tax_discount = taxable_base * (percentage / 100.0)
+        ET.SubElement(exoneration_node, "TarifaExonerada").text = self._fp_format_decimal(tax_rate)
+
+        # Hacienda valida el orden del XSD: TarifaExonerada debe emitirse antes de Articulo.
         required_article_types = {"02", "03", "06", "07", "08"}
         article = (exoneration.article or "").strip()
         if exoneration_type in required_article_types:
@@ -940,9 +944,6 @@ class AccountMove(models.Model):
                 )
             ET.SubElement(exoneration_node, "Articulo").text = article[:10]
 
-        percentage = max(min(exoneration.exoneration_percentage or 0.0, 100.0), 0.0)
-        tax_discount = taxable_base * (percentage / 100.0)
-        ET.SubElement(exoneration_node, "TarifaExonerada").text = self._fp_format_decimal(tax_rate)
         ET.SubElement(exoneration_node, "MontoExoneracion").text = self._fp_format_decimal(tax_discount)
         return tax_discount
 
