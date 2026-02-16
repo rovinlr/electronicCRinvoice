@@ -933,12 +933,23 @@ class AccountMove(models.Model):
             ET.SubElement(location_node, "OtrasSenas").text = partner.street[:160]
 
     def _fp_append_contact_nodes(self, parent_node, partner):
-        if partner.phone:
+        phone_number = self._fp_normalize_phone_number(partner.phone)
+        if phone_number:
             phone_node = ET.SubElement(parent_node, "Telefono")
             ET.SubElement(phone_node, "CodigoPais").text = "506"
-            ET.SubElement(phone_node, "NumTelefono").text = "".join(ch for ch in partner.phone if ch.isdigit())[:20]
+            ET.SubElement(phone_node, "NumTelefono").text = phone_number
         if partner.email:
             ET.SubElement(parent_node, "CorreoElectronico").text = partner.email
+
+    def _fp_normalize_phone_number(self, phone):
+        digits = "".join(ch for ch in (phone or "") if ch.isdigit())
+        if not digits:
+            return ""
+        if digits == "506":
+            return ""
+        if digits.startswith("506") and len(digits) > 8:
+            digits = digits[3:]
+        return digits[:20]
 
     def _fp_pad_numeric_code(self, value, length, default):
         digits = "".join(ch for ch in (value or "") if ch.isdigit())
