@@ -104,6 +104,7 @@
         id="menu_fp_hacienda_root"
         name="Hacienda"
         action="action_fp_electronic_documents"
+        web_icon="factura_profesional_integration,static/description/icon.svg"
         sequence="14"
         groups="account.group_account_invoice"
     />
