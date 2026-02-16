@@ -10,9 +10,7 @@ class FpCabysCode(models.Model):
     name = fields.Char(string="Descripción", required=True)
     active = fields.Boolean(default=True)
 
-    _sql_constraints = [
-        ("fp_cabys_code_unique", "unique(code)", "El código CABYS debe ser único."),
-    ]
+    _fp_cabys_code_unique = models.Constraint("UNIQUE(code)", "El código CABYS debe ser único.")
 
     def name_get(self):
         return [(record.id, f"{record.code} - {record.name}") for record in self]
@@ -27,9 +25,9 @@ class FpEconomicActivity(models.Model):
     name = fields.Char(string="Descripción", required=True)
     active = fields.Boolean(default=True)
 
-    _sql_constraints = [
-        ("fp_economic_activity_code_unique", "unique(code)", "El código de actividad económica debe ser único."),
-    ]
+    _fp_economic_activity_code_unique = models.Constraint(
+        "UNIQUE(code)", "El código de actividad económica debe ser único."
+    )
 
     def name_get(self):
         return [(record.id, f"{record.code} - {record.name}") for record in self]
@@ -46,9 +44,7 @@ class FpProvince(models.Model):
 
     canton_ids = fields.One2many("fp.canton", "province_id", string="Cantones")
 
-    _sql_constraints = [
-        ("fp_province_code_unique", "unique(code)", "El código de provincia debe ser único."),
-    ]
+    _fp_province_code_unique = models.Constraint("UNIQUE(code)", "El código de provincia debe ser único.")
 
     def name_get(self):
         return [(record.id, f"{record.code} - {record.name}") for record in self]
@@ -66,13 +62,10 @@ class FpCanton(models.Model):
 
     district_ids = fields.One2many("fp.district", "canton_id", string="Distritos")
 
-    _sql_constraints = [
-        (
-            "fp_canton_code_unique_per_province",
-            "unique(province_id, code)",
-            "El código de cantón debe ser único por provincia.",
-        ),
-    ]
+    _fp_canton_code_unique_per_province = models.Constraint(
+        "UNIQUE(province_id, code)",
+        "El código de cantón debe ser único por provincia.",
+    )
 
     def name_get(self):
         return [(record.id, f"{record.code} - {record.name}") for record in self]
@@ -95,13 +88,10 @@ class FpDistrict(models.Model):
     )
     active = fields.Boolean(default=True)
 
-    _sql_constraints = [
-        (
-            "fp_district_code_unique_per_canton",
-            "unique(canton_id, code)",
-            "El código de distrito debe ser único por cantón.",
-        ),
-    ]
+    _fp_district_code_unique_per_canton = models.Constraint(
+        "UNIQUE(canton_id, code)",
+        "El código de distrito debe ser único por cantón.",
+    )
 
     def name_get(self):
         return [(record.id, f"{record.code} - {record.name}") for record in self]

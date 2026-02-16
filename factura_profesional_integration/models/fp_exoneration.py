@@ -56,9 +56,10 @@ class FpClientExoneration(models.Model):
     line_ids = fields.One2many("fp.client.exoneration.line", "exoneration_id", string="Códigos CABYS")
     active = fields.Boolean(default=True)
 
-    _sql_constraints = [
-        ("fp_client_exoneration_unique", "unique(exoneration_number, partner_id)", "Ya existe esta exoneración para el cliente."),
-    ]
+    _fp_client_exoneration_unique = models.Constraint(
+        "UNIQUE(exoneration_number, partner_id)",
+        "Ya existe esta exoneración para el cliente.",
+    )
 
     @api.depends("exoneration_number", "exoneration_percentage")
     def _compute_name(self):
@@ -75,10 +76,7 @@ class FpClientExonerationLine(models.Model):
     cabys_code_id = fields.Many2one("fp.cabys.code", string="Código CABYS")
     exoneration_code = fields.Char(string="Código exoneración")
 
-    _sql_constraints = [
-        (
-            "fp_client_exoneration_line_unique",
-            "unique(exoneration_id, product_id, cabys_code_id)",
-            "No puede repetir el mismo producto/CABYS en la misma exoneración.",
-        ),
-    ]
+    _fp_client_exoneration_line_unique = models.Constraint(
+        "UNIQUE(exoneration_id, product_id, cabys_code_id)",
+        "No puede repetir el mismo producto/CABYS en la misma exoneración.",
+    )
