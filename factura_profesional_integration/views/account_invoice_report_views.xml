@@ -139,9 +139,9 @@
                             <tr>
                                 <td class="fp-grid-cell" colspan="2" style="padding-right: 0; border-left: 0 !important;">
                                     <div t-if="o.partner_id.vat"><span class="fp-label">Identificación:</span><span t-esc="o.partner_id.vat"/></div>
-                                    <div t-if="o.partner_id.street or o.partner_id.street2">
+                                    <div t-if="o.partner_id.street or o.partner_id.fp_district_id or o.partner_id.fp_canton_id or o.partner_id.fp_province_id">
                                         <span class="fp-label">Dirección:</span>
-                                        <span t-esc="', '.join(filter(None, [o.partner_id.street, o.partner_id.street2]))"/>
+                                        <span t-esc="', '.join(filter(None, [o.partner_id.street, o.partner_id.fp_district_id.name, o.partner_id.fp_canton_id.name, o.partner_id.fp_province_id.name]))"/>
                                     </div>
                                 </td>
                             </tr>
