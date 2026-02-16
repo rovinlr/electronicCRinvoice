@@ -154,10 +154,11 @@
 
         <xpath expr="//div[contains(@class, 'page')]" position="inside">
             <t t-if="o.fp_is_electronic_invoice">
-                <div class="mt-4 text-muted" style="font-size: 11px;">
+                <div class="mt-4 text-muted text-center" style="font-size: 11px;">
                     Emitida conforme lo establecido en la resolución de Facturación Electrónica,
                     MH-DGT-RES-0027-2024 del 19 de noviembre de 2024 de la Dirección General de Tributación Directa.
                 </div>
+                <div class="text-muted text-center" style="font-size: 11px;">Versión del documento 4.4.</div>
             </t>
         </xpath>
     </template>
