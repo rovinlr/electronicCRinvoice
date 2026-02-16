@@ -21,16 +21,8 @@
             </t>
         </xpath>
 
-        <xpath expr="//t[@t-set='address']" position="after">
-            <t t-if="o.fp_is_electronic_invoice" t-set="address">
-                <div/>
-            </t>
-        </xpath>
-
-        <xpath expr="//t[@t-set='information_block']" position="after">
-            <t t-if="o.fp_is_electronic_invoice" t-set="information_block">
-                <div/>
-            </t>
+        <xpath expr="//t[@t-call='web.external_layout']/div[@class='row']" position="attributes">
+            <attribute name="t-if">not o.fp_is_electronic_invoice</attribute>
         </xpath>
 
         <xpath expr="//div[@id='informations']" position="attributes">
@@ -40,14 +32,6 @@
         <xpath expr="//div[@id='informations']" position="before">
             <t t-if="o.fp_is_electronic_invoice">
                 <style>
-                    .fp-doc-heading {
-                        font-size: 20px;
-                        font-weight: 700;
-                        text-transform: uppercase;
-                        letter-spacing: 0.8px;
-                        color: #0b0f19;
-                        margin: 8px 0 14px 0;
-                    }
                     .fp-reference-line {
                         font-size: 15px;
                         margin-bottom: 2px;
@@ -72,44 +56,22 @@
                     }
                     .fp-grid {
                         width: 100%;
-                    }
-                    .fp-grid-columns-3,
-                    .fp-grid-columns-2 {
-                        display: flex;
-                        gap: 24px;
-                        width: 100%;
-                    }
-                    .fp-grid-columns-3 .fp-grid-column {
-                        flex: 1 1 0;
-                    }
-                    .fp-grid-columns-2 .fp-grid-column {
-                        flex: 1 1 0;
-                    }
-                    .fp-grid-column {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 6px;
-                    }
-                    .fp-grid-row {
-                        display: flex;
-                        gap: 24px;
-                        margin-bottom: 6px;
-                    }
-                    .fp-grid-row:last-child {
-                        margin-bottom: 0;
+                        border-collapse: separate;
+                        border-spacing: 0;
+                        table-layout: fixed;
                     }
                     .fp-grid-cell {
-                        flex: 1 1 0;
                         vertical-align: top;
                         font-size: 15px;
                         color: #111827;
+                        padding: 0 16px 6px 0;
+                    }
+                    .fp-grid tr:last-child .fp-grid-cell {
+                        padding-bottom: 0;
                     }
                     .fp-grid .fp-label {
                         font-weight: 700;
                         margin-right: 4px;
-                    }
-                    .fp-wide {
-                        width: 100%;
                     }
                     .fp-client-card {
                         margin-top: 12px;
@@ -126,42 +88,46 @@
                 </div>
 
                 <div class="fp-card">
-                    <div class="fp-grid">
-                        <div class="fp-grid-columns-3">
-                            <div class="fp-grid-column">
-                                <div class="fp-grid-cell"><span class="fp-label">Fecha:</span><span t-field="o.invoice_date"/></div>
-                                <div class="fp-grid-cell"><span class="fp-label">Vencimiento:</span><span t-field="o.invoice_date_due"/></div>
-                            </div>
-                            <div class="fp-grid-column">
-                                <div class="fp-grid-cell"><span class="fp-label">Condición de venta:</span><span t-field="o.fp_sale_condition"/></div>
-                                <div class="fp-grid-cell"><span class="fp-label">Medio de pago:</span><span t-field="o.fp_payment_method"/></div>
-                            </div>
-                            <div class="fp-grid-column">
-                                <div class="fp-grid-cell"><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></div>
-                                <div class="fp-grid-cell"><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
-                            </div>
-                        </div>
-                    </div>
+                    <table class="fp-grid">
+                        <tbody>
+                            <tr>
+                                <td class="fp-grid-cell" style="width:33.33%;">
+                                    <div><span class="fp-label">Fecha:</span><span t-field="o.invoice_date"/></div>
+                                    <div><span class="fp-label">Vencimiento:</span><span t-field="o.invoice_date_due"/></div>
+                                </td>
+                                <td class="fp-grid-cell" style="width:33.33%;">
+                                    <div><span class="fp-label">Condición de venta:</span><span t-field="o.fp_sale_condition"/></div>
+                                    <div><span class="fp-label">Medio de pago:</span><span t-field="o.fp_payment_method"/></div>
+                                </td>
+                                <td class="fp-grid-cell" style="width:33.33%; padding-right: 0;">
+                                    <div><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></div>
+                                    <div><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <div class="fp-section-title">Datos del receptor:</div>
                 <div class="fp-card fp-client-card">
-                    <div class="fp-grid">
-                        <div class="fp-grid-columns-2">
-                            <div class="fp-grid-column">
-                                <div class="fp-grid-cell"><span class="fp-label">Cliente:</span><span t-esc="o.partner_id.name or ''"/></div>
-                                <div class="fp-grid-cell" t-if="o.partner_id.vat"><span class="fp-label">Identificación:</span><span t-esc="o.partner_id.vat"/></div>
-                                <div class="fp-grid-cell" t-if="o.partner_id.street or o.partner_id.street2">
-                                    <span class="fp-label">Dirección:</span>
-                                    <span t-esc="', '.join(filter(None, [o.partner_id.street, o.partner_id.street2]))"/>
-                                </div>
-                            </div>
-                            <div class="fp-grid-column">
-                                <div class="fp-grid-cell" t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-esc="o.partner_id.email"/></div>
-                                <div class="fp-grid-cell" t-if="o.partner_id.phone or o.partner_id.mobile"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or o.partner_id.mobile"/></div>
-                            </div>
-                        </div>
-                    </div>
+                    <table class="fp-grid">
+                        <tbody>
+                            <tr>
+                                <td class="fp-grid-cell" style="width:50%;">
+                                    <div><span class="fp-label">Cliente:</span><span t-esc="o.partner_id.name or ''"/></div>
+                                    <div t-if="o.partner_id.vat"><span class="fp-label">Identificación:</span><span t-esc="o.partner_id.vat"/></div>
+                                    <div t-if="o.partner_id.street or o.partner_id.street2">
+                                        <span class="fp-label">Dirección:</span>
+                                        <span t-esc="', '.join(filter(None, [o.partner_id.street, o.partner_id.street2]))"/>
+                                    </div>
+                                </td>
+                                <td class="fp-grid-cell" style="width:50%; padding-right: 0;">
+                                    <div t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-esc="o.partner_id.email"/></div>
+                                    <div t-if="o.partner_id.phone or o.partner_id.mobile"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or o.partner_id.mobile"/></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </t>
         </xpath>
