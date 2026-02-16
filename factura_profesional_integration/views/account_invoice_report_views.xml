@@ -236,14 +236,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="o.invoice_line_ids" t-as="line" t-if="not line.display_type">
-                                <td t-esc="line.product_id.fp_cabys_code or '-'"/>
-                                <td><span t-field="line.name"/></td>
-                                <td class="text-end" t-esc="line.quantity"/>
-                                <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                                <td class="text-end"><span t-field="line.price_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                                <td class="text-end"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                            </tr>
+                            <t t-set="fp_lines_to_report" t-value="o._get_move_lines_to_report()"/>
+                            <t t-foreach="fp_lines_to_report" t-as="line">
+                                <t t-if="line.display_type in ('product', False)">
+                                    <tr>
+                                        <td t-esc="line.product_id.fp_cabys_code or '-'"/>
+                                        <td><span t-field="line.name"/></td>
+                                        <td class="text-end" t-esc="line.quantity"/>
+                                        <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td class="text-end"><span t-out="format_amount(o.company_id, line.price_total - line.price_subtotal, o.currency_id)"/></td>
+                                        <td class="text-end"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </t>
+                            </t>
                         </tbody>
                     </table>
                 </div>
