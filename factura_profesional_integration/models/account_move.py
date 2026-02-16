@@ -894,10 +894,8 @@ class AccountMove(models.Model):
         tax_discount = tax_amount * (percentage / 100.0)
         ET.SubElement(exoneration_node, "TarifaExonerada").text = self._fp_format_decimal(tax_rate)
         ET.SubElement(exoneration_node, "MontoExoneracion").text = self._fp_format_decimal(tax_discount)
-        if exoneration.article:
-            ET.SubElement(exoneration_node, "Articulo").text = (exoneration.article or "")[:3]
-        if exoneration.incise:
-            ET.SubElement(exoneration_node, "Inciso").text = (exoneration.incise or "")[:3]
+        # En v4.4 del esquema FE, Exoneracion termina en MontoExoneracion.
+        # Articulo/Inciso ya no son nodos válidos y causan rechazo XSD.
         return tax_discount
 
     def _fp_format_decimal(self, value):
