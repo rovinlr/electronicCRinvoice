@@ -624,7 +624,10 @@ class AccountMove(models.Model):
         self._fp_append_location_nodes(receptor, self.partner_id)
         self._fp_append_contact_nodes(receptor, self.partner_id)
 
-        ET.SubElement(root, "CondicionVenta").text = self.fp_sale_condition or "01"
+        sale_condition = self.fp_sale_condition or "01"
+        ET.SubElement(root, "CondicionVenta").text = sale_condition
+        if sale_condition in ("02", "10"):
+            ET.SubElement(root, "PlazoCredito").text = str(self._fp_get_credit_term_days())
 
         lines = ET.SubElement(root, "DetalleServicio")
         detalle_vals = self._fp_build_detail_lines(lines)
@@ -971,7 +974,7 @@ class AccountMove(models.Model):
     def _fp_append_location_nodes(self, parent_node, partner):
         if partner.country_id.code == "CR":
             province_source = partner.state_id.code if partner.state_id and partner.state_id.code else partner.fp_province_code
-            canton_source = partner.city or partner.fp_canton_code
+            canton_source = partner.fp_canton_code or partner.city
             district_source = partner.fp_district_code
             neighborhood_source = partner.fp_neighborhood_code
         else:
@@ -1023,6 +1026,16 @@ class AccountMove(models.Model):
         if not code:
             return "01"
         return code[:64]
+
+    def _fp_get_credit_term_days(self):
+        self.ensure_one()
+        invoice_date = self.invoice_date
+        due_date = self.invoice_date_due
+        if invoice_date and due_date:
+            days = (due_date - invoice_date).days
+            if days > 0:
+                return days
+        return 1
 
     def _fp_sign_xml(self, xml_text):
         self.ensure_one()
