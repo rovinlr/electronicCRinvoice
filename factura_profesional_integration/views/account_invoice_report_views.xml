@@ -41,9 +41,9 @@
                         font-weight: 700;
                     }
                     .fp-section-title {
-                        font-size: 19px;
+                        font-size: 16px;
                         font-weight: 700;
-                        margin: 14px 0 8px 0;
+                        margin: 8px 0 4px 0;
                         color: #111827;
                     }
                     .fp-card {
@@ -88,7 +88,7 @@
                         margin-right: 4px;
                     }
                     .fp-client-card {
-                        margin-top: 12px;
+                        margin-top: 4px;
                     }
                 </style>
 
@@ -127,18 +127,22 @@
                     <table class="fp-grid">
                         <tbody>
                             <tr>
-                                <td class="fp-grid-cell" style="width:50%;">
+                                <td class="fp-grid-cell" style="width:65%;">
                                     <div><span class="fp-label">Cliente:</span><span t-esc="o.partner_id.name or ''"/></div>
+                                </td>
+                                <td class="fp-grid-cell" style="width:35%; padding-right: 0;">
+                                    <t t-set="partner_mobile" t-value="o.partner_id._fields.get('mobile') and o.partner_id.mobile or False"/>
+                                    <div t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-esc="o.partner_id.email"/></div>
+                                    <div t-if="o.partner_id.phone or partner_mobile"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or partner_mobile"/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fp-grid-cell" colspan="2" style="padding-right: 0; border-left: 0 !important;">
                                     <div t-if="o.partner_id.vat"><span class="fp-label">Identificación:</span><span t-esc="o.partner_id.vat"/></div>
                                     <div t-if="o.partner_id.street or o.partner_id.street2">
                                         <span class="fp-label">Dirección:</span>
                                         <span t-esc="', '.join(filter(None, [o.partner_id.street, o.partner_id.street2]))"/>
                                     </div>
-                                </td>
-                                <td class="fp-grid-cell" style="width:50%; padding-right: 0;">
-                                    <t t-set="partner_mobile" t-value="o.partner_id._fields.get('mobile') and o.partner_id.mobile or False"/>
-                                    <div t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-esc="o.partner_id.email"/></div>
-                                    <div t-if="o.partner_id.phone or partner_mobile"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or partner_mobile"/></div>
                                 </td>
                             </tr>
                         </tbody>
