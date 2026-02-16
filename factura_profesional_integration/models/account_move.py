@@ -774,11 +774,11 @@ class AccountMove(models.Model):
                 exoneration_amount = self._fp_append_exoneracion_node(
                     impuesto,
                     exoneration,
-                    total_impuesto_xml_linea,
+                    subtotal,
                     tax_rate,
                 )
                 has_exoneration = bool(exoneration)
-                impuesto_neto_linea = max(total_impuesto_linea - exoneration_amount, 0.0)
+                impuesto_neto_linea = max(total_impuesto_xml_linea - exoneration_amount, 0.0)
                 monto_total_linea = subtotal + impuesto_neto_linea
                 ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
                 ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(impuesto_neto_linea)
@@ -880,7 +880,7 @@ class AccountMove(models.Model):
                     return exoneration
         return self.env["fp.client.exoneration"]
 
-    def _fp_append_exoneracion_node(self, impuesto_node, exoneration, tax_amount, tax_rate):
+    def _fp_append_exoneracion_node(self, impuesto_node, exoneration, taxable_base, tax_rate):
         if not exoneration:
             return 0.0
         exoneration_node = ET.SubElement(impuesto_node, "Exoneracion")
@@ -891,7 +891,7 @@ class AccountMove(models.Model):
         exoneration_issue_dt = fields.Datetime.to_datetime(exoneration.issue_date)
         ET.SubElement(exoneration_node, "FechaEmisionEX").text = exoneration_issue_dt.strftime("%Y-%m-%dT%H:%M:%S") if exoneration_issue_dt else ""
         percentage = max(min(exoneration.exoneration_percentage or 0.0, 100.0), 0.0)
-        tax_discount = tax_amount * (percentage / 100.0)
+        tax_discount = taxable_base * (percentage / 100.0)
         ET.SubElement(exoneration_node, "TarifaExonerada").text = self._fp_format_decimal(tax_rate)
         ET.SubElement(exoneration_node, "MontoExoneracion").text = self._fp_format_decimal(tax_discount)
         # En v4.4 del esquema FE, Exoneracion termina en MontoExoneracion.
