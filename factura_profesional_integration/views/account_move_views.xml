@@ -62,6 +62,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_date']" position="after">
                 <field name="fp_consecutive_number" string="Consecutivo" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='status_in_payment']" position="after">
                 <field
                     name="fp_invoice_status"
                     string="Estado FE"
