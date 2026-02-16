@@ -236,12 +236,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="o.invoice_line_ids.filtered(lambda l: not l.display_type)" t-as="line">
+                            <tr t-foreach="o.invoice_line_ids" t-as="line" t-if="not line.display_type">
                                 <td t-esc="line.product_id.fp_cabys_code or '-'"/>
                                 <td><span t-field="line.name"/></td>
                                 <td class="text-end" t-esc="line.quantity"/>
                                 <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                                <td class="text-end"><span t-esc="sum([tax.get('amount', 0.0) for tax in (line.tax_ids.compute_all(line.price_unit, currency=o.currency_id, quantity=line.quantity, product=line.product_id, partner=o.partner_id).get('taxes') or [])])"/></td>
+                                <td class="text-end"><span t-field="line.price_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                 <td class="text-end"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                             </tr>
                         </tbody>
