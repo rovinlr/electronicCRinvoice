@@ -926,7 +926,7 @@ class AccountMove(models.Model):
 
         percentage = max(min(exoneration.exoneration_percentage or 0.0, 100.0), 0.0)
         tax_discount = taxable_base * (percentage / 100.0)
-        ET.SubElement(exoneration_node, "TarifaExonerada").text = self._fp_format_decimal(tax_rate)
+        ET.SubElement(exoneration_node, "TarifaExonerada").text = str(int(tax_rate or 0.0))
 
         # Hacienda valida el orden del XSD: TarifaExonerada debe emitirse antes de Articulo.
         required_article_types = {"02", "03", "06", "07", "08"}
