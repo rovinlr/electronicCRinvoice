@@ -136,8 +136,9 @@
                                     </div>
                                 </td>
                                 <td class="fp-grid-cell" style="width:50%; padding-right: 0;">
+                                    <t t-set="partner_mobile" t-value="o.partner_id._fields.get('mobile') and o.partner_id.mobile or False"/>
                                     <div t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-esc="o.partner_id.email"/></div>
-                                    <div t-if="o.partner_id.phone or o.partner_id.mobile"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or o.partner_id.mobile"/></div>
+                                    <div t-if="o.partner_id.phone or partner_mobile"><span class="fp-label">Teléfono:</span><span t-esc="o.partner_id.phone or partner_mobile"/></div>
                                 </td>
                             </tr>
                         </tbody>
