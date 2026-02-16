@@ -54,6 +54,9 @@
                         <setting string="Consultar automáticamente después de enviar">
                             <field name="fp_auto_consult_after_send"/>
                         </setting>
+                        <setting string="Enviar correo automáticamente cuando Hacienda acepte">
+                            <field name="fp_auto_send_email_when_accepted"/>
+                        </setting>
                         <setting string="Código de sucursal FE">
                             <field name="fp_branch_code"/>
                         </setting>

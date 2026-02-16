@@ -95,6 +95,12 @@ class ResCompany(models.Model):
         company_dependent=True,
         default=True,
     )
+    fp_auto_send_email_when_accepted = fields.Boolean(
+        string="Enviar correo automáticamente al aceptar en Hacienda",
+        company_dependent=True,
+        default=False,
+        help="Envía la factura al cliente automáticamente cuando Hacienda responde Aceptado.",
+    )
     fp_consecutive_fe = fields.Char(
         string="Consecutivo FE (01)",
         company_dependent=True,

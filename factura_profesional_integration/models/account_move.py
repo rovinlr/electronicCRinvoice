@@ -128,6 +128,98 @@ class AccountMove(models.Model):
             move._fp_generate_and_sign_xml_attachment()
         return moves
 
+    def action_invoice_sent(self):
+        self._fp_validate_ready_to_send_email()
+        action = super().action_invoice_sent()
+        return self._fp_add_hacienda_attachments_to_mail_action(action)
+
+    def action_send_and_print(self):
+        self._fp_validate_ready_to_send_email()
+        action = super().action_send_and_print()
+        return self._fp_add_hacienda_attachments_to_mail_action(action)
+
+    def _get_invoice_report_filename(self):
+        self.ensure_one()
+        filename = super()._get_invoice_report_filename()
+        if not self.fp_is_electronic_invoice or not self.fp_consecutive_number:
+            return filename
+        if self.fp_consecutive_number in (filename or ""):
+            return filename
+        return f"{filename}-{self.fp_consecutive_number}"
+
+    def _fp_validate_ready_to_send_email(self):
+        invalid_moves = self.filtered(
+            lambda move: move.fp_is_electronic_invoice
+            and move.move_type in ("out_invoice", "out_refund")
+            and move.fp_invoice_status != "accepted"
+        )
+        if invalid_moves:
+            names = ", ".join(invalid_moves.mapped("name"))
+            raise UserError(
+                _(
+                    "Solo se puede enviar el correo cuando la factura electrónica "
+                    "está aceptada por Hacienda. Documentos: %(documents)s"
+                )
+                % {"documents": names}
+            )
+
+    def _fp_add_hacienda_attachments_to_mail_action(self, action):
+        if not isinstance(action, dict):
+            return action
+
+        attachment_ids = set()
+        for move in self.filtered("fp_is_electronic_invoice"):
+            if move.fp_xml_attachment_id:
+                attachment_ids.add(move.fp_xml_attachment_id.id)
+            if move.fp_response_xml_attachment_id:
+                attachment_ids.add(move.fp_response_xml_attachment_id.id)
+
+        if not attachment_ids:
+            return action
+
+        context = dict(action.get("context") or {})
+        existing_attachment_ids = context.get("default_attachment_ids") or []
+
+        existing_ids = set()
+        if isinstance(existing_attachment_ids, list):
+            for value in existing_attachment_ids:
+                if isinstance(value, int):
+                    existing_ids.add(value)
+                elif isinstance(value, (tuple, list)) and value and value[0] == 6 and len(value) >= 3:
+                    existing_ids.update(value[2] or [])
+
+        all_attachment_ids = sorted(existing_ids.union(attachment_ids))
+        context["default_attachment_ids"] = [(6, 0, all_attachment_ids)]
+        action["context"] = context
+        return action
+
+    def _fp_get_hacienda_attachment_ids(self):
+        self.ensure_one()
+        attachment_ids = []
+        if self.fp_xml_attachment_id:
+            attachment_ids.append(self.fp_xml_attachment_id.id)
+        if self.fp_response_xml_attachment_id:
+            attachment_ids.append(self.fp_response_xml_attachment_id.id)
+        return attachment_ids
+
+    def _fp_send_accepted_invoice_email(self):
+        self.ensure_one()
+        if not self.fp_is_electronic_invoice or self.move_type not in ("out_invoice", "out_refund"):
+            return False
+        if self.fp_invoice_status != "accepted" or self.fp_email_sent:
+            return False
+
+        template = self.env.ref("account.email_template_edi_invoice", raise_if_not_found=False)
+        if not template:
+            return False
+
+        email_values = {
+            "attachment_ids": [(6, 0, self._fp_get_hacienda_attachment_ids())],
+        }
+        template.send_mail(self.id, force_send=True, email_values=email_values)
+        self.fp_email_sent = True
+        return True
+
     def _reverse_moves(self, default_values_list=None, cancel=False):
         reversed_moves = super()._reverse_moves(default_values_list=default_values_list, cancel=cancel)
         electronic_refunds = reversed_moves.filtered(
@@ -302,6 +394,11 @@ class AccountMove(models.Model):
         string="Estado FE",
         copy=False,
     )
+    fp_email_sent = fields.Boolean(
+        string="Correo FE enviado",
+        copy=False,
+        default=False,
+    )
 
     def action_fp_send_to_api(self):
         for move in self:
@@ -337,6 +434,8 @@ class AccountMove(models.Model):
             if status == "aceptado":
                 move.fp_invoice_status = "accepted"
                 move.fp_api_state = "done"
+                if move.company_id.fp_auto_send_email_when_accepted:
+                    move._fp_send_accepted_invoice_email()
             elif status in ("rechazado", "error"):
                 move.fp_invoice_status = "rejected"
                 move.fp_api_state = "error"
@@ -398,6 +497,7 @@ class AccountMove(models.Model):
 
         self.fp_external_id = payload["clave"]
         self.fp_invoice_status = "sent"
+        self.fp_email_sent = False
         self.message_post(body=_("Factura enviada directamente a Hacienda (Recepción v4.4)."))
         if company.fp_auto_consult_after_send:
             self.action_fp_consult_api_document()

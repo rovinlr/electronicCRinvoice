@@ -29,6 +29,10 @@ class ResConfigSettings(models.TransientModel):
         related="company_id.fp_auto_consult_after_send",
         readonly=False,
     )
+    fp_auto_send_email_when_accepted = fields.Boolean(
+        related="company_id.fp_auto_send_email_when_accepted",
+        readonly=False,
+    )
 
     fp_invoice_template_style = fields.Selection(
         related="company_id.fp_invoice_template_style",
