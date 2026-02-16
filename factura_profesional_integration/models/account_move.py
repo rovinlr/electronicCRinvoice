@@ -518,9 +518,10 @@ class AccountMove(models.Model):
         signed_xml_text = self._fp_sign_xml(xml_text)
         signed_xml_bytes = signed_xml_text.encode("utf-8")
         signed_xml_b64 = base64.b64encode(signed_xml_bytes)
+        xml_filename_prefix = self._fp_get_xml_filename_prefix(clave=clave)
         attachment = self.env["ir.attachment"].create(
             {
-                "name": f"{self.name or 'factura'}-firmado.xml",
+                "name": f"{xml_filename_prefix}-firmado.xml",
                 "type": "binary",
                 "datas": signed_xml_b64,
                 "res_model": "account.move",
@@ -909,17 +910,33 @@ class AccountMove(models.Model):
             return 0.0
         exoneration_node = ET.SubElement(impuesto_node, "Exoneracion")
         # En v4.4, el nodo de exoneración utiliza TipoDocumentoEX1 (no TipoDocumento).
-        ET.SubElement(exoneration_node, "TipoDocumentoEX1").text = exoneration.exoneration_type or "99"
+        exoneration_type = exoneration.exoneration_type or "99"
+        ET.SubElement(exoneration_node, "TipoDocumentoEX1").text = exoneration_type
         ET.SubElement(exoneration_node, "NumeroDocumento").text = (exoneration.exoneration_number or "")[:40]
         ET.SubElement(exoneration_node, "NombreInstitucion").text = (exoneration.institution_name or "")[:160]
         exoneration_issue_dt = fields.Datetime.to_datetime(exoneration.issue_date)
         ET.SubElement(exoneration_node, "FechaEmisionEX").text = exoneration_issue_dt.strftime("%Y-%m-%dT%H:%M:%S") if exoneration_issue_dt else ""
+
+        # Hacienda exige Articulo para tipos de exoneración específicos.
+        required_article_types = {"02", "03", "06", "07", "08"}
+        article = (exoneration.article or "").strip()
+        if exoneration_type in required_article_types:
+            if not article:
+                raise UserError(
+                    _(
+                        "La exoneración '%(exoneration)s' requiere el campo Artículo para el tipo %(type)s."
+                    )
+                    % {
+                        "exoneration": exoneration.display_name,
+                        "type": exoneration_type,
+                    }
+                )
+            ET.SubElement(exoneration_node, "Articulo").text = article[:10]
+
         percentage = max(min(exoneration.exoneration_percentage or 0.0, 100.0), 0.0)
         tax_discount = taxable_base * (percentage / 100.0)
         ET.SubElement(exoneration_node, "TarifaExonerada").text = self._fp_format_decimal(tax_rate)
         ET.SubElement(exoneration_node, "MontoExoneracion").text = self._fp_format_decimal(tax_discount)
-        # En v4.4 del esquema FE, Exoneracion termina en MontoExoneracion.
-        # Articulo/Inciso ya no son nodos válidos y causan rechazo XSD.
         return tax_discount
 
     def _fp_format_decimal(self, value):
@@ -1211,9 +1228,10 @@ class AccountMove(models.Model):
             except Exception:
                 xml_text = xml_payload
 
+        xml_filename_prefix = self._fp_get_xml_filename_prefix(clave=self.fp_external_id)
         attachment = self.env["ir.attachment"].create(
             {
-                "name": f"{self.name or 'factura'}-respuesta-hacienda.xml",
+                "name": f"{xml_filename_prefix}-respuesta-hacienda.xml",
                 "type": "binary",
                 "datas": base64.b64encode(xml_text.encode("utf-8")),
                 "res_model": "account.move",
@@ -1297,6 +1315,12 @@ class AccountMove(models.Model):
         if len(clave or "") >= 41:
             return clave[21:41]
         return (clave or "").zfill(20)[-20:]
+
+    def _fp_get_xml_filename_prefix(self, clave=None):
+        self.ensure_one()
+        clave_value = clave or self.fp_external_id or self._fp_build_clave()
+        consecutive = self._fp_extract_consecutive_from_clave(clave_value)
+        return f"{self.name or 'factura'}-{consecutive}"
 
     def _fp_build_clave(self):
         self.ensure_one()
