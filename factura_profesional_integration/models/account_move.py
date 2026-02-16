@@ -928,9 +928,13 @@ class AccountMove(models.Model):
         tax_discount = taxable_base * (percentage / 100.0)
         ET.SubElement(exoneration_node, "TarifaExonerada").text = str(int(tax_rate or 0.0))
 
-        # Hacienda valida el orden del XSD: TarifaExonerada debe emitirse antes de Articulo.
+        # Hacienda valida el orden del XSD en v4.4: MontoExoneracion debe ir antes de Articulo/Inciso.
         required_article_types = {"02", "03", "06", "07", "08"}
         article = (exoneration.article or "").strip()
+        incise = (exoneration.incise or "").strip()
+
+        ET.SubElement(exoneration_node, "MontoExoneracion").text = self._fp_format_decimal(tax_discount)
+
         if exoneration_type in required_article_types:
             if not article:
                 raise UserError(
@@ -944,7 +948,8 @@ class AccountMove(models.Model):
                 )
             ET.SubElement(exoneration_node, "Articulo").text = article[:10]
 
-        ET.SubElement(exoneration_node, "MontoExoneracion").text = self._fp_format_decimal(tax_discount)
+            if incise:
+                ET.SubElement(exoneration_node, "Inciso").text = incise[:3]
         return tax_discount
 
     def _fp_format_decimal(self, value):
