@@ -4,6 +4,7 @@
     "version": "19.0.5.0.5",
     "category": "Accounting",
     "license": "LGPL-3",
+    "images": ["static/description/Gemini_Generated_Image_hs6p77hs6p77hs6p.png"],
     "depends": ["account", "product", "uom"],
     "data": [
         "security/ir.model.access.csv",
