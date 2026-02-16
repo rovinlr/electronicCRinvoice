@@ -368,6 +368,7 @@ class AccountMove(models.Model):
         if not company.fp_hacienda_api_base_url or not company.fp_hacienda_token_url:
             raise UserError(_("Configure URLs de Hacienda en Ajustes > Contabilidad."))
 
+        self._fp_refresh_signed_xml_if_outdated()
         if not self.fp_xml_attachment_id:
             self._fp_generate_and_sign_xml_attachment()
 
@@ -390,6 +391,29 @@ class AccountMove(models.Model):
         self.message_post(body=_("Factura enviada directamente a Hacienda (Recepción v4.4)."))
         if company.fp_auto_consult_after_send:
             self.action_fp_consult_api_document()
+
+    def _fp_refresh_signed_xml_if_outdated(self):
+        self.ensure_one()
+        attachment = self.fp_xml_attachment_id
+        if not attachment or not attachment.datas:
+            return
+
+        should_regenerate = False
+        try:
+            xml_text = base64.b64decode(attachment.datas).decode("utf-8")
+            root = ET.fromstring(xml_text)
+            issue_date_raw = (root.findtext("FechaEmision") or "").strip()
+            issue_date = fields.Datetime.to_datetime(issue_date_raw).date() if issue_date_raw else False
+            today = fields.Date.context_today(self)
+            should_regenerate = not issue_date or issue_date != today
+        except Exception:
+            should_regenerate = True
+
+        if should_regenerate:
+            self.fp_xml_attachment_id = False
+            self.fp_xml_signed_digest = False
+            self.fp_external_id = False
+            self._fp_generate_and_sign_xml_attachment()
 
     def _fp_get_hacienda_access_token(self):
         self.ensure_one()
