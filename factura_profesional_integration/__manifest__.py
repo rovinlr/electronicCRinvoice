@@ -22,6 +22,7 @@
         "views/product_template_views.xml",
         "views/uom_uom_views.xml",
         "views/fp_catalog_views.xml",
+        "data/mail_template_data.xml",
         "data/ir_cron_data.xml",
     ],
     "installable": True,
