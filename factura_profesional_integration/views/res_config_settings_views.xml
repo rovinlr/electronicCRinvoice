@@ -63,7 +63,7 @@
                         <setting string="Plantilla de factura electrónica">
                             <field name="fp_invoice_template_style"/>
                             <div class="text-muted">
-                                Selecciona entre 5 estilos (Azul, Oscura, Clara, Esmeralda y Atardecer). Si no seleccionas ninguna, se usa la plantilla estándar de Odoo.
+                                Selecciona Estándar Odoo para el formato original, o una de las plantillas modernas (Azul, Oscura, Clara, Esmeralda y Atardecer).
                             </div>
                         </setting>
                     </block>

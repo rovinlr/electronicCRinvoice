@@ -80,6 +80,8 @@ class ResCompany(models.Model):
 
     fp_invoice_template_style = fields.Selection(
         [
+            ("standard", "Estándar Odoo"),
+            ("modern", "Moderna Azul (legacy)"),
             ("modern_blue", "Moderna Azul"),
             ("modern_dark", "Moderna Oscura"),
             ("modern_clean", "Moderna Clara"),
@@ -88,7 +90,7 @@ class ResCompany(models.Model):
         ],
         string="Plantilla factura electrónica",
         company_dependent=True,
-        help="Si se define, aplica una plantilla FE personalizada en el PDF. Si queda vacía, se usa la plantilla estándar de Odoo.",
+        help="Selecciona el estilo del PDF FE. Usa 'Estándar Odoo' para el formato original; el resto aplica plantillas personalizadas.",
     )
     fp_auto_consult_after_send = fields.Boolean(
         string="Consultar estado automáticamente después de enviar",
