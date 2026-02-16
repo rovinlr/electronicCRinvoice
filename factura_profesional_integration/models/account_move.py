@@ -188,8 +188,10 @@ class AccountMove(models.Model):
                 elif isinstance(value, (tuple, list)) and value and value[0] == 6 and len(value) >= 3:
                     existing_ids.update(value[2] or [])
 
-        all_attachment_ids = sorted(existing_ids.union(attachment_ids))
-        context["default_attachment_ids"] = [(6, 0, all_attachment_ids)]
+        attachment_commands = list(existing_attachment_ids) if isinstance(existing_attachment_ids, list) else []
+        missing_attachment_ids = sorted(attachment_ids.difference(existing_ids))
+        attachment_commands.extend((4, attachment_id) for attachment_id in missing_attachment_ids)
+        context["default_attachment_ids"] = attachment_commands
         action["context"] = context
         return action
 
@@ -213,10 +215,12 @@ class AccountMove(models.Model):
         if not template:
             return False
 
-        email_values = {
-            "attachment_ids": [(6, 0, self._fp_get_hacienda_attachment_ids())],
-        }
-        template.send_mail(self.id, force_send=True, email_values=email_values)
+        mail_id = template.send_mail(self.id, force_send=True)
+        attachment_ids = self._fp_get_hacienda_attachment_ids()
+        if mail_id and attachment_ids:
+            self.env["mail.mail"].browse(mail_id).write(
+                {"attachment_ids": [(4, attachment_id) for attachment_id in attachment_ids]}
+            )
         self.fp_email_sent = True
         return True
 
