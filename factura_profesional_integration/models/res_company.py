@@ -77,6 +77,19 @@ class ResCompany(models.Model):
         string="Contraseña certificado FE",
         company_dependent=True,
     )
+
+    fp_invoice_template_style = fields.Selection(
+        [
+            ("modern_blue", "Moderna Azul"),
+            ("modern_dark", "Moderna Oscura"),
+            ("modern_clean", "Moderna Clara"),
+            ("modern_emerald", "Moderna Esmeralda"),
+            ("modern_sunset", "Moderna Atardecer"),
+        ],
+        string="Plantilla factura electrónica",
+        company_dependent=True,
+        help="Si se define, aplica una plantilla FE personalizada en el PDF. Si queda vacía, se usa la plantilla estándar de Odoo.",
+    )
     fp_auto_consult_after_send = fields.Boolean(
         string="Consultar estado automáticamente después de enviar",
         company_dependent=True,

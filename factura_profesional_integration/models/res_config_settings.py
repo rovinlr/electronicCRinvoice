@@ -30,6 +30,11 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
     )
 
+    fp_invoice_template_style = fields.Selection(
+        related="company_id.fp_invoice_template_style",
+        readonly=False,
+    )
+
     fp_certificate_subject = fields.Char(related="company_id.fp_certificate_subject", readonly=True)
     fp_certificate_serial_subject = fields.Char(related="company_id.fp_certificate_serial_subject", readonly=True)
     fp_certificate_issue_date = fields.Date(related="company_id.fp_certificate_issue_date", readonly=True)

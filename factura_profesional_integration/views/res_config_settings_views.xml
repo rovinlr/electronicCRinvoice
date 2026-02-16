@@ -60,6 +60,12 @@
                         <setting string="Código de terminal FE">
                             <field name="fp_terminal_code"/>
                         </setting>
+                        <setting string="Plantilla de factura electrónica">
+                            <field name="fp_invoice_template_style"/>
+                            <div class="text-muted">
+                                Selecciona entre 5 estilos (Azul, Oscura, Clara, Esmeralda y Atardecer). Si no seleccionas ninguna, se usa la plantilla estándar de Odoo.
+                            </div>
+                        </setting>
                     </block>
                     <block title="Último consecutivo por tipo de comprobante (Hacienda 4.4)">
                         <setting string="Factura electrónica (01) - último número">
