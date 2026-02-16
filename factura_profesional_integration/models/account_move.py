@@ -138,9 +138,9 @@ class AccountMove(models.Model):
         action = super().action_send_and_print()
         return self._fp_add_hacienda_attachments_to_mail_action(action)
 
-    def _get_invoice_report_filename(self):
+    def _get_invoice_report_filename(self, report=None):
         self.ensure_one()
-        filename = super()._get_invoice_report_filename()
+        filename = super()._get_invoice_report_filename(report=report)
         if not self.fp_is_electronic_invoice or not self.fp_consecutive_number:
             return filename
         if self.fp_consecutive_number in (filename or ""):
