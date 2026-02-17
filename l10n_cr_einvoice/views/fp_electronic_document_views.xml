@@ -97,14 +97,14 @@
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
         <field name="target">current</field>
-        <field name="context">{'module': 'factura_profesional_integration'}</field>
+        <field name="context">{'module': 'l10n_cr_einvoice'}</field>
     </record>
 
     <menuitem
         id="menu_fp_hacienda_root"
         name="Hacienda"
         action="action_fp_electronic_documents"
-        web_icon="factura_profesional_integration,static/description/icon.svg"
+        web_icon="l10n_cr_einvoice,static/description/icon.svg"
         sequence="14"
         groups="account.group_account_invoice"
     />

@@ -469,7 +469,7 @@ class AccountMove(models.Model):
     def action_fp_open_hacienda_documents(self):
         self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id(
-            "factura_profesional_integration.action_fp_electronic_documents"
+            "l10n_cr_einvoice.action_fp_electronic_documents"
         )
         domain = [
             ("fp_is_electronic_invoice", "=", True),
@@ -480,8 +480,8 @@ class AccountMove(models.Model):
             action["name"] = _("Hacienda: %s") % self.fp_consecutive_number
             action["res_id"] = self.id
             action["views"] = [
-                (self.env.ref("factura_profesional_integration.view_move_form_fp_documents").id, "form"),
-                (self.env.ref("factura_profesional_integration.view_move_tree_fp_documents").id, "list"),
+                (self.env.ref("l10n_cr_einvoice.view_move_form_fp_documents").id, "form"),
+                (self.env.ref("l10n_cr_einvoice.view_move_tree_fp_documents").id, "list"),
             ]
 
         action["domain"] = domain

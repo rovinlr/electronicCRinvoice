@@ -2,7 +2,7 @@
 <odoo>
     <template id="report_invoice_document_fp_template_router" inherit_id="account.report_invoice_document">
         <xpath expr="//t[@t-call='web.external_layout']" position="before">
-            <t t-if="o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard'" t-call="factura_profesional_integration.report_invoice_document_fp_custom" t-lang="lang"/>
+            <t t-if="o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard'" t-call="l10n_cr_einvoice.report_invoice_document_fp_custom" t-lang="lang"/>
         </xpath>
         <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
             <attribute name="t-if">not (o.company_id.fp_invoice_template_style and o.company_id.fp_invoice_template_style != 'standard')</attribute>
