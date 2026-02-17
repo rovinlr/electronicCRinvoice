@@ -104,7 +104,7 @@ Este código de error no suele ser un problema de estructura del XML, sino de **
 
 Para que la app **Hacienda** muestre un logo en el listado de Apps de Odoo, debes colocar un archivo exactamente en:
 
-`factura_profesional_integration/static/description/icon.png`
+`l10n_cr_einvoice/static/description/icon.png`
 
 Recomendaciones:
 
@@ -115,10 +115,10 @@ Recomendaciones:
 Pasos rápidos:
 
 1. Crea la carpeta si no existe:
-   - `mkdir -p factura_profesional_integration/static/description`
+   - `mkdir -p l10n_cr_einvoice/static/description`
 2. Copia ahí el logo oficial del Ministerio (renombrado como `icon.png`).
 3. Reinicia Odoo.
 4. Actualiza el módulo:
-   - `odoo -u factura_profesional_integration -d <tu_base>`
+   - `odoo -u l10n_cr_einvoice -d <tu_base>`
 
 Con eso, Odoo toma automáticamente ese ícono para la tarjeta de la app.

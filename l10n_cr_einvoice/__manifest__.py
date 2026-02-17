@@ -5,7 +5,7 @@
     "category": "Accounting",
     "license": "LGPL-3",
     "author": "FenixCR Solutions",
-    "icon": "/factura_profesional_integration/static/description/Gemini_Generated_Image_hs6p77hs6p77hs6p.png",
+    "icon": "/l10n_cr_einvoice/static/description/Gemini_Generated_Image_hs6p77hs6p77hs6p.png",
     "images": ["static/description/Gemini_Generated_Image_hs6p77hs6p77hs6p.png"],
     "depends": ["account", "product", "uom"],
     "data": [
