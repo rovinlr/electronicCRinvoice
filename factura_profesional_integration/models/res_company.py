@@ -87,6 +87,7 @@ class ResCompany(models.Model):
             ("modern_clean", "Moderna Clara"),
             ("modern_emerald", "Moderna Esmeralda"),
             ("modern_sunset", "Moderna Atardecer"),
+            ("modern_prohygiene", "Corporativa CR (similar referencia)"),
         ],
         string="Plantilla factura electrónica",
         company_dependent=True,
