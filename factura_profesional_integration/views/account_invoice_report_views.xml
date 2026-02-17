@@ -244,7 +244,7 @@
                                         <td><span t-field="line.name"/></td>
                                         <td class="text-end" t-esc="line.quantity"/>
                                         <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                                        <td class="text-end"><span t-out="format_amount(o.company_id, line.price_total - line.price_subtotal, o.currency_id)"/></td>
+                                        <td class="text-end"><span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                         <td class="text-end"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                     </tr>
                                 </t>
