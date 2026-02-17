@@ -75,6 +75,7 @@
                                     </div>
                                     <div><strong>Datos del emisor: <span t-esc="(o.company_id.name or '').upper()"/></strong></div>
                                     <div><span class="fp-cr-label">Identificación:</span> <span t-esc="o.company_id.vat or ''"/></div>
+                                    <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="o.company_id.phone or ''"/></div>
                                     <div><span class="fp-cr-label">Correo electrónico:</span> <span t-esc="o.company_id.email or ''"/></div>
                                     <div><span class="fp-cr-label">Dirección emisor:</span> <span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                                 </td>
@@ -98,12 +99,16 @@
 
                         <div class="fp-cr-box">
                             <div class="fp-cr-box-body">
-                                <div>
-                                    <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
-                                    <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
-                                    <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
-                                    <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
-                                    <div><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
+                                <div class="fp-cr-receiver-grid">
+                                    <div class="fp-cr-receiver-col">
+                                        <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
+                                        <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
+                                        <div><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
+                                    </div>
+                                    <div class="fp-cr-receiver-col">
+                                        <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
+                                        <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -304,10 +309,21 @@
 
                     <div class="fp-section-title">Datos del receptor:</div>
                     <div class="fp-card fp-client-card">
-                        <div><span class="fp-label">Cliente:</span><span t-esc="fp_receiver_partner.name or ''"/></div>
-                        <div><span class="fp-label">Identificación:</span><span t-esc="fp_receiver_partner.vat or ''"/></div>
-                        <div><span class="fp-label">Correo Electrónico:</span><span t-esc="fp_receiver_partner.email or ''"/></div>
-                        <div><span class="fp-label">Dirección:</span><span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
+                        <table class="fp-grid">
+                            <tbody>
+                                <tr>
+                                    <td class="fp-grid-cell" style="width: 50%;">
+                                        <div><span class="fp-label">Cliente:</span><span t-esc="fp_receiver_partner.name or ''"/></div>
+                                        <div><span class="fp-label">Correo Electrónico:</span><span t-esc="fp_receiver_partner.email or ''"/></div>
+                                        <div><span class="fp-label">Dirección:</span><span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
+                                    </td>
+                                    <td class="fp-grid-cell" style="width: 50%; padding-right: 0;">
+                                        <div><span class="fp-label">Identificación:</span><span t-esc="fp_receiver_partner.vat or ''"/></div>
+                                        <div><span class="fp-label">Teléfono:</span><span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div class="fp-lines-table">
