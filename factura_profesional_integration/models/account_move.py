@@ -796,14 +796,17 @@ class AccountMove(models.Model):
 
     def _fp_get_exchange_rate(self):
         self.ensure_one()
-        if self.currency_id == self.company_currency_id:
+        if self.currency_id == self.company_currency_id or (self.currency_id.name or "").upper() == "CRC":
             return 1.0
 
-        company_rate = getattr(self.currency_id, "inverse_company_rate", False)
-        if company_rate:
-            return company_rate
+        inverse_company_rate = getattr(self.currency_id, "inverse_company_rate", False)
+        if inverse_company_rate:
+            return inverse_company_rate
 
-        return self.invoice_currency_rate or 1.0
+        if self.invoice_currency_rate:
+            return 1.0 / self.invoice_currency_rate
+
+        return 1.0
 
     def _fp_append_reference_information(self, root_node):
         self.ensure_one()
