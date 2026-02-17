@@ -57,8 +57,8 @@
                         .fp-cr-small-table th, .fp-cr-small-table td { border: 2px solid #00a9eb; padding: 4px 6px; }
                         .fp-cr-small-table th { background: #0d4f9b; color: #fff; }
                         .fp-cr-total td { font-size: 13px; }
-                        .fp-cr-receiver-grid { display: flex; gap: 16px; }
-                        .fp-cr-receiver-col { flex: 1; }
+                        .fp-cr-receiver-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+                        .fp-cr-receiver-table td { width: 50%; vertical-align: top; padding: 0; }
                         .fp-cr-sign { border: 2px solid #00a9eb; margin-top: 8px; padding: 8px; min-height: 70px; }
                         .fp-cr-footer { margin-top: 10px; background: #0d4f9b; color: #fff; padding: 8px 10px; font-size: 12px; }
                         .fp-cr-qr img { max-width: 140px; max-height: 140px; }
@@ -99,17 +99,19 @@
 
                         <div class="fp-cr-box">
                             <div class="fp-cr-box-body">
-                                <div class="fp-cr-receiver-grid">
-                                    <div class="fp-cr-receiver-col">
-                                        <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
-                                        <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
-                                        <div><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
-                                    </div>
-                                    <div class="fp-cr-receiver-col">
-                                        <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
-                                        <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
-                                    </div>
-                                </div>
+                                <table class="fp-cr-receiver-table">
+                                    <tr>
+                                        <td style="padding-right: 8px;">
+                                            <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
+                                            <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
+                                            <div><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
+                                        </td>
+                                        <td style="padding-left: 8px;">
+                                            <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
+                                            <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
 
