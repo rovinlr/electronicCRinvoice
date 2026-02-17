@@ -57,6 +57,8 @@
                         .fp-cr-small-table th, .fp-cr-small-table td { border: 2px solid #00a9eb; padding: 4px 6px; }
                         .fp-cr-small-table th { background: #0d4f9b; color: #fff; }
                         .fp-cr-total td { font-size: 13px; }
+                        .fp-cr-receiver-grid { display: flex; gap: 16px; }
+                        .fp-cr-receiver-col { flex: 1; }
                         .fp-cr-sign { border: 2px solid #00a9eb; margin-top: 8px; padding: 8px; min-height: 70px; }
                         .fp-cr-footer { margin-top: 10px; background: #0d4f9b; color: #fff; padding: 8px 10px; font-size: 12px; }
                         .fp-cr-qr img { max-width: 140px; max-height: 140px; }
@@ -88,6 +90,7 @@
                                         <div><span class="fp-cr-label">Medio de Pago:</span> <span t-field="o.fp_payment_method"/></div>
                                         <div><span class="fp-cr-label">Moneda Aplicable:</span> <span t-field="o.currency_id"/></div>
                                         <div><span class="fp-cr-label">Tipo Cambio:</span> <span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                                        <div><span class="fp-cr-label">Dirección emisor:</span> <span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                                     </div>
                                 </td>
                             </tr>
@@ -95,25 +98,17 @@
 
                         <div class="fp-cr-box">
                             <div class="fp-cr-box-body">
-                                <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
-                            </div>
-                        </div>
-
-                        <div class="fp-cr-box">
-                            <div class="fp-cr-box-body">
-                                <table class="fp-cr-row" style="margin-bottom:0;">
-                                    <tr>
-                                        <td style="width:65%;">
-                                            <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
-                                            <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
-                                        </td>
-                                        <td style="width:35%;">
-                                            <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
-                                            <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
-                                            <div><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
-                                        </td>
-                                    </tr>
-                                </table>
+                                <div class="fp-cr-receiver-grid">
+                                    <div class="fp-cr-receiver-col">
+                                        <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
+                                        <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
+                                    </div>
+                                    <div class="fp-cr-receiver-col">
+                                        <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
+                                        <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
+                                        <div><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -186,6 +181,10 @@
                                             <tr>
                                                 <td><span class="fp-cr-label">Total exonerado</span></td>
                                                 <td class="text-end"><span t-esc="fp_summary_totals['total_exonerado']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Total no sujeto</span></td>
+                                                <td class="text-end"><span t-esc="fp_summary_totals['total_no_sujeto']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="fp-cr-label">Total venta</span></td>
@@ -274,7 +273,6 @@
                                 <div class="fp-modern-line"><strong>Identificación:</strong> <span t-esc="o.company_id.vat or ''"/></div>
                                 <div class="fp-modern-line"><strong>Correo electrónico:</strong> <span t-esc="o.company_id.email or ''"/></div>
                                 <div class="fp-modern-line"><strong>Teléfono:</strong> <span t-esc="o.company_id.phone or ''"/></div>
-                                <div class="fp-modern-line"><strong>Dirección:</strong> <span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                             </td>
                             <td t-att-style="'width: 40%; background: rgba(255,255,255,0.12);' if fp_template_style != 'modern_clean' else 'width: 40%; background: rgba(15,23,42,0.06);'">
                                 <div class="fp-modern-subtitle" t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
@@ -300,6 +298,7 @@
                                     <td class="fp-grid-cell" style="width:33.33%; padding-right: 0;">
                                         <div><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></div>
                                         <div><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                                        <div><span class="fp-label">Dirección emisor:</span><span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -357,6 +356,10 @@
                         <tr>
                             <td class="fp-total-label">Total exonerado</td>
                             <td class="text-end"><span t-esc="fp_summary_totals['total_exonerado']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-total-label">Total no sujeto</td>
+                            <td class="text-end"><span t-esc="fp_summary_totals['total_no_sujeto']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                         </tr>
                         <tr>
                             <td class="fp-total-label">Total venta</td>
