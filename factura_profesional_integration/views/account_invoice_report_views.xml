@@ -26,14 +26,19 @@
             <t t-set="fp_lines_to_report" t-value="o._get_move_lines_to_report()"/>
             <t t-set="fp_product_lines" t-value="fp_lines_to_report.filtered(lambda l: l.display_type in ('product', False))"/>
             <t t-set="qr_code_url" t-value="o._generate_qr_code(silent_errors=True) if o.display_qr_code else False"/>
+            <t t-set="fp_company_partner" t-value="o.company_id.partner_id"/>
+            <t t-set="fp_receiver_partner" t-value="o.partner_id"/>
+            <t t-set="fp_reference_value" t-value="o.reversed_entry_id.fp_consecutive_number if o.fp_document_type == 'NC' and o.reversed_entry_id else (o.ref or '-')"/>
 
             <div class="page">
                 <t t-if="fp_template_style == 'modern_prohygiene'">
                     <style>
+                        .header { display: none !important; }
+                        .article { margin-top: 0 !important; }
                         .fp-cr-wrap { color: #111; font-size: 13px; }
                         .fp-cr-top-bar { height: 24px; margin-bottom: 8px; background: linear-gradient(90deg, #10b7a5 0%, #1160aa 82%); }
-                        .fp-cr-row { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
-                        .fp-cr-row td { vertical-align: top; }
+                        .fp-cr-row { width: 100%; border-collapse: collapse; margin-bottom: 6px; border: 0 !important; }
+                        .fp-cr-row tr, .fp-cr-row td { vertical-align: top; border: 0 !important; }
                         .fp-cr-head-title { background: #0d4f9b; color: #fff; padding: 8px 10px; font-weight: 700; font-size: 14px; text-transform: uppercase; }
                         .fp-cr-head-meta { border: 1px solid #00a9eb; border-top: 0; padding: 8px 10px; }
                         .fp-cr-head-meta div { margin-bottom: 2px; }
@@ -65,8 +70,9 @@
                                     <div t-if="o.company_id.logo" style="margin-bottom:6px;">
                                         <img t-att-src="image_data_uri(o.company_id.logo)" style="max-width: 290px; max-height: 95px;"/>
                                     </div>
-                                    <div><span t-esc="o.company_id.phone or ''"/></div>
-                                    <div><span t-esc="o.company_id.email or ''"/></div>
+                                    <div><span class="fp-cr-label">Datos del emisor:</span> <span t-esc="(o.company_id.name or '').upper()"/></div>
+                                    <div><span class="fp-cr-label">Identificación:</span> <span t-esc="o.company_id.vat or ''"/></div>
+                                    <div><span class="fp-cr-label">Correo electrónico:</span> <span t-esc="o.company_id.email or ''"/></div>
                                 </td>
                                 <td style="width:56%;">
                                     <div class="fp-cr-head-title">
@@ -76,8 +82,10 @@
                                     <div class="fp-cr-head-meta">
                                         <div><span class="fp-cr-label">Clave Comprobante:</span> <span t-field="o.fp_external_id"/></div>
                                         <div><span class="fp-cr-label">Fecha de Emisión:</span> <span t-field="o.invoice_date"/></div>
+                                        <div><span class="fp-cr-label">Fecha de Vencimiento:</span> <span t-field="o.invoice_date_due"/></div>
+                                        <div><span class="fp-cr-label">Condición de Venta:</span> <span t-field="o.fp_sale_condition"/></div>
+                                        <div><span class="fp-cr-label">Medio de Pago:</span> <span t-field="o.fp_payment_method"/></div>
                                         <div><span class="fp-cr-label">Moneda Aplicable:</span> <span t-field="o.currency_id"/></div>
-                                        <div><span class="fp-cr-label">Consecutivo:</span> <span t-field="o.fp_consecutive_number"/></div>
                                         <div><span class="fp-cr-label">Tipo Cambio:</span> <span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
                                     </div>
                                 </td>
@@ -86,12 +94,10 @@
 
                         <div class="fp-cr-box">
                             <div class="fp-cr-box-body">
-                                <div><span class="fp-cr-label" t-esc="(o.company_id.name or '').upper()"/></div>
-                                <div><span class="fp-cr-label">Dirección:</span> <span t-esc="o.company_id.partner_id.contact_address or ''"/></div>
-                                <div>
-                                    <span class="fp-cr-label">Condición de Venta:</span> <span t-field="o.fp_sale_condition"/>
-                                    <span style="margin-left:20px;" class="fp-cr-label">Medio de Pago:</span> <span t-field="o.fp_payment_method"/>
-                                </div>
+                                <div><span class="fp-cr-label">Street:</span> <span t-esc="fp_company_partner.street or ''"/></div>
+                                <div><span class="fp-cr-label">Distrito:</span> <span t-esc="fp_company_partner.district_id.name if fp_company_partner.district_id else ''"/></div>
+                                <div><span class="fp-cr-label">Cantón:</span> <span t-esc="fp_company_partner.canton_id.name if fp_company_partner.canton_id else ''"/></div>
+                                <div><span class="fp-cr-label">Provincia:</span> <span t-esc="fp_company_partner.state_id.name if fp_company_partner.state_id else ''"/></div>
                             </div>
                         </div>
 
@@ -100,14 +106,16 @@
                                 <table class="fp-cr-row" style="margin-bottom:0;">
                                     <tr>
                                         <td style="width:65%;">
-                                            <div><span class="fp-cr-label">Cliente:</span> <span t-esc="o.partner_id.name or ''"/></div>
-                                            <div><span class="fp-cr-label">Dirección:</span> <span t-esc="o.partner_id.contact_address or ''"/></div>
-                                            <div><span class="fp-cr-label">Código:</span> <span t-esc="o.partner_id.ref or '-'"/></div>
+                                            <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
+                                            <div><span class="fp-cr-label">Street:</span> <span t-esc="fp_receiver_partner.street or ''"/></div>
+                                            <div><span class="fp-cr-label">Distrito:</span> <span t-esc="fp_receiver_partner.district_id.name if fp_receiver_partner.district_id else ''"/></div>
+                                            <div><span class="fp-cr-label">Cantón:</span> <span t-esc="fp_receiver_partner.canton_id.name if fp_receiver_partner.canton_id else ''"/></div>
+                                            <div><span class="fp-cr-label">Provincia:</span> <span t-esc="fp_receiver_partner.state_id.name if fp_receiver_partner.state_id else ''"/></div>
                                         </td>
                                         <td style="width:35%;">
-                                            <div><span class="fp-cr-label">Identificación:</span> <span t-esc="o.partner_id.vat or ''"/></div>
-                                            <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="o.partner_id.phone or o.partner_id.mobile or ''"/></div>
-                                            <div><span class="fp-cr-label">Correo:</span> <span t-esc="o.partner_id.email or ''"/></div>
+                                            <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
+                                            <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
+                                            <div><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
                                         </td>
                                     </tr>
                                 </table>
@@ -119,21 +127,23 @@
                                 <tr>
                                     <th style="width:8%;">Cantidad</th>
                                     <th style="width:14%;">Artículo</th>
-                                    <th style="width:32%;">Descripción</th>
+                                    <th style="width:26%;">Descripción</th>
                                     <th style="width:8%;">UM</th>
                                     <th style="width:14%;">Precio Unit.</th>
+                                    <th style="width:10%;">Impuesto</th>
                                     <th style="width:10%;">Descuento</th>
-                                    <th style="width:14%;">Valor Total</th>
+                                    <th style="width:10%;">Valor Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <t t-foreach="fp_product_lines" t-as="line">
                                     <tr>
                                         <td class="text-end" t-esc="line.quantity"/>
-                                        <td t-esc="line.product_id.default_code or line.product_id.fp_cabys_code or '-'"/>
+                                        <td t-esc="line.product_id.fp_cabys_code or '-'"/>
                                         <td><span t-field="line.name"/></td>
                                         <td class="text-end" t-esc="line.product_uom_id.name if line.product_uom_id else '-'"/>
                                         <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td class="text-end"><span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                         <td class="text-end"><span t-esc="line.discount"/>%</td>
                                         <td class="text-end"><span t-field="line.price_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                     </tr>
@@ -151,7 +161,7 @@
                                         <tbody>
                                             <tr>
                                                 <td><span class="fp-cr-label">Referencia</span></td>
-                                                <td><span t-esc="o.ref or '-'"/></td>
+                                                <td><span t-esc="fp_reference_value"/></td>
                                             </tr>
                                             <tr>
                                                 <td><span class="fp-cr-label">Observación</span></td>
@@ -200,6 +210,8 @@
                 </t>
                 <t t-else="">
                     <style>
+                        .header { display: none !important; }
+                        .article { margin-top: 0 !important; }
                         .fp-modern-header {
                             background-color: #2144c0;
                             background: linear-gradient(135deg, #102a74, #2144c0 58%, #3969f5);
@@ -239,10 +251,15 @@
                     <table t-attf-class="fp-modern-header #{'fp-modern-header--dark' if fp_template_style == 'modern_dark' else ('fp-modern-header--clean' if fp_template_style == 'modern_clean' else ('fp-modern-header--emerald' if fp_template_style == 'modern_emerald' else ('fp-modern-header--sunset' if fp_template_style == 'modern_sunset' else '')))}" t-attf-style="width: 100%; background-color: #{'#1f2937' if fp_template_style == 'modern_dark' else ('#f1f5f9' if fp_template_style == 'modern_clean' else ('#047857' if fp_template_style == 'modern_emerald' else ('#ea580c' if fp_template_style == 'modern_sunset' else '#2144c0')))};">
                         <tr>
                             <td style="width: 60%;">
+                                <div class="fp-modern-subtitle">Datos del emisor:</div>
                                 <div class="fp-modern-company-name" t-esc="o.company_id.name or ''"/>
                                 <div class="fp-modern-line"><strong>Identificación:</strong> <span t-esc="o.company_id.vat or ''"/></div>
                                 <div class="fp-modern-line"><strong>Correo electrónico:</strong> <span t-esc="o.company_id.email or ''"/></div>
                                 <div class="fp-modern-line"><strong>Teléfono:</strong> <span t-esc="o.company_id.phone or ''"/></div>
+                                <div class="fp-modern-line"><strong>Street:</strong> <span t-esc="fp_company_partner.street or ''"/></div>
+                                <div class="fp-modern-line"><strong>Distrito:</strong> <span t-esc="fp_company_partner.district_id.name if fp_company_partner.district_id else ''"/></div>
+                                <div class="fp-modern-line"><strong>Cantón:</strong> <span t-esc="fp_company_partner.canton_id.name if fp_company_partner.canton_id else ''"/></div>
+                                <div class="fp-modern-line"><strong>Provincia:</strong> <span t-esc="fp_company_partner.state_id.name if fp_company_partner.state_id else ''"/></div>
                             </td>
                             <td t-att-style="'width: 40%; background: rgba(255,255,255,0.12);' if fp_template_style != 'modern_clean' else 'width: 40%; background: rgba(15,23,42,0.06);'">
                                 <div class="fp-modern-subtitle" t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
@@ -272,13 +289,18 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <div class="fp-modern-line" style="margin-top: 8px;"><strong>Referencia:</strong> <span t-esc="fp_reference_value"/></div>
                     </div>
 
                     <div class="fp-section-title">Datos del receptor:</div>
                     <div class="fp-card fp-client-card">
-                        <div><span class="fp-label">Cliente:</span><span t-esc="o.partner_id.name or ''"/></div>
-                        <div t-if="o.partner_id.vat"><span class="fp-label">Identificación:</span><span t-esc="o.partner_id.vat"/></div>
-                        <div t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-esc="o.partner_id.email"/></div>
+                        <div><span class="fp-label">Cliente:</span><span t-esc="fp_receiver_partner.name or ''"/></div>
+                        <div><span class="fp-label">Identificación:</span><span t-esc="fp_receiver_partner.vat or ''"/></div>
+                        <div><span class="fp-label">Correo Electrónico:</span><span t-esc="fp_receiver_partner.email or ''"/></div>
+                        <div><span class="fp-label">Street:</span><span t-esc="fp_receiver_partner.street or ''"/></div>
+                        <div><span class="fp-label">Distrito:</span><span t-esc="fp_receiver_partner.district_id.name if fp_receiver_partner.district_id else ''"/></div>
+                        <div><span class="fp-label">Cantón:</span><span t-esc="fp_receiver_partner.canton_id.name if fp_receiver_partner.canton_id else ''"/></div>
+                        <div><span class="fp-label">Provincia:</span><span t-esc="fp_receiver_partner.state_id.name if fp_receiver_partner.state_id else ''"/></div>
                     </div>
 
                     <div class="fp-lines-table">
