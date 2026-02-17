@@ -23,227 +23,278 @@
                 'CPCE': 'Confirmación Parcial de Aceptación',
                 'RCE': 'Confirmación de Rechazo'
             }"/>
+            <t t-set="fp_lines_to_report" t-value="o._get_move_lines_to_report()"/>
+            <t t-set="fp_product_lines" t-value="fp_lines_to_report.filtered(lambda l: l.display_type in ('product', False))"/>
+            <t t-set="qr_code_url" t-value="o._generate_qr_code(silent_errors=True) if o.display_qr_code else False"/>
 
             <div class="page">
-                <style>
-                    .fp-modern-header {
-                        background-color: #2144c0;
-                        background: linear-gradient(135deg, #102a74, #2144c0 58%, #3969f5);
-                        border-radius: 18px;
-                        color: #ffffff;
-                        margin: 8px 0 12px 0;
-                        overflow: hidden;
-                    }
-                    .fp-modern-header--dark {
-                        background-color: #1f2937;
-                        background: linear-gradient(135deg, #0b1220, #1f2937 58%, #374151);
-                    }
-                    .fp-modern-header--clean {
-                        background-color: #f1f5f9;
-                        background: linear-gradient(135deg, #ffffff, #f1f5f9 58%, #e2e8f0);
-                        color: #0f172a;
-                        border: 1px solid #dbe4ff;
-                    }
-                    .fp-modern-header--emerald {
-                        background-color: #047857;
-                        background: linear-gradient(135deg, #064e3b, #047857 58%, #10b981);
-                    }
-                    .fp-modern-header--sunset {
-                        background-color: #ea580c;
-                        background: linear-gradient(135deg, #7c2d12, #ea580c 58%, #fb923c);
-                    }
-                    .fp-modern-header--clean .fp-modern-subtitle {
-                        color: #334155;
-                        opacity: 1;
-                    }
-                    .fp-modern-header td {
-                        vertical-align: top;
-                        padding: 16px;
-                    }
-                    .fp-modern-company-name {
-                        font-size: 24px;
-                        font-weight: 700;
-                        line-height: 1.2;
-                        margin-bottom: 10px;
-                    }
-                    .fp-modern-line {
-                        margin-bottom: 4px;
-                        font-size: 13px;
-                    }
-                    .fp-modern-line strong {
-                        font-weight: 700;
-                    }
-                    .fp-modern-subtitle {
-                        opacity: 0.9;
-                        font-size: 13px;
-                        letter-spacing: 0.6px;
-                        text-transform: uppercase;
-                        margin-bottom: 8px;
-                    }
-                    .fp-reference-line {
-                        font-size: 15px;
-                        margin-bottom: 2px;
-                        color: #141d2e;
-                    }
-                    .fp-reference-line .fp-label-inline {
-                        font-weight: 700;
-                    }
-                    .fp-section-title {
-                        font-size: 16px;
-                        font-weight: 700;
-                        margin: 8px 0 4px 0;
-                        color: #111827;
-                    }
-                    .fp-card {
-                        border: 2px solid #1b2c96;
-                        border-radius: 18px;
-                        padding: 12px 14px;
-                        margin: 8px 0;
-                        background: #f8faff;
-                        width: 100%;
-                    }
-                    .fp-grid {
-                        width: 100%;
-                        border-collapse: separate;
-                        border-spacing: 0;
-                        table-layout: fixed;
-                        border: 0 !important;
-                        outline: 0 !important;
-                        background: transparent;
-                    }
-                    .fp-grid tbody,
-                    .fp-grid tr,
-                    .fp-grid td {
-                        border: 0 !important;
-                        outline: 0 !important;
-                        box-shadow: none !important;
-                    }
-                    .fp-grid-cell {
-                        vertical-align: top;
-                        font-size: 15px;
-                        color: #111827;
-                        padding: 6px 10px 6px 0;
-                        border-left: 0 !important;
-                    }
-                    .fp-label {
-                        display: inline-block;
-                        font-weight: 700;
-                        min-width: 128px;
-                        color: #1f2a44;
-                        margin-right: 4px;
-                    }
-                    .fp-client-card {
-                        border-color: #3b82f6;
-                        background: #f8fbff;
-                    }
-                    .fp-lines-table {
-                        margin-top: 12px;
-                        border: 1px solid #dbe4ff;
-                        border-radius: 14px;
-                        overflow: hidden;
-                    }
-                    .fp-lines-table table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    .fp-lines-table thead th {
-                        background: #f0f4ff;
-                        color: #1f2a44;
-                        font-size: 12px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.4px;
-                        border-bottom: 1px solid #dbe4ff;
-                        padding: 8px;
-                    }
-                    .fp-lines-table tbody td {
-                        font-size: 12px;
-                        border-bottom: 1px solid #edf1ff;
-                        padding: 8px;
-                        color: #1f2937;
-                    }
-                    .fp-lines-table tbody tr:last-child td {
-                        border-bottom: 0;
-                    }
-                    .fp-totals {
-                        width: 45%;
-                        margin-left: auto;
-                        margin-top: 14px;
-                        font-size: 13px;
-                    }
-                    .fp-totals td {
-                        padding: 4px 0;
-                    }
-                    .fp-totals .fp-total-label {
-                        font-weight: 700;
-                        color: #1f2a44;
-                    }
-                    .fp-totals .fp-total-grand {
-                        border-top: 1px solid #dbe4ff;
-                        font-size: 15px;
-                    }
-                </style>
+                <t t-if="fp_template_style == 'modern_prohygiene'">
+                    <style>
+                        .fp-cr-wrap { color: #111; font-size: 13px; }
+                        .fp-cr-top-bar { height: 24px; margin-bottom: 8px; background: linear-gradient(90deg, #10b7a5 0%, #1160aa 82%); }
+                        .fp-cr-row { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+                        .fp-cr-row td { vertical-align: top; }
+                        .fp-cr-head-title { background: #0d4f9b; color: #fff; padding: 8px 10px; font-weight: 700; font-size: 14px; text-transform: uppercase; }
+                        .fp-cr-head-meta { border: 1px solid #00a9eb; border-top: 0; padding: 8px 10px; }
+                        .fp-cr-head-meta div { margin-bottom: 2px; }
+                        .fp-cr-box { border: 2px solid #00a9eb; margin-top: 6px; }
+                        .fp-cr-box-title { background: #0d4f9b; color: #fff; padding: 4px 8px; font-weight: 700; text-transform: uppercase; }
+                        .fp-cr-box-body { padding: 6px 8px; }
+                        .fp-cr-label { font-weight: 700; }
+                        .fp-cr-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                        .fp-cr-table th, .fp-cr-table td { border: 2px solid #00a9eb; padding: 5px 6px; }
+                        .fp-cr-table th { background: #0d4f9b; color: #fff; text-align: center; }
+                        .fp-cr-table td.text-end { text-align: right; }
+                        .fp-cr-grid-2 { width: 100%; border-collapse: collapse; margin-top: 8px; }
+                        .fp-cr-grid-2 > tbody > tr > td { width: 50%; vertical-align: top; }
+                        .fp-cr-small-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                        .fp-cr-small-table th, .fp-cr-small-table td { border: 2px solid #00a9eb; padding: 4px 6px; }
+                        .fp-cr-small-table th { background: #0d4f9b; color: #fff; }
+                        .fp-cr-total td { font-size: 13px; }
+                        .fp-cr-sign { border: 2px solid #00a9eb; margin-top: 8px; padding: 8px; min-height: 70px; }
+                        .fp-cr-footer { margin-top: 10px; background: #0d4f9b; color: #fff; padding: 8px 10px; font-size: 12px; }
+                        .fp-cr-qr img { max-width: 140px; max-height: 140px; }
+                    </style>
 
-                <table t-attf-class="fp-modern-header #{'fp-modern-header--dark' if fp_template_style == 'modern_dark' else ('fp-modern-header--clean' if fp_template_style == 'modern_clean' else ('fp-modern-header--emerald' if fp_template_style == 'modern_emerald' else ('fp-modern-header--sunset' if fp_template_style == 'modern_sunset' else '')))}" t-attf-style="width: 100%; background-color: #{'#1f2937' if fp_template_style == 'modern_dark' else ('#f1f5f9' if fp_template_style == 'modern_clean' else ('#047857' if fp_template_style == 'modern_emerald' else ('#ea580c' if fp_template_style == 'modern_sunset' else '#2144c0')))};">
-                    <tr>
-                        <td style="width: 60%;">
-                            <div class="fp-modern-company-name" t-esc="o.company_id.name or ''"/>
-                            <div class="fp-modern-line"><strong>Identificación:</strong> <span t-esc="o.company_id.vat or ''"/></div>
-                            <div class="fp-modern-line"><strong>Correo electrónico:</strong> <span t-esc="o.company_id.email or ''"/></div>
-                            <div class="fp-modern-line"><strong>Teléfono:</strong> <span t-esc="o.company_id.phone or ''"/></div>
-                        </td>
-                        <td t-att-style="'width: 40%; background: rgba(255,255,255,0.12);' if fp_template_style != 'modern_clean' else 'width: 40%; background: rgba(15,23,42,0.06);'">
-                            <div class="fp-modern-subtitle" t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
-                            <div style="font-size: 22px; font-weight: 700; margin-bottom: 8px;" t-esc="o.fp_document_type or 'FE'"/>
-                            <div class="fp-modern-line"><strong>Consecutivo:</strong> <span t-field="o.fp_consecutive_number"/></div>
-                            <div class="fp-modern-line"><strong>Clave:</strong> <span t-field="o.fp_external_id"/></div>
-                        </td>
-                    </tr>
-                </table>
+                    <div class="fp-cr-wrap">
+                        <div class="fp-cr-top-bar"/>
 
-                <div class="fp-card">
-                    <table class="fp-grid">
-                        <tbody>
+                        <table class="fp-cr-row">
                             <tr>
-                                <td class="fp-grid-cell" style="width:33.33%;">
-                                    <div><span class="fp-label">Fecha:</span><span t-field="o.invoice_date"/></div>
-                                    <div><span class="fp-label">Vencimiento:</span><span t-field="o.invoice_date_due"/></div>
+                                <td style="width:44%; padding-right: 8px;">
+                                    <div t-if="o.company_id.logo" style="margin-bottom:6px;">
+                                        <img t-att-src="image_data_uri(o.company_id.logo)" style="max-width: 290px; max-height: 95px;"/>
+                                    </div>
+                                    <div><span t-esc="o.company_id.phone or ''"/></div>
+                                    <div><span t-esc="o.company_id.email or ''"/></div>
                                 </td>
-                                <td class="fp-grid-cell" style="width:33.33%;">
-                                    <div><span class="fp-label">Condición:</span><span t-field="o.fp_sale_condition"/></div>
-                                    <div><span class="fp-label">Pago:</span><span t-field="o.fp_payment_method"/></div>
-                                </td>
-                                <td class="fp-grid-cell" style="width:33.33%; padding-right: 0;">
-                                    <div><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></div>
-                                    <div><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                                <td style="width:56%;">
+                                    <div class="fp-cr-head-title">
+                                        <span t-esc="fp_document_types.get(o.fp_document_type, 'Factura Electrónica')"/>:
+                                        <span t-field="o.fp_consecutive_number"/>
+                                    </div>
+                                    <div class="fp-cr-head-meta">
+                                        <div><span class="fp-cr-label">Clave Comprobante:</span> <span t-field="o.fp_external_id"/></div>
+                                        <div><span class="fp-cr-label">Fecha de Emisión:</span> <span t-field="o.invoice_date"/></div>
+                                        <div><span class="fp-cr-label">Moneda Aplicable:</span> <span t-field="o.currency_id"/></div>
+                                        <div><span class="fp-cr-label">Consecutivo:</span> <span t-field="o.fp_consecutive_number"/></div>
+                                        <div><span class="fp-cr-label">Tipo Cambio:</span> <span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                                    </div>
                                 </td>
                             </tr>
-                        </tbody>
+                        </table>
+
+                        <div class="fp-cr-box">
+                            <div class="fp-cr-box-body">
+                                <div><span class="fp-cr-label" t-esc="(o.company_id.name or '').upper()"/></div>
+                                <div><span class="fp-cr-label">Dirección:</span> <span t-esc="o.company_id.partner_id.contact_address or ''"/></div>
+                                <div>
+                                    <span class="fp-cr-label">Condición de Venta:</span> <span t-field="o.fp_sale_condition"/>
+                                    <span style="margin-left:20px;" class="fp-cr-label">Medio de Pago:</span> <span t-field="o.fp_payment_method"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="fp-cr-box">
+                            <div class="fp-cr-box-body">
+                                <table class="fp-cr-row" style="margin-bottom:0;">
+                                    <tr>
+                                        <td style="width:65%;">
+                                            <div><span class="fp-cr-label">Cliente:</span> <span t-esc="o.partner_id.name or ''"/></div>
+                                            <div><span class="fp-cr-label">Dirección:</span> <span t-esc="o.partner_id.contact_address or ''"/></div>
+                                            <div><span class="fp-cr-label">Código:</span> <span t-esc="o.partner_id.ref or '-'"/></div>
+                                        </td>
+                                        <td style="width:35%;">
+                                            <div><span class="fp-cr-label">Identificación:</span> <span t-esc="o.partner_id.vat or ''"/></div>
+                                            <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="o.partner_id.phone or o.partner_id.mobile or ''"/></div>
+                                            <div><span class="fp-cr-label">Correo:</span> <span t-esc="o.partner_id.email or ''"/></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <table class="fp-cr-table" style="margin-top:8px;">
+                            <thead>
+                                <tr>
+                                    <th style="width:8%;">Cantidad</th>
+                                    <th style="width:14%;">Artículo</th>
+                                    <th style="width:32%;">Descripción</th>
+                                    <th style="width:8%;">UM</th>
+                                    <th style="width:14%;">Precio Unit.</th>
+                                    <th style="width:10%;">Descuento</th>
+                                    <th style="width:14%;">Valor Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="fp_product_lines" t-as="line">
+                                    <tr>
+                                        <td class="text-end" t-esc="line.quantity"/>
+                                        <td t-esc="line.product_id.default_code or line.product_id.fp_cabys_code or '-'"/>
+                                        <td><span t-field="line.name"/></td>
+                                        <td class="text-end" t-esc="line.product_uom_id.name if line.product_uom_id else '-'"/>
+                                        <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td class="text-end"><span t-esc="line.discount"/>%</td>
+                                        <td class="text-end"><span t-field="line.price_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <table class="fp-cr-grid-2">
+                            <tr>
+                                <td style="padding-right:8px;">
+                                    <table class="fp-cr-small-table">
+                                        <thead>
+                                            <tr><th style="width:40%;">Información adicional</th><th>Detalle</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Referencia</span></td>
+                                                <td><span t-esc="o.ref or '-'"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Observación</span></td>
+                                                <td><span t-field="o.narration"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Monto en letras</span></td>
+                                                <td><span t-field="o.amount_total_words"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td style="padding-left:8px;">
+                                    <table class="fp-cr-small-table fp-cr-total">
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Gravado</span></td>
+                                                <td class="text-end"><span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">IVA</span></td>
+                                                <td class="text-end"><span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Total</span></td>
+                                                <td class="text-end"><strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="fp-cr-sign">
+                                        <div><strong>Recibo Conforme:</strong></div>
+                                        <div style="margin-top:22px; border-top:1px solid #333;"/>
+                                        <div style="margin-top:4px;">Firma: _____________________ &amp;nbsp; Cédula: _____________________</div>
+                                    </div>
+                                    <div class="fp-cr-qr" t-if="qr_code_url" style="text-align:right; margin-top:8px;">
+                                        <img t-att-src="qr_code_url"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="fp-cr-footer">
+                            Emitida conforme la resolución de Facturación Electrónica de Costa Rica. Versión del documento 4.4.
+                        </div>
+                    </div>
+                </t>
+                <t t-else="">
+                    <style>
+                        .fp-modern-header {
+                            background-color: #2144c0;
+                            background: linear-gradient(135deg, #102a74, #2144c0 58%, #3969f5);
+                            border-radius: 18px;
+                            color: #ffffff;
+                            margin: 8px 0 12px 0;
+                            overflow: hidden;
+                        }
+                        .fp-modern-header--dark { background-color: #1f2937; background: linear-gradient(135deg, #0b1220, #1f2937 58%, #374151); }
+                        .fp-modern-header--clean { background-color: #f1f5f9; background: linear-gradient(135deg, #ffffff, #f1f5f9 58%, #e2e8f0); color: #0f172a; border: 1px solid #dbe4ff; }
+                        .fp-modern-header--emerald { background-color: #047857; background: linear-gradient(135deg, #064e3b, #047857 58%, #10b981); }
+                        .fp-modern-header--sunset { background-color: #ea580c; background: linear-gradient(135deg, #7c2d12, #ea580c 58%, #fb923c); }
+                        .fp-modern-header--clean .fp-modern-subtitle { color: #334155; opacity: 1; }
+                        .fp-modern-header td { vertical-align: top; padding: 16px; }
+                        .fp-modern-company-name { font-size: 24px; font-weight: 700; line-height: 1.2; margin-bottom: 10px; }
+                        .fp-modern-line { margin-bottom: 4px; font-size: 13px; }
+                        .fp-modern-line strong { font-weight: 700; }
+                        .fp-modern-subtitle { opacity: 0.9; font-size: 13px; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 8px; }
+                        .fp-section-title { font-size: 16px; font-weight: 700; margin: 8px 0 4px 0; color: #111827; }
+                        .fp-card { border: 2px solid #1b2c96; border-radius: 18px; padding: 12px 14px; margin: 8px 0; background: #f8faff; width: 100%; }
+                        .fp-grid { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; border: 0 !important; outline: 0 !important; background: transparent; }
+                        .fp-grid tbody, .fp-grid tr, .fp-grid td { border: 0 !important; outline: 0 !important; box-shadow: none !important; }
+                        .fp-grid-cell { vertical-align: top; font-size: 15px; color: #111827; padding: 6px 10px 6px 0; border-left: 0 !important; }
+                        .fp-label { display: inline-block; font-weight: 700; min-width: 128px; color: #1f2a44; margin-right: 4px; }
+                        .fp-client-card { border-color: #3b82f6; background: #f8fbff; }
+                        .fp-lines-table { margin-top: 12px; border: 1px solid #dbe4ff; border-radius: 14px; overflow: hidden; }
+                        .fp-lines-table table { width: 100%; border-collapse: collapse; }
+                        .fp-lines-table thead th { background: #f0f4ff; color: #1f2a44; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #dbe4ff; padding: 8px; }
+                        .fp-lines-table tbody td { font-size: 12px; border-bottom: 1px solid #edf1ff; padding: 8px; color: #1f2937; }
+                        .fp-lines-table tbody tr:last-child td { border-bottom: 0; }
+                        .fp-totals { width: 45%; margin-left: auto; margin-top: 14px; font-size: 13px; }
+                        .fp-totals td { padding: 4px 0; }
+                        .fp-totals .fp-total-label { font-weight: 700; color: #1f2a44; }
+                        .fp-totals .fp-total-grand { border-top: 1px solid #dbe4ff; font-size: 15px; }
+                    </style>
+
+                    <table t-attf-class="fp-modern-header #{'fp-modern-header--dark' if fp_template_style == 'modern_dark' else ('fp-modern-header--clean' if fp_template_style == 'modern_clean' else ('fp-modern-header--emerald' if fp_template_style == 'modern_emerald' else ('fp-modern-header--sunset' if fp_template_style == 'modern_sunset' else '')))}" t-attf-style="width: 100%; background-color: #{'#1f2937' if fp_template_style == 'modern_dark' else ('#f1f5f9' if fp_template_style == 'modern_clean' else ('#047857' if fp_template_style == 'modern_emerald' else ('#ea580c' if fp_template_style == 'modern_sunset' else '#2144c0')))};">
+                        <tr>
+                            <td style="width: 60%;">
+                                <div class="fp-modern-company-name" t-esc="o.company_id.name or ''"/>
+                                <div class="fp-modern-line"><strong>Identificación:</strong> <span t-esc="o.company_id.vat or ''"/></div>
+                                <div class="fp-modern-line"><strong>Correo electrónico:</strong> <span t-esc="o.company_id.email or ''"/></div>
+                                <div class="fp-modern-line"><strong>Teléfono:</strong> <span t-esc="o.company_id.phone or ''"/></div>
+                            </td>
+                            <td t-att-style="'width: 40%; background: rgba(255,255,255,0.12);' if fp_template_style != 'modern_clean' else 'width: 40%; background: rgba(15,23,42,0.06);'">
+                                <div class="fp-modern-subtitle" t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
+                                <div style="font-size: 22px; font-weight: 700; margin-bottom: 8px;" t-esc="o.fp_document_type or 'FE'"/>
+                                <div class="fp-modern-line"><strong>Consecutivo:</strong> <span t-field="o.fp_consecutive_number"/></div>
+                                <div class="fp-modern-line"><strong>Clave:</strong> <span t-field="o.fp_external_id"/></div>
+                            </td>
+                        </tr>
                     </table>
-                </div>
 
-                <div class="fp-section-title">Datos del receptor:</div>
-                <div class="fp-card fp-client-card">
-                    <div><span class="fp-label">Cliente:</span><span t-esc="o.partner_id.name or ''"/></div>
-                    <div t-if="o.partner_id.vat"><span class="fp-label">Identificación:</span><span t-esc="o.partner_id.vat"/></div>
-                    <div t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-esc="o.partner_id.email"/></div>
-                </div>
+                    <div class="fp-card">
+                        <table class="fp-grid">
+                            <tbody>
+                                <tr>
+                                    <td class="fp-grid-cell" style="width:33.33%;">
+                                        <div><span class="fp-label">Fecha:</span><span t-field="o.invoice_date"/></div>
+                                        <div><span class="fp-label">Vencimiento:</span><span t-field="o.invoice_date_due"/></div>
+                                    </td>
+                                    <td class="fp-grid-cell" style="width:33.33%;">
+                                        <div><span class="fp-label">Condición:</span><span t-field="o.fp_sale_condition"/></div>
+                                        <div><span class="fp-label">Pago:</span><span t-field="o.fp_payment_method"/></div>
+                                    </td>
+                                    <td class="fp-grid-cell" style="width:33.33%; padding-right: 0;">
+                                        <div><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></div>
+                                        <div><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                <div class="fp-lines-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 13%;">Cabys</th>
-                                <th style="width: 31%;">Detalle</th>
-                                <th class="text-end" style="width: 10%;">Cantidad</th>
-                                <th class="text-end" style="width: 16%;">Precio unitario</th>
-                                <th class="text-end" style="width: 15%;">Impuesto</th>
-                                <th class="text-end" style="width: 15%;">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-set="fp_lines_to_report" t-value="o._get_move_lines_to_report()"/>
-                            <t t-foreach="fp_lines_to_report" t-as="line">
-                                <t t-if="line.display_type in ('product', False)">
+                    <div class="fp-section-title">Datos del receptor:</div>
+                    <div class="fp-card fp-client-card">
+                        <div><span class="fp-label">Cliente:</span><span t-esc="o.partner_id.name or ''"/></div>
+                        <div t-if="o.partner_id.vat"><span class="fp-label">Identificación:</span><span t-esc="o.partner_id.vat"/></div>
+                        <div t-if="o.partner_id.email"><span class="fp-label">Correo:</span><span t-esc="o.partner_id.email"/></div>
+                    </div>
+
+                    <div class="fp-lines-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 13%;">Cabys</th>
+                                    <th style="width: 31%;">Detalle</th>
+                                    <th class="text-end" style="width: 10%;">Cantidad</th>
+                                    <th class="text-end" style="width: 16%;">Precio unitario</th>
+                                    <th class="text-end" style="width: 15%;">Impuesto</th>
+                                    <th class="text-end" style="width: 15%;">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="fp_product_lines" t-as="line">
                                     <tr>
                                         <td t-esc="line.product_id.fp_cabys_code or '-'"/>
                                         <td><span t-field="line.name"/></td>
@@ -253,31 +304,31 @@
                                         <td class="text-end"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                     </tr>
                                 </t>
-                            </t>
-                        </tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <table class="fp-totals">
+                        <tr>
+                            <td class="fp-total-label">Subtotal</td>
+                            <td class="text-end"><span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-total-label">Impuestos</td>
+                            <td class="text-end"><span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr class="fp-total-grand">
+                            <td class="fp-total-label">Total</td>
+                            <td class="text-end"><strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                        </tr>
                     </table>
-                </div>
 
-                <table class="fp-totals">
-                    <tr>
-                        <td class="fp-total-label">Subtotal</td>
-                        <td class="text-end"><span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                    </tr>
-                    <tr>
-                        <td class="fp-total-label">Impuestos</td>
-                        <td class="text-end"><span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                    </tr>
-                    <tr class="fp-total-grand">
-                        <td class="fp-total-label">Total</td>
-                        <td class="text-end"><strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
-                    </tr>
-                </table>
-
-                <div class="mt-4 text-muted text-center" style="font-size: 11px;">
-                    Emitida conforme lo establecido en la resolución de Facturación Electrónica,
-                    MH-DGT-RES-0027-2024 del 19 de noviembre de 2024 de la Dirección General de Tributación Directa.
-                </div>
-                <div class="text-muted text-center" style="font-size: 11px;">Versión del documento 4.4.</div>
+                    <div class="mt-4 text-muted text-center" style="font-size: 11px;">
+                        Emitida conforme lo establecido en la resolución de Facturación Electrónica,
+                        MH-DGT-RES-0027-2024 del 19 de noviembre de 2024 de la Dirección General de Tributación Directa.
+                    </div>
+                    <div class="text-muted text-center" style="font-size: 11px;">Versión del documento 4.4.</div>
+                </t>
             </div>
         </t>
     </template>
