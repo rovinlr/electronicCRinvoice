@@ -68,6 +68,17 @@ class AccountMove(models.Model):
                 vals["fp_document_type"] = "NC"
         return super().create(vals_list)
 
+    @api.model
+    def _selection_fp_document_type(self):
+        move_type = self._context.get("default_move_type")
+        if move_type == "out_refund":
+            return [("NC", "Nota de Crédito Electrónica")]
+        return [
+            ("FE", "Factura Electrónica"),
+            ("TE", "Tiquete Electrónico"),
+            ("FEE", "Factura Electrónica de Exportación"),
+        ]
+
     def write(self, vals):
         protected_fields = self._FP_LOCKED_FIELDS_AFTER_SEND.intersection(vals)
         if protected_fields:
@@ -278,12 +289,7 @@ class AccountMove(models.Model):
         readonly=True,
     )
     fp_document_type = fields.Selection(
-        [
-            ("FE", "Factura Electrónica"),
-            ("FEE", "Factura Electrónica de Exportación"),
-            ("NC", "Nota de Crédito Electrónica"),
-            ("TE", "Tiquete Electrónico"),
-        ],
+        selection=_selection_fp_document_type,
         string="Tipo de documento (FE)",
         default="FE",
     )
