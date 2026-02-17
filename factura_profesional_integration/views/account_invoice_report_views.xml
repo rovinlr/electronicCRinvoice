@@ -95,8 +95,8 @@
                         <div class="fp-cr-box">
                             <div class="fp-cr-box-body">
                                 <div><span class="fp-cr-label">Street:</span> <span t-esc="fp_company_partner.street or ''"/></div>
-                                <div><span class="fp-cr-label">Distrito:</span> <span t-esc="fp_company_partner.district_id.name if fp_company_partner.district_id else ''"/></div>
-                                <div><span class="fp-cr-label">Cantón:</span> <span t-esc="fp_company_partner.canton_id.name if fp_company_partner.canton_id else ''"/></div>
+                                <div><span class="fp-cr-label">Distrito:</span> <span t-esc="fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else ''"/></div>
+                                <div><span class="fp-cr-label">Cantón:</span> <span t-esc="fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else ''"/></div>
                                 <div><span class="fp-cr-label">Provincia:</span> <span t-esc="fp_company_partner.state_id.name if fp_company_partner.state_id else ''"/></div>
                             </div>
                         </div>
@@ -108,8 +108,8 @@
                                         <td style="width:65%;">
                                             <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
                                             <div><span class="fp-cr-label">Street:</span> <span t-esc="fp_receiver_partner.street or ''"/></div>
-                                            <div><span class="fp-cr-label">Distrito:</span> <span t-esc="fp_receiver_partner.district_id.name if fp_receiver_partner.district_id else ''"/></div>
-                                            <div><span class="fp-cr-label">Cantón:</span> <span t-esc="fp_receiver_partner.canton_id.name if fp_receiver_partner.canton_id else ''"/></div>
+                                            <div><span class="fp-cr-label">Distrito:</span> <span t-esc="fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else ''"/></div>
+                                            <div><span class="fp-cr-label">Cantón:</span> <span t-esc="fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else ''"/></div>
                                             <div><span class="fp-cr-label">Provincia:</span> <span t-esc="fp_receiver_partner.state_id.name if fp_receiver_partner.state_id else ''"/></div>
                                         </td>
                                         <td style="width:35%;">
@@ -257,8 +257,8 @@
                                 <div class="fp-modern-line"><strong>Correo electrónico:</strong> <span t-esc="o.company_id.email or ''"/></div>
                                 <div class="fp-modern-line"><strong>Teléfono:</strong> <span t-esc="o.company_id.phone or ''"/></div>
                                 <div class="fp-modern-line"><strong>Street:</strong> <span t-esc="fp_company_partner.street or ''"/></div>
-                                <div class="fp-modern-line"><strong>Distrito:</strong> <span t-esc="fp_company_partner.district_id.name if fp_company_partner.district_id else ''"/></div>
-                                <div class="fp-modern-line"><strong>Cantón:</strong> <span t-esc="fp_company_partner.canton_id.name if fp_company_partner.canton_id else ''"/></div>
+                                <div class="fp-modern-line"><strong>Distrito:</strong> <span t-esc="fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else ''"/></div>
+                                <div class="fp-modern-line"><strong>Cantón:</strong> <span t-esc="fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else ''"/></div>
                                 <div class="fp-modern-line"><strong>Provincia:</strong> <span t-esc="fp_company_partner.state_id.name if fp_company_partner.state_id else ''"/></div>
                             </td>
                             <td t-att-style="'width: 40%; background: rgba(255,255,255,0.12);' if fp_template_style != 'modern_clean' else 'width: 40%; background: rgba(15,23,42,0.06);'">
@@ -298,8 +298,8 @@
                         <div><span class="fp-label">Identificación:</span><span t-esc="fp_receiver_partner.vat or ''"/></div>
                         <div><span class="fp-label">Correo Electrónico:</span><span t-esc="fp_receiver_partner.email or ''"/></div>
                         <div><span class="fp-label">Street:</span><span t-esc="fp_receiver_partner.street or ''"/></div>
-                        <div><span class="fp-label">Distrito:</span><span t-esc="fp_receiver_partner.district_id.name if fp_receiver_partner.district_id else ''"/></div>
-                        <div><span class="fp-label">Cantón:</span><span t-esc="fp_receiver_partner.canton_id.name if fp_receiver_partner.canton_id else ''"/></div>
+                        <div><span class="fp-label">Distrito:</span><span t-esc="fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else ''"/></div>
+                        <div><span class="fp-label">Cantón:</span><span t-esc="fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else ''"/></div>
                         <div><span class="fp-label">Provincia:</span><span t-esc="fp_receiver_partner.state_id.name if fp_receiver_partner.state_id else ''"/></div>
                     </div>
 
