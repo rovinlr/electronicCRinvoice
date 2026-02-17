@@ -10,7 +10,7 @@
     </template>
 
     <template id="report_invoice_document_fp_custom">
-        <t t-call="web.external_layout">
+        <t t-call="web.basic_layout">
             <t t-set="fp_template_style" t-value="o.company_id.fp_invoice_template_style"/>
             <t t-set="fp_document_types" t-value="{
                 'FE': 'Factura Electrónica',
@@ -73,9 +73,10 @@
                                     <div t-if="o.company_id.logo" style="margin-bottom:6px;">
                                         <img t-att-src="image_data_uri(o.company_id.logo)" style="max-width: 290px; max-height: 95px;"/>
                                     </div>
-                                    <div><span class="fp-cr-label">Datos del emisor:</span> <span t-esc="(o.company_id.name or '').upper()"/></div>
+                                    <div><span class="fp-cr-label"><strong>Datos del emisor:</strong></span> <span t-esc="(o.company_id.name or '').upper()"/></div>
                                     <div><span class="fp-cr-label">Identificación:</span> <span t-esc="o.company_id.vat or ''"/></div>
                                     <div><span class="fp-cr-label">Correo electrónico:</span> <span t-esc="o.company_id.email or ''"/></div>
+                                    <div><span class="fp-cr-label">Dirección emisor:</span> <span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                                 </td>
                                 <td style="width:56%;">
                                     <div class="fp-cr-head-title">
@@ -90,7 +91,6 @@
                                         <div><span class="fp-cr-label">Medio de Pago:</span> <span t-field="o.fp_payment_method"/></div>
                                         <div><span class="fp-cr-label">Moneda Aplicable:</span> <span t-field="o.currency_id"/></div>
                                         <div><span class="fp-cr-label">Tipo Cambio:</span> <span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
-                                        <div><span class="fp-cr-label">Dirección emisor:</span> <span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                                     </div>
                                 </td>
                             </tr>
@@ -268,10 +268,11 @@
                     <table t-attf-class="fp-modern-header #{'fp-modern-header--dark' if fp_template_style == 'modern_dark' else ('fp-modern-header--clean' if fp_template_style == 'modern_clean' else ('fp-modern-header--emerald' if fp_template_style == 'modern_emerald' else ('fp-modern-header--sunset' if fp_template_style == 'modern_sunset' else '')))}" t-attf-style="width: 100%; background-color: #{'#1f2937' if fp_template_style == 'modern_dark' else ('#f1f5f9' if fp_template_style == 'modern_clean' else ('#047857' if fp_template_style == 'modern_emerald' else ('#ea580c' if fp_template_style == 'modern_sunset' else '#2144c0')))};">
                         <tr>
                             <td style="width: 60%;">
-                                <div class="fp-modern-subtitle">Datos del emisor:</div>
+                                <div class="fp-modern-subtitle"><strong>Datos del emisor:</strong></div>
                                 <div class="fp-modern-company-name" t-esc="o.company_id.name or ''"/>
                                 <div class="fp-modern-line"><strong>Identificación:</strong> <span t-esc="o.company_id.vat or ''"/></div>
                                 <div class="fp-modern-line"><strong>Correo electrónico:</strong> <span t-esc="o.company_id.email or ''"/></div>
+                                <div class="fp-modern-line"><strong>Dirección emisor:</strong> <span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                                 <div class="fp-modern-line"><strong>Teléfono:</strong> <span t-esc="o.company_id.phone or ''"/></div>
                             </td>
                             <td t-att-style="'width: 40%; background: rgba(255,255,255,0.12);' if fp_template_style != 'modern_clean' else 'width: 40%; background: rgba(15,23,42,0.06);'">
@@ -298,7 +299,6 @@
                                     <td class="fp-grid-cell" style="width:33.33%; padding-right: 0;">
                                         <div><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></div>
                                         <div><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
-                                        <div><span class="fp-label">Dirección emisor:</span><span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                                     </td>
                                 </tr>
                             </tbody>
