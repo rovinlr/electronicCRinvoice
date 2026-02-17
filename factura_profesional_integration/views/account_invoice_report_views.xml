@@ -91,7 +91,7 @@
                                         <div><span class="fp-cr-label">Condición de Venta:</span> <span t-field="o.fp_sale_condition"/></div>
                                         <div><span class="fp-cr-label">Medio de Pago:</span> <span t-field="o.fp_payment_method"/></div>
                                         <div><span class="fp-cr-label">Moneda Aplicable:</span> <span t-field="o.currency_id"/></div>
-                                        <div><span class="fp-cr-label">Tipo Cambio:</span> <span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                                        <div><span class="fp-cr-label">Tipo Cambio:</span> <span t-esc="'%.6f' % o._fp_get_exchange_rate()"/></div>
                                     </div>
                                 </td>
                             </tr>
@@ -299,7 +299,7 @@
                                     </td>
                                     <td class="fp-grid-cell" style="width:33.33%; padding-right: 0;">
                                         <div><span class="fp-label">Moneda:</span><span t-field="o.currency_id"/></div>
-                                        <div><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % (o.invoice_currency_rate or 1.0)"/></div>
+                                        <div><span class="fp-label">Tipo de cambio:</span><span t-esc="'%.6f' % o._fp_get_exchange_rate()"/></div>
                                     </td>
                                 </tr>
                             </tbody>

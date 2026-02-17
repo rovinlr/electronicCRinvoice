@@ -758,7 +758,7 @@ class AccountMove(models.Model):
         resumen = ET.SubElement(root, "ResumenFactura")
         currency_node = ET.SubElement(resumen, "CodigoTipoMoneda")
         ET.SubElement(currency_node, "CodigoMoneda").text = self.currency_id.name or "CRC"
-        ET.SubElement(currency_node, "TipoCambio").text = f"{self.currency_id.rate or 1:.5f}"
+        ET.SubElement(currency_node, "TipoCambio").text = f"{self._fp_get_exchange_rate():.5f}"
         ET.SubElement(resumen, "TotalServGravados").text = self._fp_format_decimal(detalle_vals["total_serv_gravados"])
         ET.SubElement(resumen, "TotalServExentos").text = self._fp_format_decimal(detalle_vals["total_serv_exentos"])
         ET.SubElement(resumen, "TotalServExonerado").text = self._fp_format_decimal(detalle_vals["total_serv_exonerado"])
@@ -793,6 +793,17 @@ class AccountMove(models.Model):
         ET.register_namespace("", namespace)
         ET.register_namespace("ds", DS_XML_NS)
         return ET.tostring(root, encoding="utf-8", xml_declaration=True).decode("utf-8")
+
+    def _fp_get_exchange_rate(self):
+        self.ensure_one()
+        if self.currency_id == self.company_currency_id:
+            return 1.0
+
+        company_rate = getattr(self.currency_id, "inverse_company_rate", False)
+        if company_rate:
+            return company_rate
+
+        return self.invoice_currency_rate or 1.0
 
     def _fp_append_reference_information(self, root_node):
         self.ensure_one()
