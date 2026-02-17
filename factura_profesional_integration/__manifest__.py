@@ -4,6 +4,7 @@
     "version": "19.0.5.0.7",
     "category": "Accounting",
     "license": "LGPL-3",
+    "author": "FenixCR Solutions",
     "icon": "/factura_profesional_integration/static/description/Gemini_Generated_Image_hs6p77hs6p77hs6p.png",
     "images": ["static/description/Gemini_Generated_Image_hs6p77hs6p77hs6p.png"],
     "depends": ["account", "product", "uom"],
