@@ -990,6 +990,10 @@ class AccountMove(models.Model):
 
         return totals
 
+    def _fp_get_report_summary_totals(self):
+        self.ensure_one()
+        return self._fp_build_detail_lines(ET.Element("DetalleServicio"))
+
     def _fp_append_line_extra_nodes(self, detail_node, line):
         product = line.product_id.product_tmpl_id if line.product_id else False
         if not product:

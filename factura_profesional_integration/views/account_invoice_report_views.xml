@@ -29,6 +29,7 @@
             <t t-set="fp_company_partner" t-value="o.company_id.partner_id"/>
             <t t-set="fp_receiver_partner" t-value="o.partner_id"/>
             <t t-set="fp_reference_value" t-value="o.reversed_entry_id.fp_consecutive_number if o.fp_document_type == 'NC' and o.reversed_entry_id else (o.ref or '-')"/>
+            <t t-set="fp_summary_totals" t-value="o._fp_get_report_summary_totals()"/>
 
             <div class="page">
                 <t t-if="fp_template_style == 'modern_prohygiene'">
@@ -94,10 +95,7 @@
 
                         <div class="fp-cr-box">
                             <div class="fp-cr-box-body">
-                                <div><span class="fp-cr-label">Street:</span> <span t-esc="fp_company_partner.street or ''"/></div>
-                                <div><span class="fp-cr-label">Distrito:</span> <span t-esc="fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else ''"/></div>
-                                <div><span class="fp-cr-label">Cantón:</span> <span t-esc="fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else ''"/></div>
-                                <div><span class="fp-cr-label">Provincia:</span> <span t-esc="fp_company_partner.state_id.name if fp_company_partner.state_id else ''"/></div>
+                                <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                             </div>
                         </div>
 
@@ -107,10 +105,7 @@
                                     <tr>
                                         <td style="width:65%;">
                                             <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
-                                            <div><span class="fp-cr-label">Street:</span> <span t-esc="fp_receiver_partner.street or ''"/></div>
-                                            <div><span class="fp-cr-label">Distrito:</span> <span t-esc="fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else ''"/></div>
-                                            <div><span class="fp-cr-label">Cantón:</span> <span t-esc="fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else ''"/></div>
-                                            <div><span class="fp-cr-label">Provincia:</span> <span t-esc="fp_receiver_partner.state_id.name if fp_receiver_partner.state_id else ''"/></div>
+                                            <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
                                         </td>
                                         <td style="width:35%;">
                                             <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
@@ -143,7 +138,10 @@
                                         <td><span t-field="line.name"/></td>
                                         <td class="text-end" t-esc="line.product_uom_id.name if line.product_uom_id else '-'"/>
                                         <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                                        <td class="text-end"><span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td class="text-end">
+                                            <span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                            <span t-if="line.tax_ids"> (<span t-esc="'%.0f' % (line.tax_ids[0].amount or 0.0)"/>%)</span>
+                                        </td>
                                         <td class="text-end"><span t-esc="line.discount"/>%</td>
                                         <td class="text-end"><span t-field="line.price_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                     </tr>
@@ -178,16 +176,36 @@
                                     <table class="fp-cr-small-table fp-cr-total">
                                         <tbody>
                                             <tr>
-                                                <td><span class="fp-cr-label">Gravado</span></td>
-                                                <td class="text-end"><span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                <td><span class="fp-cr-label">Total gravado</span></td>
+                                                <td class="text-end"><span t-esc="fp_summary_totals['total_gravado']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                             </tr>
                                             <tr>
-                                                <td><span class="fp-cr-label">IVA</span></td>
-                                                <td class="text-end"><span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                <td><span class="fp-cr-label">Total exento</span></td>
+                                                <td class="text-end"><span t-esc="fp_summary_totals['total_exento']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                             </tr>
                                             <tr>
-                                                <td><span class="fp-cr-label">Total</span></td>
-                                                <td class="text-end"><strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                                                <td><span class="fp-cr-label">Total exonerado</span></td>
+                                                <td class="text-end"><span t-esc="fp_summary_totals['total_exonerado']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Total venta</span></td>
+                                                <td class="text-end"><span t-esc="fp_summary_totals['total_venta']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Total descuento</span></td>
+                                                <td class="text-end"><span t-esc="fp_summary_totals['total_descuentos']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Total venta neta</span></td>
+                                                <td class="text-end"><span t-esc="fp_summary_totals['total_venta_neta']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Total IVA</span></td>
+                                                <td class="text-end"><span t-esc="fp_summary_totals['total_impuesto']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="fp-cr-label">Total comprobante</span></td>
+                                                <td class="text-end"><strong><span t-esc="fp_summary_totals['total_comprobante']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -256,10 +274,7 @@
                                 <div class="fp-modern-line"><strong>Identificación:</strong> <span t-esc="o.company_id.vat or ''"/></div>
                                 <div class="fp-modern-line"><strong>Correo electrónico:</strong> <span t-esc="o.company_id.email or ''"/></div>
                                 <div class="fp-modern-line"><strong>Teléfono:</strong> <span t-esc="o.company_id.phone or ''"/></div>
-                                <div class="fp-modern-line"><strong>Street:</strong> <span t-esc="fp_company_partner.street or ''"/></div>
-                                <div class="fp-modern-line"><strong>Distrito:</strong> <span t-esc="fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else ''"/></div>
-                                <div class="fp-modern-line"><strong>Cantón:</strong> <span t-esc="fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else ''"/></div>
-                                <div class="fp-modern-line"><strong>Provincia:</strong> <span t-esc="fp_company_partner.state_id.name if fp_company_partner.state_id else ''"/></div>
+                                <div class="fp-modern-line"><strong>Dirección:</strong> <span t-esc="', '.join(filter(None, [fp_company_partner.street, fp_company_partner.fp_district_id.name if fp_company_partner.fp_district_id else False, fp_company_partner.fp_canton_id.name if fp_company_partner.fp_canton_id else False, fp_company_partner.fp_province_id.name if fp_company_partner.fp_province_id else False]))"/></div>
                             </td>
                             <td t-att-style="'width: 40%; background: rgba(255,255,255,0.12);' if fp_template_style != 'modern_clean' else 'width: 40%; background: rgba(15,23,42,0.06);'">
                                 <div class="fp-modern-subtitle" t-esc="fp_document_types.get(o.fp_document_type, 'Comprobante Electrónico')"/>
@@ -297,10 +312,7 @@
                         <div><span class="fp-label">Cliente:</span><span t-esc="fp_receiver_partner.name or ''"/></div>
                         <div><span class="fp-label">Identificación:</span><span t-esc="fp_receiver_partner.vat or ''"/></div>
                         <div><span class="fp-label">Correo Electrónico:</span><span t-esc="fp_receiver_partner.email or ''"/></div>
-                        <div><span class="fp-label">Street:</span><span t-esc="fp_receiver_partner.street or ''"/></div>
-                        <div><span class="fp-label">Distrito:</span><span t-esc="fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else ''"/></div>
-                        <div><span class="fp-label">Cantón:</span><span t-esc="fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else ''"/></div>
-                        <div><span class="fp-label">Provincia:</span><span t-esc="fp_receiver_partner.state_id.name if fp_receiver_partner.state_id else ''"/></div>
+                        <div><span class="fp-label">Dirección:</span><span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
                     </div>
 
                     <div class="fp-lines-table">
@@ -322,7 +334,10 @@
                                         <td><span t-field="line.name"/></td>
                                         <td class="text-end" t-esc="line.quantity"/>
                                         <td class="text-end"><span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                                        <td class="text-end"><span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                        <td class="text-end">
+                                            <span t-esc="line.price_total - line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                            <span t-if="line.tax_ids"> (<span t-esc="'%.0f' % (line.tax_ids[0].amount or 0.0)"/>%)</span>
+                                        </td>
                                         <td class="text-end"><span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                                     </tr>
                                 </t>
@@ -332,16 +347,36 @@
 
                     <table class="fp-totals">
                         <tr>
-                            <td class="fp-total-label">Subtotal</td>
-                            <td class="text-end"><span t-field="o.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                            <td class="fp-total-label">Total gravado</td>
+                            <td class="text-end"><span t-esc="fp_summary_totals['total_gravado']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                         </tr>
                         <tr>
-                            <td class="fp-total-label">Impuestos</td>
-                            <td class="text-end"><span t-field="o.amount_tax" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                            <td class="fp-total-label">Total exento</td>
+                            <td class="text-end"><span t-esc="fp_summary_totals['total_exento']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-total-label">Total exonerado</td>
+                            <td class="text-end"><span t-esc="fp_summary_totals['total_exonerado']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-total-label">Total venta</td>
+                            <td class="text-end"><span t-esc="fp_summary_totals['total_venta']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-total-label">Total descuento</td>
+                            <td class="text-end"><span t-esc="fp_summary_totals['total_descuentos']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-total-label">Total venta neta</td>
+                            <td class="text-end"><span t-esc="fp_summary_totals['total_venta_neta']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr>
+                            <td class="fp-total-label">Total IVA</td>
+                            <td class="text-end"><span t-esc="fp_summary_totals['total_impuesto']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                         </tr>
                         <tr class="fp-total-grand">
-                            <td class="fp-total-label">Total</td>
-                            <td class="text-end"><strong><span t-field="o.amount_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                            <td class="fp-total-label">Total comprobante</td>
+                            <td class="text-end"><strong><span t-esc="fp_summary_totals['total_comprobante']" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
                         </tr>
                     </table>
 
