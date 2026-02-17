@@ -27,6 +27,7 @@
             <div class="page">
                 <style>
                     .fp-modern-header {
+                        background-color: #2144c0;
                         background: linear-gradient(135deg, #102a74, #2144c0 58%, #3969f5);
                         border-radius: 18px;
                         color: #ffffff;
@@ -34,17 +35,21 @@
                         overflow: hidden;
                     }
                     .fp-modern-header--dark {
+                        background-color: #1f2937;
                         background: linear-gradient(135deg, #0b1220, #1f2937 58%, #374151);
                     }
                     .fp-modern-header--clean {
+                        background-color: #f1f5f9;
                         background: linear-gradient(135deg, #ffffff, #f1f5f9 58%, #e2e8f0);
                         color: #0f172a;
                         border: 1px solid #dbe4ff;
                     }
                     .fp-modern-header--emerald {
+                        background-color: #047857;
                         background: linear-gradient(135deg, #064e3b, #047857 58%, #10b981);
                     }
                     .fp-modern-header--sunset {
+                        background-color: #ea580c;
                         background: linear-gradient(135deg, #7c2d12, #ea580c 58%, #fb923c);
                     }
                     .fp-modern-header--clean .fp-modern-subtitle {
@@ -178,7 +183,7 @@
                     }
                 </style>
 
-                <table t-attf-class="fp-modern-header #{'fp-modern-header--dark' if fp_template_style == 'modern_dark' else ('fp-modern-header--clean' if fp_template_style == 'modern_clean' else ('fp-modern-header--emerald' if fp_template_style == 'modern_emerald' else ('fp-modern-header--sunset' if fp_template_style == 'modern_sunset' else '')))}" style="width: 100%;">
+                <table t-attf-class="fp-modern-header #{'fp-modern-header--dark' if fp_template_style == 'modern_dark' else ('fp-modern-header--clean' if fp_template_style == 'modern_clean' else ('fp-modern-header--emerald' if fp_template_style == 'modern_emerald' else ('fp-modern-header--sunset' if fp_template_style == 'modern_sunset' else '')))}" t-attf-style="width: 100%; background-color: #{'#1f2937' if fp_template_style == 'modern_dark' else ('#f1f5f9' if fp_template_style == 'modern_clean' else ('#047857' if fp_template_style == 'modern_emerald' else ('#ea580c' if fp_template_style == 'modern_sunset' else '#2144c0')))};">
                     <tr>
                         <td style="width: 60%;">
                             <div class="fp-modern-company-name" t-esc="o.company_id.name or ''"/>
