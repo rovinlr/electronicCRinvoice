@@ -10,9 +10,7 @@
                 <field name="partner_id" string="Cliente"/>
                 <field name="fp_external_id" string="Clave"/>
                 <field name="fp_consecutive_number" string="Consecutivo"/>
-                <field name="fp_xml_attachment_name" string="Factura XML"/>
                 <button name="action_fp_download_invoice_xml" string="Descargar XML" type="object" class="btn-link"/>
-                <field name="fp_response_xml_attachment_name" string="XML Respuesta Hacienda"/>
                 <button name="action_fp_download_response_xml" string="Descargar Respuesta" type="object" class="btn-link"/>
                 <field name="state"/>
                 <field name="fp_invoice_status" string="Estado FE"/>
