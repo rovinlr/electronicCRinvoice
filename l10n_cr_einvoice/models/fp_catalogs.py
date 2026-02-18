@@ -12,6 +12,22 @@ class FpCabysCode(models.Model):
 
     _fp_cabys_code_unique = models.Constraint("UNIQUE(code)", "El código CABYS debe ser único.")
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        if not self.env.context.get("install_mode"):
+            return super().create(vals_list)
+
+        records = self.browse()
+        for vals in vals_list:
+            code = vals.get("code")
+            existing = self.search([("code", "=", code)], limit=1)
+            if existing:
+                existing.write({"name": vals.get("name", existing.name), "active": vals.get("active", existing.active)})
+                records |= existing
+            else:
+                records |= super(FpCabysCode, self).create([vals])
+        return records
+
     def name_get(self):
         return [(record.id, f"{record.code} - {record.name}") for record in self]
 
@@ -28,6 +44,22 @@ class FpEconomicActivity(models.Model):
     _fp_economic_activity_code_unique = models.Constraint(
         "UNIQUE(code)", "El código de actividad económica debe ser único."
     )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        if not self.env.context.get("install_mode"):
+            return super().create(vals_list)
+
+        records = self.browse()
+        for vals in vals_list:
+            code = vals.get("code")
+            existing = self.search([("code", "=", code)], limit=1)
+            if existing:
+                existing.write({"name": vals.get("name", existing.name), "active": vals.get("active", existing.active)})
+                records |= existing
+            else:
+                records |= super(FpEconomicActivity, self).create([vals])
+        return records
 
     def name_get(self):
         return [(record.id, f"{record.code} - {record.name}") for record in self]
