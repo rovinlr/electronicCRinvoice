@@ -108,7 +108,7 @@
                                         </td>
                                         <td style="padding-left: 8px;">
                                             <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
-                                            <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
+                                            <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or getattr(fp_receiver_partner, 'mobile', False) or ''"/></div>
                                         </td>
                                     </tr>
                                 </table>
@@ -321,7 +321,7 @@
                                     </td>
                                     <td class="fp-grid-cell" style="width: 50%; padding-right: 0;">
                                         <div><span class="fp-label">Identificación:</span><span t-esc="fp_receiver_partner.vat or ''"/></div>
-                                        <div><span class="fp-label">Teléfono:</span><span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
+                                        <div><span class="fp-label">Teléfono:</span><span t-esc="fp_receiver_partner.phone or getattr(fp_receiver_partner, 'mobile', False) or ''"/></div>
                                     </td>
                                 </tr>
                             </tbody>
