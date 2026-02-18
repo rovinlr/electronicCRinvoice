@@ -54,8 +54,28 @@
                         </group>
                     </group>
                     <group>
-                        <field name="fp_xml_attachment_id" string="Archivo XML" readonly="1"/>
-                        <field name="fp_response_xml_attachment_id" string="Archivo XML MH" readonly="1"/>
+                        <label for="fp_xml_attachment_id" string="Archivo XML"/>
+                        <div class="o_row">
+                            <field name="fp_xml_attachment_id" readonly="1" nolabel="1"/>
+                            <button
+                                name="action_fp_download_invoice_xml"
+                                type="object"
+                                class="btn-link"
+                                icon="fa-download"
+                                invisible="not fp_xml_attachment_id"
+                            />
+                        </div>
+                        <label for="fp_response_xml_attachment_id" string="Archivo XML MH"/>
+                        <div class="o_row">
+                            <field name="fp_response_xml_attachment_id" readonly="1" nolabel="1"/>
+                            <button
+                                name="action_fp_download_response_xml"
+                                type="object"
+                                class="btn-link"
+                                icon="fa-download"
+                                invisible="not fp_response_xml_attachment_id"
+                            />
+                        </div>
                     </group>
                 </sheet>
                 <chatter/>
