@@ -79,15 +79,39 @@ class AccountMove(models.Model):
     @api.model
     def _selection_fp_document_type(self):
         move_type = self.env.context.get("default_move_type")
+        if not move_type and self:
+            move_type = self[:1].move_type
+
         if move_type == "out_refund":
             return [("NC", "Nota de Crédito Electrónica")]
         if move_type == "in_invoice":
             return [("FEC", "Factura Electrónica de Compra")]
+        if move_type == "out_invoice":
+            return [
+                ("FE", "Factura Electrónica"),
+                ("TE", "Tiquete Electrónico"),
+                ("FEE", "Factura Electrónica de Exportación"),
+            ]
+
+        # Fallback seguro para contextos sin `default_move_type`.
+        # Evita fallos del widget de selección cuando ya existe un valor
+        # (por ejemplo FEC/NC) que no esté presente en la selección dinámica.
         return [
             ("FE", "Factura Electrónica"),
             ("TE", "Tiquete Electrónico"),
             ("FEE", "Factura Electrónica de Exportación"),
+            ("NC", "Nota de Crédito Electrónica"),
+            ("FEC", "Factura Electrónica de Compra"),
         ]
+
+    @api.model
+    def _default_fp_document_type(self):
+        move_type = self.env.context.get("default_move_type")
+        if move_type == "out_refund":
+            return "NC"
+        if move_type == "in_invoice":
+            return "FEC"
+        return "FE"
 
     def write(self, vals):
         protected_fields = self._FP_LOCKED_FIELDS_AFTER_SEND.intersection(vals)
@@ -307,7 +331,7 @@ class AccountMove(models.Model):
     fp_document_type = fields.Selection(
         selection=_selection_fp_document_type,
         string="Tipo de documento (FE)",
-        default="FE",
+        default=_default_fp_document_type,
     )
     fp_economic_activity_id = fields.Many2one(
         "fp.economic.activity",
