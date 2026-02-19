@@ -586,14 +586,7 @@ class AccountMove(models.Model):
 
     def _fp_get_hacienda_environment(self):
         self.ensure_one()
-        company = self.company_id
-        configured_environment = company.fp_hacienda_environment or "auto"
-        if configured_environment in ("prod", "sandbox"):
-            return configured_environment
-
-        token_url = (company.fp_hacienda_token_url or "").lower()
-        base_url = (company.fp_hacienda_api_base_url or "").lower()
-        if any(flag in token_url or flag in base_url for flag in ("rut-stag", "sandbox", "stag")):
+        if self.company_id.fp_hacienda_sandbox_mode:
             return "sandbox"
         return "prod"
 

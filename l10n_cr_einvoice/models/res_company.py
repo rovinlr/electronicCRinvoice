@@ -10,6 +10,17 @@ from odoo.exceptions import ValidationError
 class ResCompany(models.Model):
     _inherit = "res.company"
 
+    _FP_HACIENDA_PROD_CONFIG = {
+        "fp_hacienda_api_base_url": "https://api.comprobanteselectronicos.go.cr",
+        "fp_hacienda_token_url": "https://idp.comprobanteselectronicos.go.cr/auth/realms/rut/protocol/openid-connect/token",
+        "fp_hacienda_client_id": "api-prod",
+    }
+    _FP_HACIENDA_SANDBOX_CONFIG = {
+        "fp_hacienda_api_base_url": "https://api-sandbox.comprobanteselectronicos.go.cr/recepcion/v1",
+        "fp_hacienda_token_url": "https://idp.comprobanteselectronicos.go.cr/auth/realms/rut-stag/protocol/openid-connect/token",
+        "fp_hacienda_client_id": "api-stag",
+    }
+
     fp_branch_code = fields.Char(
         string="Sucursal FE",
         company_dependent=True,
@@ -39,16 +50,11 @@ class ResCompany(models.Model):
     fp_hacienda_client_id = fields.Char(
         string="Hacienda Client ID", company_dependent=True, default="api-prod"
     )
-    fp_hacienda_environment = fields.Selection(
-        [
-            ("auto", "Auto (detectar por URLs)"),
-            ("prod", "Producción"),
-            ("sandbox", "Pruebas / Sandbox"),
-        ],
-        string="Ambiente Hacienda",
+    fp_hacienda_sandbox_mode = fields.Boolean(
+        string="Ambiente de pruebas (Sandbox)",
         company_dependent=True,
-        default="auto",
-        help="Define el ambiente para endpoints/client_id de Hacienda. En Auto se detecta según las URLs configuradas.",
+        default=False,
+        help="Si está activo se usan automáticamente los endpoints de pruebas de Hacienda. Si no, se usan los de producción.",
     )
     fp_hacienda_username = fields.Char(string="Hacienda Username", company_dependent=True)
     fp_hacienda_password = fields.Char(string="Hacienda Password", company_dependent=True)
@@ -169,6 +175,39 @@ class ResCompany(models.Model):
         compute="_compute_fp_certificate_info",
     )
 
+
+    @api.model
+    def _fp_get_hacienda_config_values(self, sandbox_mode):
+        return dict(self._FP_HACIENDA_SANDBOX_CONFIG if sandbox_mode else self._FP_HACIENDA_PROD_CONFIG)
+
+    def _fp_sync_hacienda_environment_values(self):
+        for company in self:
+            expected_values = company._fp_get_hacienda_config_values(company.fp_hacienda_sandbox_mode)
+            updates = {
+                field_name: value
+                for field_name, value in expected_values.items()
+                if (company[field_name] or "") != value
+            }
+            if updates:
+                super(ResCompany, company.with_context(fp_skip_hacienda_sync=True)).write(updates)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        companies = super().create(vals_list)
+        companies._fp_sync_hacienda_environment_values()
+        return companies
+
+    def write(self, vals):
+        result = super().write(vals)
+        if not self.env.context.get("fp_skip_hacienda_sync"):
+            self._fp_sync_hacienda_environment_values()
+        return result
+
+    @api.onchange("fp_hacienda_sandbox_mode")
+    def _onchange_fp_hacienda_sandbox_mode(self):
+        for company in self:
+            for field_name, value in company._fp_get_hacienda_config_values(company.fp_hacienda_sandbox_mode).items():
+                company[field_name] = value
 
     @api.constrains("fp_hacienda_token_url")
     def _check_fp_hacienda_token_url(self):
