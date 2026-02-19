@@ -8,17 +8,11 @@
             <xpath expr="//form" position="inside">
                 <app string="Factura Electrónica CR" name="fp_api_settings">
                     <block title="Conexión directa con Hacienda">
-                        <setting string="URL API Hacienda">
-                            <field name="fp_hacienda_api_base_url"/>
-                        </setting>
-                        <setting string="URL OAuth Hacienda">
-                            <field name="fp_hacienda_token_url"/>
-                        </setting>
-                        <setting string="Client ID">
-                            <field name="fp_hacienda_client_id"/>
-                        </setting>
-                        <setting string="Ambiente Hacienda">
-                            <field name="fp_hacienda_environment"/>
+                        <setting string="Ambiente de pruebas (Sandbox)">
+                            <field name="fp_hacienda_sandbox_mode"/>
+                            <div class="text-muted">
+                                Actívelo para usar endpoints de pruebas de Hacienda. Desactívelo para usar producción.
+                            </div>
                         </setting>
                         <setting string="Usuario Hacienda">
                             <field name="fp_hacienda_username"/>
