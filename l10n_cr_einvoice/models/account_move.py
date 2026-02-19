@@ -89,6 +89,15 @@ class AccountMove(models.Model):
             ("FEE", "Factura Electrónica de Exportación"),
         ]
 
+    @api.model
+    def _default_fp_document_type(self):
+        move_type = self.env.context.get("default_move_type")
+        if move_type == "out_refund":
+            return "NC"
+        if move_type == "in_invoice":
+            return "FEC"
+        return "FE"
+
     def write(self, vals):
         protected_fields = self._FP_LOCKED_FIELDS_AFTER_SEND.intersection(vals)
         if protected_fields:
@@ -307,7 +316,7 @@ class AccountMove(models.Model):
     fp_document_type = fields.Selection(
         selection=_selection_fp_document_type,
         string="Tipo de documento (FE)",
-        default="FE",
+        default=_default_fp_document_type,
     )
     fp_economic_activity_id = fields.Many2one(
         "fp.economic.activity",
