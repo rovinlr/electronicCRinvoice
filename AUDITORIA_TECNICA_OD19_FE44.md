@@ -1,119 +1,141 @@
 # Auditoría técnica — `l10n_cr_einvoice` (Odoo 19, FE Costa Rica 4.4)
 
-## Alcance
-Revisión estructural y técnica del addon con foco en:
-- compatibilidad con Odoo 19,
-- uso de ORM / constraints,
-- integración con Hacienda (OAuth, XML firmado, robustez HTTP),
-- cron jobs,
-- seguridad de datos sensibles.
+## Resumen ejecutivo
+El módulo presenta una base funcional sólida para emisión FE 4.4 en Odoo 19 (XML, firma XAdES, envío/consulta a Hacienda, cron de seguimiento y plantillas de correo). En comparación con riesgos típicos de integraciones tributarias, el código ya incorpora elementos positivos como manejo explícito de errores HTTP, validaciones de endpoint OAuth, y logging en tareas automáticas.
 
-## Observaciones clasificadas
+**Veredicto actual:** **Apto para UAT/QA ampliada**, con ajustes recomendados antes de una salida productiva de alto volumen.
 
-### 🔴 Críticas
-1. **Llamadas HTTP sin manejo de excepciones de red (token y API de Hacienda)**
-   - En `_fp_get_hacienda_access_token` y `_fp_call_api` se usa `requests.post/get` sin `try/except requests.exceptions.RequestException`.
-   - Un timeout, DNS error o corte de red puede romper la transacción con traceback no controlado hacia usuario/cron.
-   - Impacto: caídas en producción, estados parciales (`fp_api_state`) y mala experiencia operativa.
+---
 
-2. **Cron marca error sin trazabilidad (except genérico sin log)**
-   - En `_fp_cron_consult_pending_documents` se captura `Exception` y solo asigna `fp_api_state = "error"`.
-   - No se registra detalle del error ni se publica mensaje en chatter.
-   - Impacto: incidentes silenciosos, difícil auditoría/soporte.
+## Alcance revisado
+- Arquitectura general del addon y manifest.
+- Seguridad y robustez de integración con Hacienda (OAuth/API).
+- Riesgos operativos en cron/procesamiento síncrono.
+- Calidad de modelos y configuración sensible.
+- Mantenibilidad del código.
 
-3. **Posible exposición de información sensible en errores de autenticación**
-   - Al fallar OAuth se construye `UserError` con `response.text` completo.
-   - Dependiendo del proveedor/infra, el body puede incluir información sensible de autenticación o diagnóstico interno.
-   - Impacto: fuga de información a usuarios funcionales o logs de cliente.
+---
 
-### 🟠 Riesgo medio
-1. **`action_post` ejecuta lógica pesada síncrona (XML + firma criptográfica)**
-   - `action_post` genera y firma XML de cada factura al confirmar.
-   - En cargas altas puede afectar tiempo de posteo y lock de usuario.
-   - Recomendación: separar generación/firma a cola asíncrona o job diferido.
+## Hallazgos clave
 
-2. **Uso de SQL directo en defaults/bootstrapping**
-   - `_default_fp_economic_activity_id` consulta `information_schema` por SQL en cada evaluación de default.
-   - Es válido para bootstrap defensivo, pero con costo extra y dependencia en metadatos DB.
-   - Recomendación: minimizar con cache/contexto de instalación o migración explícita.
+### ✅ Fortalezas relevantes
+1. **Dependencias externas declaradas correctamente en el manifest.**
+   - `requests`, `lxml` y `cryptography` ya están explicitados para despliegues reproducibles.
+2. **Manejo de red razonable en OAuth y API.**
+   - Se contemplan `Timeout` y `RequestException` con mensajes de negocio controlados.
+3. **Trazabilidad mínima en cron.**
+   - El cron de consulta registra excepción, marca estado de error y publica mensaje.
+4. **Validación defensiva de URL OAuth.**
+   - Se valida que el path apunte al endpoint esperado de token.
+5. **Protección funcional de campos después de envío.**
+   - Se restringe edición de datos FE críticos tras cambio de estado.
 
-3. **`_auto_init` de `res.partner` agrega columnas manualmente con SQL**
-   - Soluciona esquemas rotos, pero puede ocultar problemas de migración y salirse de rutas estándar ORM.
-   - Recomendación: mantener solo como parche temporal y reforzar scripts de migración.
+### 🟠 Riesgos medios (prioridad recomendada)
+1. **Credenciales sensibles sin `password=True` en definición Python.**
+   - `fp_hacienda_password` y `fp_signing_certificate_password` son `fields.Char` estándar.
+   - Aunque la vista pueda ocultar valores, definir `password=True` en modelo mejora consistencia y evita exposición accidental en UIs o herramientas genéricas.
 
-4. **Sin política explícita de reintentos/backoff para HTTP**
-   - Hay timeout configurable, pero no retry controlado en errores transitorios.
-   - Riesgo de falsos negativos con infraestructura inestable.
+2. **Archivo `account_move.py` concentra demasiadas responsabilidades.**
+   - Mezcla reglas de negocio, serialización XML, firma criptográfica, HTTP client y lógica de cron.
+   - Impacto: mayor costo de mantenimiento, pruebas más difíciles y mayor riesgo de regresión.
 
-5. **Campos secretos sin `password=True` a nivel campo Python**
-   - En vistas se usa `password="True"`, correcto para UI.
-   - No obstante, en modelo `fields.Char` de passwords no define `password=True`.
-   - Recomendación: marcar también en definición de campo para mayor consistencia de seguridad.
+3. **Procesamiento pesado en `action_post`.**
+   - Generación y firma se ejecutan en línea al publicar factura.
+   - En lotes grandes puede elevar latencia percibida por usuarios y aumentar contención.
 
-### 🟢 Mejora recomendada
-1. **Declarar `external_dependencies` en `__manifest__.py`**
-   - Se importan `requests`, `lxml`, `cryptography`; deberían declararse para instalaciones reproducibles.
+4. **Capturas amplias de `except Exception` en rutas no críticas.**
+   - Existen capturas genéricas en varios bloques para resiliencia.
+   - Recomendable acotar donde sea posible para mejorar diagnóstico y evitar ocultar fallos de programación.
 
-2. **Agregar logger estructurado (`logging.getLogger(__name__)`)**
-   - Especialmente en cron, OAuth y envío/consulta de Hacienda.
+5. **Ausencia de estrategia explícita de reintentos/backoff.**
+   - Hay timeout configurable, pero no política de retry para errores transitorios de red/servicio.
 
-3. **Refinar separación de responsabilidades en `account_move.py`**
-   - El archivo concentra mucha lógica (generación XML, firma XAdES, HTTP, cron).
-   - Recomendación: extraer servicios (`services/hacienda_client.py`, `services/xml_signer.py`).
+### 🟢 Mejoras de calidad recomendadas
+1. **Extraer servicios internos (`services/`)** para API Hacienda, firma XAdES y construcción XML.
+2. **Agregar pruebas automatizadas** (unitarias/integración) sobre:
+   - normalización de token Authorization,
+   - parseo de respuestas JSON inválidas,
+   - construcción de clave/consecutivo,
+   - comportamiento de cron ante error.
+3. **Métricas y observabilidad**: contadores de envío/aceptación/rechazo, tiempos de respuesta y errores por endpoint.
+4. **Documentar runbook operativo** (timeouts sugeridos, acciones ante rechazo, reenvío seguro, rotación de certificados).
 
-4. **Evaluar constraints adicionales en Python (`@api.constrains`) para reglas de negocio contextuales**
-   - Ejemplo: validar obligatoriedad de ciertos campos FE por tipo de documento/partner.
+---
 
-5. **Documentar estrategia de colisiones de constraints en bases con datos legacy**
-   - Existen varias `models.Constraint(UNIQUE(...))`; conviene checklist de pre-migración para deduplicar datos antes de upgrade.
+## Plan de remediación sugerido
 
-## Sugerencias concretas (ejemplos)
+### Fase 1 (rápida, bajo riesgo)
+- Marcar campos de secreto con `password=True`.
+- Ajustar mensajes de error para mantener detalle técnico solo en logs.
+- Normalizar/centralizar helpers de manejo HTTP y logging contextual.
 
-### 1) Manejo robusto de requests en OAuth/API
-```python
-import logging
-import requests
-from requests import exceptions as req_exc
+### Fase 2 (estabilidad operativa)
+- Implementar reintentos con backoff exponencial para errores transitorios (idempotencia controlada).
+- Añadir pruebas automatizadas mínimas para rutas críticas FE.
 
-_logger = logging.getLogger(__name__)
+### Fase 3 (escalabilidad/mantenibilidad)
+- Separar `account_move.py` en servicios especializados.
+- Evaluar procesamiento asíncrono para firma/envío en cargas altas.
 
-try:
-    response = requests.post(token_url, data=data, timeout=company.fp_api_timeout)
-    response.raise_for_status()
-except req_exc.Timeout:
-    raise UserError(_("Tiempo de espera agotado al autenticar con Hacienda."))
-except req_exc.RequestException as err:
-    _logger.exception("Error de red OAuth Hacienda")
-    raise UserError(_("No fue posible conectar con Hacienda. Intente nuevamente.")) from err
-```
+---
 
-### 2) Mejor trazabilidad en cron
-```python
-import logging
-_logger = logging.getLogger(__name__)
+## Conclusión
+El módulo está en una posición más madura que una integración FE promedio y **sí puede avanzar a pruebas funcionales/UAT**. Para endurecimiento productivo, las prioridades inmediatas son seguridad de secretos en modelo, reducción de acoplamiento en `account_move.py` y mejora de resiliencia de red mediante reintentos controlados.
 
-try:
-    move.action_fp_consult_api_document()
-except Exception as err:
-    _logger.exception("Error consultando FE pendiente %s", move.name)
-    move.fp_api_state = "error"
-    move.message_post(body=_("Error en consulta automática a Hacienda: %s") % err)
-```
+---
 
-### 3) Manifest con dependencias externas
-```python
-"external_dependencies": {
-    "python": ["requests", "lxml", "cryptography"],
-},
-```
+## ¿Qué hacer para completar la auditoría? (checklist accionable)
 
-## Veredicto de preparación para producción
-**Estado actual: No listo para producción sin ajustes mínimos.**
+### 1) Endurecimiento de seguridad (prioridad alta)
+- [ ] Marcar secretos con `password=True` en `res.company`:
+  - `fp_hacienda_password`
+  - `fp_signing_certificate_password`
+- [ ] Revisar que no se muestren en vistas técnicas/listados exportables.
+- [ ] Confirmar permisos de acceso a campos sensibles por grupos contables/administración.
 
-### Ajustes mínimos obligatorios
-1. Encapsular llamadas HTTP con manejo explícito de excepciones de red y mensajes controlados.
-2. Añadir logging útil en cron/procesos Hacienda (evitar errores silenciosos).
-3. Reducir exposición de detalles sensibles en errores de autenticación/API.
-4. Declarar `external_dependencies` en manifest para despliegues confiables.
+**Criterio de cierre:** usuarios no administradores no pueden visualizar secretos en UI ni exportaciones estándar.
 
-Con esos cambios, el módulo quedaría en un estado razonable para pasar a pruebas UAT/QA con carga y escenarios de contingencia de Hacienda.
+### 2) Resiliencia HTTP con reintentos y backoff (prioridad alta)
+- [ ] Añadir helper central para requests con:
+  - reintentos para `Timeout`, `ConnectionError`, `502/503/504`;
+  - backoff exponencial con jitter;
+  - límite máximo de intentos (ej. 3).
+- [ ] Aplicarlo a OAuth (`_fp_get_hacienda_access_token`) y API (`_fp_call_api`).
+- [ ] Mantener mensajes de usuario simples y trazas detalladas en log.
+
+**Criterio de cierre:** ante fallos transitorios, la operación se recupera en <= 3 intentos sin traceback al usuario.
+
+### 3) Observabilidad y soporte operativo (prioridad media)
+- [ ] Estandarizar logs con contexto mínimo: `move.name`, `fp_external_id`, endpoint, status.
+- [ ] Crear tablero operativo básico con KPIs:
+  - enviados,
+  - aceptados,
+  - rechazados,
+  - en error,
+  - tiempo promedio de consulta.
+- [ ] Definir runbook de incidentes (token inválido, certificado vencido, rechazo Hacienda).
+
+**Criterio de cierre:** soporte puede diagnosticar incidentes FE sin inspección manual de base de datos.
+
+### 4) Refactor gradual de `account_move.py` (prioridad media)
+- [ ] Extraer cliente de Hacienda a `services/hacienda_client.py`.
+- [ ] Extraer firma XAdES a `services/xml_signer.py`.
+- [ ] Dejar `account.move` como orquestador de negocio.
+
+**Criterio de cierre:** reducción de tamaño/ complejidad ciclomática del modelo y pruebas unitarias más simples.
+
+### 5) Pruebas mínimas obligatorias antes de producción (prioridad alta)
+- [ ] Test de token OAuth inválido/expirado.
+- [ ] Test de respuesta no JSON de Hacienda.
+- [ ] Test de reintentos en timeout y éxito posterior.
+- [ ] Test de cron ante excepción: marca error + `message_post`.
+- [ ] Test de bloqueo de campos FE tras envío.
+
+**Criterio de cierre:** suite verde en CI y evidencia de cobertura sobre rutas críticas FE.
+
+### 6) Plan de ejecución sugerido (3 semanas)
+- **Semana 1:** seguridad de secretos + helper HTTP + reintentos.
+- **Semana 2:** pruebas automatizadas críticas + mejoras de logging.
+- **Semana 3:** extracción de servicios y runbook operativo.
+
+**Resultado esperado:** salida productiva con menor riesgo operativo, mayor mantenibilidad y mejor capacidad de soporte.
