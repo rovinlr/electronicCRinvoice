@@ -171,7 +171,7 @@ class AccountMove(models.Model):
         moves = super().action_post()
         electronic_moves = self.filtered(
             lambda move: move.fp_is_electronic_invoice
-            and move.move_type in ("out_invoice", "out_refund")
+            and move.move_type in ("out_invoice", "out_refund", "in_invoice")
             and move.state == "posted"
             and not move.fp_xml_attachment_id
         )
@@ -470,8 +470,10 @@ class AccountMove(models.Model):
                 raise UserError(_("El diario no está marcado como factura electrónica."))
             if move.fp_api_state != "pending":
                 raise UserError(_("La factura ya fue enviada a Hacienda y no puede reenviarse desde este botón."))
-            if move.move_type not in ("out_invoice", "out_refund"):
-                raise UserError(_("Solo se permite facturación de cliente o nota de crédito."))
+            if move.move_type not in ("out_invoice", "out_refund", "in_invoice"):
+                raise UserError(
+                    _("Solo se permite facturación de cliente, nota de crédito o factura de compra.")
+                )
             if move.state != "posted":
                 raise UserError(_("La factura debe estar publicada antes de enviarse a Hacienda."))
             move._fp_send_to_hacienda()
