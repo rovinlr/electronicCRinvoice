@@ -70,7 +70,7 @@ class AccountMove(models.Model):
 
     @api.model
     def _selection_fp_document_type(self):
-        move_type = self._context.get("default_move_type")
+        move_type = self.env.context.get("default_move_type")
         if move_type == "out_refund":
             return [("NC", "Nota de Crédito Electrónica")]
         return [
