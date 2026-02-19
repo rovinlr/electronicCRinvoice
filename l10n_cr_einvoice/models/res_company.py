@@ -57,7 +57,7 @@ class ResCompany(models.Model):
         help="Si está activo se usan automáticamente los endpoints de pruebas de Hacienda. Si no, se usan los de producción.",
     )
     fp_hacienda_username = fields.Char(string="Hacienda Username", company_dependent=True)
-    fp_hacienda_password = fields.Char(string="Hacienda Password", company_dependent=True)
+    fp_hacienda_password = fields.Char(string="Hacienda Password", company_dependent=True, password=True)
     fp_api_timeout = fields.Integer(
         string="Hacienda API Timeout (s)", default=30
     )
@@ -82,6 +82,7 @@ class ResCompany(models.Model):
     fp_signing_certificate_password = fields.Char(
         string="Contraseña certificado FE",
         company_dependent=True,
+        password=True,
     )
 
     fp_invoice_template_style = fields.Selection(

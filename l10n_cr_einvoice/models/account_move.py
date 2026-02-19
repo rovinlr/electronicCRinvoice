@@ -3,6 +3,7 @@ import hashlib
 import json
 import random
 import uuid
+import logging
 from datetime import datetime
 from json import JSONDecodeError
 from urllib.parse import urlparse
@@ -17,7 +18,7 @@ from lxml import etree as LET
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
-
+_logger = logging.getLogger(__name__)
 
 XML_DOCUMENT_SPECS = {
     "FE": {
@@ -570,13 +571,27 @@ class AccountMove(models.Model):
             "username": company.fp_hacienda_username,
             "password": company.fp_hacienda_password,
         }
-        response = requests.post(
-            token_url,
-            data=data,
-            timeout=company.fp_api_timeout,
-        )
+        try:
+            response = requests.post(
+                token_url,
+                data=data,
+                timeout=company.fp_api_timeout,
+            )
+        except requests.exceptions.Timeout as error:
+            raise UserError(_("Tiempo de espera agotado al autenticar con Hacienda.")) from error
+        except requests.exceptions.RequestException as error:
+            _logger.exception("Error de red autenticando contra Hacienda para la factura %s", self.name)
+            raise UserError(_("No fue posible conectar con Hacienda para autenticación OAuth.")) from error
+
         if response.status_code >= 400:
-            raise UserError(_("Error autenticando contra Hacienda (%s): %s") % (response.status_code, response.text))
+            preview = (response.text or "")[:200]
+            raise UserError(
+                _("Error autenticando contra Hacienda (%(status)s). Detalle: %(detail)s")
+                % {
+                    "status": response.status_code,
+                    "detail": preview or _("sin detalle"),
+                }
+            )
 
         response_data = self._fp_parse_json_response(response, response_context="autenticación")
         access_token = response_data.get("access_token")
@@ -1517,13 +1532,29 @@ class AccountMove(models.Model):
             "Authorization": self._fp_build_authorization_header(token),
             "Content-Type": "application/json",
         }
-        if method == "GET":
-            response = requests.get(url, headers=headers, timeout=timeout, params=params)
-        else:
-            response = requests.post(url, data=json.dumps(payload), headers=headers, timeout=timeout)
+        try:
+            if method == "GET":
+                response = requests.get(url, headers=headers, timeout=timeout, params=params)
+            else:
+                response = requests.post(url, data=json.dumps(payload), headers=headers, timeout=timeout)
+        except requests.exceptions.Timeout as error:
+            self.fp_api_state = "error"
+            raise UserError(_("Tiempo de espera agotado comunicando con Hacienda.")) from error
+        except requests.exceptions.RequestException as error:
+            self.fp_api_state = "error"
+            _logger.exception("Error de red llamando API de Hacienda para factura %s", self.name)
+            raise UserError(_("No fue posible conectar con la API de Hacienda.")) from error
+
         if response.status_code >= 400:
             self.fp_api_state = "error"
-            raise UserError(_("Error API Hacienda (%s): %s") % (response.status_code, response.text))
+            preview = (response.text or "")[:200]
+            raise UserError(
+                _("Error API Hacienda (%(status)s). Detalle: %(detail)s")
+                % {
+                    "status": response.status_code,
+                    "detail": preview or _("sin detalle"),
+                }
+            )
         if not response.text:
             return {}
         return self._fp_parse_json_response(response, response_context="API")
@@ -1572,5 +1603,7 @@ class AccountMove(models.Model):
         for move in moves:
             try:
                 move.action_fp_consult_api_document()
-            except Exception:
+            except Exception as error:
+                _logger.exception("Error en cron FE consultando documento %s", move.name)
                 move.fp_api_state = "error"
+                move.message_post(body=_("Error en consulta automática a Hacienda: %s") % error)

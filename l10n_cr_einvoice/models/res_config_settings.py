@@ -9,7 +9,7 @@ class ResConfigSettings(models.TransientModel):
     fp_hacienda_client_id = fields.Char(related="company_id.fp_hacienda_client_id", readonly=False)
     fp_hacienda_sandbox_mode = fields.Boolean(related="company_id.fp_hacienda_sandbox_mode", readonly=False)
     fp_hacienda_username = fields.Char(related="company_id.fp_hacienda_username", readonly=False)
-    fp_hacienda_password = fields.Char(related="company_id.fp_hacienda_password", readonly=False)
+    fp_hacienda_password = fields.Char(related="company_id.fp_hacienda_password", readonly=False, password=True)
     fp_api_timeout = fields.Integer(related="company_id.fp_api_timeout", readonly=False)
 
     fp_economic_activity_id = fields.Many2one(related="company_id.fp_economic_activity_id", readonly=False)
@@ -24,6 +24,7 @@ class ResConfigSettings(models.TransientModel):
     fp_signing_certificate_password = fields.Char(
         related="company_id.fp_signing_certificate_password",
         readonly=False,
+        password=True,
     )
     fp_auto_consult_after_send = fields.Boolean(
         related="company_id.fp_auto_consult_after_send",

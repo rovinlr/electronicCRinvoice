@@ -1,8 +1,12 @@
+import logging
+
 import requests
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.sql import column_exists
+
+_logger = logging.getLogger(__name__)
 
 
 class ResPartner(models.Model):
@@ -230,9 +234,21 @@ class ResPartner(models.Model):
             ]
             data = None
             for endpoint in endpoints:
-                response = requests.get(endpoint, timeout=15)
+                try:
+                    response = requests.get(endpoint, timeout=15)
+                except requests.exceptions.Timeout:
+                    _logger.warning("Timeout consultando endpoint Hacienda de partner: %s", endpoint)
+                    continue
+                except requests.exceptions.RequestException:
+                    _logger.exception("Error consultando endpoint Hacienda de partner: %s", endpoint)
+                    continue
+
                 if response.status_code < 400:
-                    payload = response.json()
+                    try:
+                        payload = response.json()
+                    except ValueError:
+                        _logger.warning("Respuesta no JSON desde Hacienda para endpoint: %s", endpoint)
+                        continue
                     if payload:
                         data = payload
                         break
