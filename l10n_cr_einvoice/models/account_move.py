@@ -41,6 +41,11 @@ XML_DOCUMENT_SPECS = {
         "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronicaExportacion",
         "xsd": "facturaElectronicaExportacion.xsd",
     },
+    "FEC": {
+        "root": "FacturaElectronicaCompra",
+        "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronicaCompra",
+        "xsd": "facturaElectronicaCompra.xsd",
+    },
 }
 DS_XML_NS = "http://www.w3.org/2000/09/xmldsig#"
 XADES_XML_NS = "http://uri.etsi.org/01903/v1.3.2#"
@@ -67,6 +72,8 @@ class AccountMove(models.Model):
         for vals in vals_list:
             if vals.get("move_type") == "out_refund" and not vals.get("fp_document_type"):
                 vals["fp_document_type"] = "NC"
+            if vals.get("move_type") == "in_invoice" and not vals.get("fp_document_type"):
+                vals["fp_document_type"] = "FEC"
         return super().create(vals_list)
 
     @api.model
@@ -74,6 +81,8 @@ class AccountMove(models.Model):
         move_type = self.env.context.get("default_move_type")
         if move_type == "out_refund":
             return [("NC", "Nota de Crédito Electrónica")]
+        if move_type == "in_invoice":
+            return [("FEC", "Factura Electrónica de Compra")]
         return [
             ("FE", "Factura Electrónica"),
             ("TE", "Tiquete Electrónico"),
@@ -98,6 +107,8 @@ class AccountMove(models.Model):
         for move in self:
             if move.move_type == "out_refund" and move.fp_is_electronic_invoice:
                 move.fp_document_type = "NC"
+            elif move.move_type == "in_invoice" and move.fp_is_electronic_invoice:
+                move.fp_document_type = "FEC"
             elif move.move_type == "out_invoice" and move.fp_document_type not in ("FE", "TE", "FEE"):
                 move.fp_document_type = "FE"
 
@@ -113,6 +124,10 @@ class AccountMove(models.Model):
             if move.move_type == "out_refund" and move.fp_document_type != "NC":
                 raise ValidationError(
                     _("Para rectificativas solo se permite Nota de Crédito Electrónica (NC).")
+                )
+            if move.move_type == "in_invoice" and move.fp_document_type != "FEC":
+                raise ValidationError(
+                    _("Para facturas de proveedor solo se permite Factura Electrónica de Compra (FEC).")
                 )
 
     @api.onchange("reversed_entry_id", "fp_document_type")
@@ -1451,6 +1466,7 @@ class AccountMove(models.Model):
         document_map = {
             "FE": "01",
             "FEE": "09",
+            "FEC": "08",
             "NC": "03",
             "TE": "04",
         }
@@ -1461,6 +1477,7 @@ class AccountMove(models.Model):
         return {
             "FE": "fp_consecutive_fe",
             "FEE": "fp_consecutive_others",
+            "FEC": "fp_consecutive_fec",
             "NC": "fp_consecutive_nc",
             "TE": "fp_consecutive_te",
         }.get(self.fp_document_type, "fp_consecutive_others")
