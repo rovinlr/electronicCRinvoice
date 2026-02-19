@@ -61,6 +61,7 @@
                                 class="btn-link"
                                 icon="fa-download"
                                 invisible="not fp_xml_attachment_id"
+                                title="Descargar XML"
                             />
                         </div>
                         <label for="fp_response_xml_attachment_id" string="Archivo XML MH"/>
@@ -72,6 +73,7 @@
                                 class="btn-link"
                                 icon="fa-download"
                                 invisible="not fp_response_xml_attachment_id"
+                                title="Descargar XML de respuesta"
                             />
                         </div>
                     </group>

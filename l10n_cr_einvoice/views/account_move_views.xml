@@ -28,16 +28,15 @@
                 <field name="fp_api_state" readonly="1" invisible="1"/>
                 <label for="fp_consecutive_number" invisible="not fp_is_electronic_invoice"/>
                 <div class="o_row" invisible="not fp_is_electronic_invoice">
+                    <field name="fp_consecutive_number" readonly="1" nolabel="1"/>
                     <button
                         name="action_fp_open_hacienda_documents"
                         type="object"
-                        class="btn-link px-0"
+                        class="btn-link px-0 ms-1"
                         icon="fa-external-link"
                         invisible="not fp_consecutive_number"
-                    >
-                        <field name="fp_consecutive_number" readonly="1" nolabel="1"/>
-                    </button>
-                    <field name="fp_consecutive_number" readonly="1" nolabel="1" invisible="fp_consecutive_number"/>
+                        title="Abrir documentos en Hacienda"
+                    />
                 </div>
                 <field name="fp_invoice_status" readonly="1" invisible="not fp_is_electronic_invoice"/>
             </xpath>
