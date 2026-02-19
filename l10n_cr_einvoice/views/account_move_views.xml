@@ -13,12 +13,17 @@
                 <field name="fp_is_electronic_invoice" invisible="1"/>
                 <field
                     name="fp_document_type"
-                    invisible="not fp_is_electronic_invoice or move_type == 'out_refund'"
+                    invisible="not fp_is_electronic_invoice or move_type in ('out_refund', 'in_invoice')"
                     readonly="fp_api_state != 'pending'"
                 />
                 <field
                     name="fp_document_type"
                     invisible="not fp_is_electronic_invoice or move_type != 'out_refund'"
+                    readonly="1"
+                />
+                <field
+                    name="fp_document_type"
+                    invisible="not fp_is_electronic_invoice or move_type != 'in_invoice'"
                     readonly="1"
                 />
                 <field name="fp_economic_activity_id" invisible="not fp_is_electronic_invoice" readonly="fp_api_state != 'pending'"/>
