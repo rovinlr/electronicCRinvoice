@@ -83,6 +83,7 @@ class AccountMove(models.Model):
             "TE": "Tiquete Electrónico",
             "FEE": "Factura Electrónica de Exportación",
             "NC": "Nota de Crédito Electrónica",
+            "ND": "Nota de Débito Electrónica",
             "FEC": "Factura Electrónica de Compra",
         }
         move_type = self.env.context.get("default_move_type")
@@ -105,9 +106,9 @@ class AccountMove(models.Model):
         # de cliente cuando falta contexto. Si el registro ya tiene un valor
         # especial (NC/FEC), se agrega para que el widget no falle.
         selection_codes = ["FE", "TE", "FEE"]
-        existing_codes = {code for code in self.mapped("fp_document_type") if code in ("NC", "FEC")}
-        selection_codes.extend(sorted(existing_codes))
-        return [(code, labels[code]) for code in selection_codes]
+        existing_codes = {code for code in self.mapped("fp_document_type") if code}
+        selection_codes.extend(sorted(existing_codes.difference(selection_codes)))
+        return [(code, labels.get(code, code)) for code in selection_codes]
 
     @api.model
     def _default_fp_document_type(self):
