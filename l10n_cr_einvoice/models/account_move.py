@@ -272,7 +272,7 @@ class AccountMove(models.Model):
                         all_attachment_ids.clear()
 
         all_attachment_ids.update(attachment_ids)
-        context["default_attachment_ids"] = sorted(all_attachment_ids)
+        context["default_attachment_ids"] = [(6, 0, sorted(all_attachment_ids))]
         action["context"] = context
         return action
 
