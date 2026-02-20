@@ -1145,6 +1145,8 @@ class AccountMove(models.Model):
             ET.SubElement(detail, "Cantidad").text = self._fp_format_decimal(quantity)
             unit_code = (line.product_uom_id.fp_unit_code or "").strip() if line.product_uom_id else ""
             ET.SubElement(detail, "UnidadMedida").text = unit_code or "Unid"
+            if self.fp_document_type == "FEE" and line.product_uom_id and line.product_uom_id.name:
+                ET.SubElement(detail, "UnidadMedidaComercial").text = line.product_uom_id.name
             ET.SubElement(detail, "Detalle").text = line.name or ""
             ET.SubElement(detail, "PrecioUnitario").text = self._fp_format_decimal(line.price_unit)
 
@@ -1173,7 +1175,6 @@ class AccountMove(models.Model):
             exoneration_amount = 0.0
             has_exoneration = False
             if has_tax:
-                ET.SubElement(detail, "BaseImponible").text = self._fp_format_decimal(subtotal)
                 impuesto = ET.SubElement(detail, "Impuesto")
                 ET.SubElement(impuesto, "Codigo").text = tax_code
                 ET.SubElement(impuesto, "CodigoTarifaIVA").text = tax_rate_code
@@ -1189,9 +1190,11 @@ class AccountMove(models.Model):
                 has_exoneration = bool(exoneration)
                 impuesto_neto_linea = max(total_impuesto_xml_linea - exoneration_amount, 0.0)
                 monto_total_linea = subtotal + impuesto_neto_linea
-                if self.fp_document_type != "FEC":
-                    ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
-                ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(impuesto_neto_linea)
+                if self.fp_document_type != "FEE":
+                    if self.fp_document_type != "FEC":
+                        ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
+                    ET.SubElement(detail, "BaseImponible").text = self._fp_format_decimal(subtotal)
+                    ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(impuesto_neto_linea)
                 desglose_key = (tax_code, tax_rate_code)
                 totals["total_desglose_impuesto"][desglose_key] = (
                     totals["total_desglose_impuesto"].get(desglose_key, 0.0) + impuesto_neto_linea
