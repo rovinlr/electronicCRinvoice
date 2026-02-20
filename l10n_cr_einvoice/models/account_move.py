@@ -41,6 +41,11 @@ XML_DOCUMENT_SPECS = {
         "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronicaExportacion",
         "xsd": "facturaElectronicaExportacion.xsd",
     },
+    "TE": {
+        "root": "TiqueteElectronico",
+        "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/tiqueteElectronico",
+        "xsd": "tiqueteElectronico.xsd",
+    },
     "FEC": {
         "root": "FacturaElectronicaCompra",
         "namespace": "https://cdn.comprobanteselectronicos.go.cr/xml-schemas/v4.4/facturaElectronicaCompra",
@@ -763,13 +768,6 @@ class AccountMove(models.Model):
 
     def _fp_get_xml_document_spec(self):
         self.ensure_one()
-        if self.fp_document_type == "TE":
-            raise UserError(
-                _(
-                    "El Tiquete Electrónico (TE) requiere una estructura XML específica de v4.4. "
-                    "Configure FE/NC/ND o implemente el generador TE antes de enviar a Hacienda."
-                )
-            )
         spec = XML_DOCUMENT_SPECS.get(self.fp_document_type)
         if not spec:
             raise UserError(_("Tipo de documento FE no soportado: %s") % (self.fp_document_type or ""))
