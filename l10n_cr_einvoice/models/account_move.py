@@ -272,10 +272,10 @@ class AccountMove(models.Model):
                         all_attachment_ids.clear()
 
         all_attachment_ids.update(attachment_ids)
-        # mail.compose.message expects plain attachment IDs in context defaults.
-        # Passing x2many commands here can prevent template-generated PDF from
-        # being preserved when re-sending from the Hacienda button.
-        context["default_attachment_ids"] = sorted(all_attachment_ids)
+        # ``default_attachment_ids`` is consumed by a Many2many field.
+        # Using a (6, 0, ids) command keeps compatibility with the composer
+        # defaults while still allowing the template report PDF to be generated.
+        context["default_attachment_ids"] = [(6, 0, sorted(all_attachment_ids))]
         action["context"] = context
         return action
 
