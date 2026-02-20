@@ -934,7 +934,12 @@ class AccountMove(models.Model):
             should_set_date = force or not move.fp_reference_issue_datetime
 
             if should_set_type:
-                move.fp_reference_document_type = referenced_move._fp_get_document_code()
+                if move.fp_document_type == "NC" and referenced_move.fp_document_type == "FEC":
+                    move.fp_reference_document_type = "17"
+                elif move.fp_document_type == "ND" and referenced_move.fp_document_type == "FEC":
+                    move.fp_reference_document_type = "18"
+                else:
+                    move.fp_reference_document_type = referenced_move._fp_get_document_code()
             if should_set_number:
                 move.fp_reference_number = (
                     referenced_move.fp_external_id
@@ -1581,10 +1586,11 @@ class AccountMove(models.Model):
         self.ensure_one()
         document_map = {
             "FE": "01",
-            "FEE": "09",
-            "FEC": "08",
+            "ND": "02",
             "NC": "03",
             "TE": "04",
+            "FEC": "08",
+            "FEE": "09",
         }
         return document_map.get(self.fp_document_type, "99")
 
