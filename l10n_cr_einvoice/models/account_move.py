@@ -971,10 +971,11 @@ class AccountMove(models.Model):
                 )
             if should_set_date:
                 reference_date = referenced_move.invoice_date or referenced_move.date or fields.Date.context_today(move)
-                move.fp_reference_issue_datetime = datetime.combine(
-                    reference_date,
-                    datetime.now().astimezone().timetz(),
-                ).replace(tzinfo=None)
+                # Para NC/ND debemos preservar la misma *fecha* del comprobante origen.
+                # Usar una hora fija evita desfaces por conversiones de zona horaria.
+                move.fp_reference_issue_datetime = datetime.combine(reference_date, datetime.min.time()).replace(
+                    hour=12
+                )
 
             if force and not move.fp_reference_reason:
                 move.fp_reference_reason = _("Documento de referencia para nota electrónica")
