@@ -1046,8 +1046,8 @@ class AccountMove(models.Model):
                 has_exoneration = bool(exoneration)
                 impuesto_neto_linea = max(total_impuesto_xml_linea - exoneration_amount, 0.0)
                 monto_total_linea = subtotal + impuesto_neto_linea
-                ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
                 ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(impuesto_neto_linea)
+                ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
                 desglose_key = (tax_code, tax_rate_code)
                 totals["total_desglose_impuesto"][desglose_key] = (
                     totals["total_desglose_impuesto"].get(desglose_key, 0.0) + impuesto_neto_linea
