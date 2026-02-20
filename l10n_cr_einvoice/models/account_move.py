@@ -403,6 +403,13 @@ class AccountMove(models.Model):
             ("06", "06 - Contrato"),
             ("07", "07 - Procedimiento"),
             ("08", "08 - Comprobante emitido en contingencia"),
+            ("09", "09 - Devolución mercadería"),
+            ("10", "10 - Comprobante rechazado por el Ministerio de Hacienda"),
+            ("11", "11 - Sustituye factura rechazada por el receptor"),
+            ("12", "12 - Sustituye factura de exportación"),
+            ("13", "13 - Facturación mes vencido"),
+            ("14", "14 - Comprobante aportado por contribuyente de Régimen Especial"),
+            ("15", "15 - Sustituye una Factura Electrónica de Compra"),
             ("16", "16 - Comprobante de Proveedor No Domiciliado"),
             ("17", "17 - Nota de Crédito a Factura Electrónica de Compra"),
             ("18", "18 - Nota de Débito a Factura Electrónica de Compra"),
@@ -425,10 +432,16 @@ class AccountMove(models.Model):
     fp_reference_code = fields.Selection(
         [
             ("01", "01 - Anula documento de referencia"),
-            ("02", "02 - Corrige texto del documento de referencia"),
-            ("03", "03 - Corrige monto"),
+            ("02", "02 - Corrige monto"),
             ("04", "04 - Referencia a otro documento"),
             ("05", "05 - Sustituye comprobante provisional por contingencia"),
+            ("06", "06 - Devolución de mercadería"),
+            ("07", "07 - Sustituye comprobante electrónico"),
+            ("08", "08 - Factura endosada"),
+            ("09", "09 - Nota de crédito financiera"),
+            ("10", "10 - Nota de débito financiera"),
+            ("11", "11 - Proveedor no domiciliado"),
+            ("12", "12 - Crédito por exoneración posterior a la facturación"),
             ("99", "99 - Otros"),
         ],
         string="Código de referencia (FE)",
@@ -893,16 +906,22 @@ class AccountMove(models.Model):
 
     def _fp_append_reference_information(self, root_node):
         self.ensure_one()
-        if self.fp_document_type not in ("NC", "ND"):
+        if self.fp_document_type not in ("NC", "ND", "FEC"):
             return
 
         self._fp_populate_reference_from_reversed_entry(force=False)
         if not self.fp_reference_document_type or not self.fp_reference_number or not self.fp_reference_issue_datetime:
-            raise UserError(
-                _(
-                    "La nota electrónica requiere información de referencia. "
-                    "Complete Tipo de documento, Número y Fecha de emisión del documento de referencia."
+            message = _(
+                "La nota electrónica requiere información de referencia. "
+                "Complete Tipo de documento, Número y Fecha de emisión del documento de referencia."
+            )
+            if self.fp_document_type == "FEC":
+                message = _(
+                    "La Factura Electrónica de Compra requiere información de referencia. "
+                    "Complete Tipo de documento, Número y Fecha de emisión del comprobante de referencia."
                 )
+            raise UserError(
+                message
             )
 
         reference_node = ET.SubElement(root_node, "InformacionReferencia")
@@ -927,7 +946,12 @@ class AccountMove(models.Model):
             should_set_date = force or not move.fp_reference_issue_datetime
 
             if should_set_type:
-                move.fp_reference_document_type = referenced_move._fp_get_document_code()
+                if move.fp_document_type == "NC" and referenced_move.fp_document_type == "FEC":
+                    move.fp_reference_document_type = "17"
+                elif move.fp_document_type == "ND" and referenced_move.fp_document_type == "FEC":
+                    move.fp_reference_document_type = "18"
+                else:
+                    move.fp_reference_document_type = referenced_move._fp_get_document_code()
             if should_set_number:
                 move.fp_reference_number = (
                     referenced_move.fp_external_id
@@ -1550,10 +1574,11 @@ class AccountMove(models.Model):
         self.ensure_one()
         document_map = {
             "FE": "01",
-            "FEE": "09",
-            "FEC": "08",
+            "ND": "02",
             "NC": "03",
             "TE": "04",
+            "FEC": "08",
+            "FEE": "09",
         }
         return document_map.get(self.fp_document_type, "99")
 
