@@ -242,14 +242,14 @@ class AccountMove(models.Model):
         if not isinstance(action, dict):
             return action
 
-        attachment_ids = set()
+        attachments_by_id = {}
         for move in self.filtered("fp_is_electronic_invoice"):
             if move.fp_xml_attachment_id:
-                attachment_ids.add(move.fp_xml_attachment_id.id)
+                attachments_by_id[move.fp_xml_attachment_id.id] = move.fp_xml_attachment_id
             if move.fp_response_xml_attachment_id:
-                attachment_ids.add(move.fp_response_xml_attachment_id.id)
+                attachments_by_id[move.fp_response_xml_attachment_id.id] = move.fp_response_xml_attachment_id
 
-        if not attachment_ids:
+        if not attachments_by_id:
             return action
 
         context = dict(action.get("context") or {})
@@ -271,11 +271,36 @@ class AccountMove(models.Model):
                     elif command == 5:
                         all_attachment_ids.clear()
 
-        all_attachment_ids.update(attachment_ids)
+        all_attachment_ids.update(attachments_by_id)
         # ``default_attachment_ids`` is consumed by a Many2many field.
         # Using a (6, 0, ids) command keeps compatibility with the composer
         # defaults while still allowing the template report PDF to be generated.
         context["default_attachment_ids"] = [(6, 0, sorted(all_attachment_ids))]
+
+        # Odoo's invoice composer (account.move.send.wizard) may consume
+        # ``default_mail_attachments_widget`` instead of
+        # ``default_attachment_ids`` depending on the flow/version.
+        # Keep both context defaults in sync to ensure XML files are attached
+        # when sending from Hacienda > Comprobantes electrónicos.
+        existing_widget_values = context.get("default_mail_attachments_widget") or []
+        widget_by_id = {}
+        if isinstance(existing_widget_values, list):
+            for value in existing_widget_values:
+                if not isinstance(value, dict):
+                    continue
+                attachment_id = value.get("id")
+                if attachment_id:
+                    widget_by_id[attachment_id] = value
+
+        for attachment in attachments_by_id.values():
+            widget_by_id[attachment.id] = {
+                "id": attachment.id,
+                "name": attachment.name,
+                "mimetype": attachment.mimetype,
+                "placeholder": False,
+                "protect_from_deletion": False,
+            }
+        context["default_mail_attachments_widget"] = list(widget_by_id.values())
         action["context"] = context
         return action
 
