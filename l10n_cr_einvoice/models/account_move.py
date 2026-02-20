@@ -102,13 +102,12 @@ class AccountMove(models.Model):
             ]
 
         # Fallback seguro para contextos sin `default_move_type`.
-        # Mantiene FE/TE/FEE por defecto para evitar mostrar NC/FEC en facturas
-        # de cliente cuando falta contexto. Si el registro ya tiene un valor
-        # especial (NC/FEC), se agrega para que el widget no falle.
-        selection_codes = ["FE", "TE", "FEE"]
-        existing_codes = {code for code in self.mapped("fp_document_type") if code}
-        selection_codes.extend(sorted(existing_codes.difference(selection_codes)))
-        return [(code, labels.get(code, code)) for code in selection_codes]
+        # En formularios con onchange (new records), el widget de selección
+        # puede intentar resolver la etiqueta del valor actual sin que ese valor
+        # esté presente en las opciones. Para evitar errores Owl en cliente,
+        # exponemos todas las opciones válidas cuando el tipo de movimiento no
+        # se puede inferir.
+        return [(code, label) for code, label in labels.items()]
 
     @api.model
     def _default_fp_document_type(self):
