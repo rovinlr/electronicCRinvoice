@@ -1050,7 +1050,6 @@ class AccountMove(models.Model):
                 if self.fp_document_type != "FEC":
                     ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
                 ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(impuesto_neto_linea)
-                ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
                 desglose_key = (tax_code, tax_rate_code)
                 totals["total_desglose_impuesto"][desglose_key] = (
                     totals["total_desglose_impuesto"].get(desglose_key, 0.0) + impuesto_neto_linea
