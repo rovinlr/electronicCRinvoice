@@ -76,6 +76,17 @@
                                 title="Descargar XML de respuesta"
                             />
                         </div>
+                        <label for="fp_hacienda_detail_message" string="Mensaje de Hacienda"/>
+                        <div class="o_row">
+                            <field
+                                name="fp_hacienda_detail_message"
+                                readonly="1"
+                                nolabel="1"
+                                widget="text"
+                                class="w-100"
+                                placeholder="Sin mensaje de detalle en la respuesta de Hacienda"
+                            />
+                        </div>
                     </group>
                 </sheet>
                 <chatter/>
