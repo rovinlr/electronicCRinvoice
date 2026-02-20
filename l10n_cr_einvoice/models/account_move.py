@@ -467,6 +467,10 @@ class AccountMove(models.Model):
         string="Nombre XML Respuesta Hacienda",
         readonly=True,
     )
+    fp_hacienda_detail_message = fields.Text(
+        string="Mensaje de Hacienda",
+        compute="_compute_fp_hacienda_detail_message",
+    )
     fp_api_state = fields.Selection(
         [
             ("pending", "Pendiente"),
@@ -491,6 +495,19 @@ class AccountMove(models.Model):
         copy=False,
         default=False,
     )
+
+    @api.depends("fp_response_xml_attachment_id", "fp_response_xml_attachment_id.datas")
+    def _compute_fp_hacienda_detail_message(self):
+        for move in self:
+            move.fp_hacienda_detail_message = False
+            attachment = move.fp_response_xml_attachment_id
+            if not attachment or not attachment.datas:
+                continue
+            try:
+                xml_text = base64.b64decode(attachment.datas).decode("utf-8")
+            except Exception:
+                continue
+            move.fp_hacienda_detail_message = move._fp_extract_hacienda_detail_message_from_xml(xml_text)
 
     def action_fp_send_to_api(self):
         for move in self:
@@ -1627,6 +1644,22 @@ class AccountMove(models.Model):
             }
         )
         self.fp_response_xml_attachment_id = attachment
+
+    def _fp_extract_hacienda_detail_message_from_xml(self, xml_text):
+        self.ensure_one()
+        if not xml_text:
+            return False
+        try:
+            root = ET.fromstring(xml_text)
+        except ET.ParseError:
+            return False
+
+        for node in root.iter():
+            if node.tag.endswith("DetalleMensaje"):
+                message = (node.text or "").strip()
+                if message:
+                    return message
+        return False
 
 
     def action_fp_download_invoice_xml(self):
