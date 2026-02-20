@@ -28,6 +28,8 @@
             <t t-set="qr_code_url" t-value="o._generate_qr_code(silent_errors=True) if o.display_qr_code else False"/>
             <t t-set="fp_company_partner" t-value="o.company_id.partner_id"/>
             <t t-set="fp_receiver_partner" t-value="o.partner_id"/>
+            <t t-set="fp_receiver_address" t-value="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/>
+            <t t-set="fp_receiver_phone" t-value="fp_receiver_partner.phone or getattr(fp_receiver_partner, 'mobile', False) or ''"/>
             <t t-set="fp_reference_value" t-value="o.reversed_entry_id.fp_consecutive_number if o.fp_document_type == 'NC' and o.reversed_entry_id else (o.ref or '-')"/>
             <t t-set="fp_summary_totals" t-value="o._fp_get_report_summary_totals()"/>
 
@@ -103,12 +105,12 @@
                                     <tr>
                                         <td style="padding-right: 8px;">
                                             <div><span class="fp-cr-label">Datos del receptor:</span> <span t-esc="fp_receiver_partner.name or ''"/></div>
-                                            <div><span class="fp-cr-label">Dirección:</span> <span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
-                                            <div><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
+                                            <div t-if="o.fp_document_type != 'TE' or fp_receiver_address"><span class="fp-cr-label">Dirección:</span> <span t-esc="fp_receiver_address"/></div>
+                                            <div t-if="o.fp_document_type != 'TE' or fp_receiver_partner.email"><span class="fp-cr-label">Correo Electrónico:</span> <span t-esc="fp_receiver_partner.email or ''"/></div>
                                         </td>
                                         <td style="padding-left: 8px;">
                                             <div><span class="fp-cr-label">Identificación:</span> <span t-esc="fp_receiver_partner.vat or ''"/></div>
-                                            <div><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
+                                            <div t-if="o.fp_document_type != 'TE' or fp_receiver_phone"><span class="fp-cr-label">Teléfono:</span> <span t-esc="fp_receiver_phone"/></div>
                                         </td>
                                     </tr>
                                 </table>
@@ -316,12 +318,12 @@
                                 <tr>
                                     <td class="fp-grid-cell" style="width: 50%;">
                                         <div><span class="fp-label">Cliente:</span><span t-esc="fp_receiver_partner.name or ''"/></div>
-                                        <div><span class="fp-label">Correo Electrónico:</span><span t-esc="fp_receiver_partner.email or ''"/></div>
-                                        <div><span class="fp-label">Dirección:</span><span t-esc="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/></div>
+                                        <div t-if="o.fp_document_type != 'TE' or fp_receiver_partner.email"><span class="fp-label">Correo Electrónico:</span><span t-esc="fp_receiver_partner.email or ''"/></div>
+                                        <div t-if="o.fp_document_type != 'TE' or fp_receiver_address"><span class="fp-label">Dirección:</span><span t-esc="fp_receiver_address"/></div>
                                     </td>
                                     <td class="fp-grid-cell" style="width: 50%; padding-right: 0;">
                                         <div><span class="fp-label">Identificación:</span><span t-esc="fp_receiver_partner.vat or ''"/></div>
-                                        <div><span class="fp-label">Teléfono:</span><span t-esc="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/></div>
+                                        <div t-if="o.fp_document_type != 'TE' or fp_receiver_phone"><span class="fp-label">Teléfono:</span><span t-esc="fp_receiver_phone"/></div>
                                     </td>
                                 </tr>
                             </tbody>
