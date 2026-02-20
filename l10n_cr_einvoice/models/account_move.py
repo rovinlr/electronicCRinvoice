@@ -860,13 +860,13 @@ class AccountMove(models.Model):
 
         emisor = ET.SubElement(root, "Emisor")
         ET.SubElement(emisor, "Nombre").text = emisor_name or ""
-        self._fp_append_identification_nodes(emisor, emisor_partner, emisor_vat)
+        self._fp_append_identification_nodes(emisor, emisor_partner, emisor_vat, "emisor")
         self._fp_append_location_nodes(emisor, emisor_partner, "emisor")
         self._fp_append_contact_nodes(emisor, emisor_partner)
 
         receptor = ET.SubElement(root, "Receptor")
         ET.SubElement(receptor, "Nombre").text = receptor_name or ""
-        self._fp_append_identification_nodes(receptor, receptor_partner, receptor_vat)
+        self._fp_append_identification_nodes(receptor, receptor_partner, receptor_vat, "receptor")
         self._fp_append_location_nodes(receptor, receptor_partner, "receptor")
         self._fp_append_contact_nodes(receptor, receptor_partner)
 
@@ -1272,14 +1272,19 @@ class AccountMove(models.Model):
         return f"{(value or 0.0):.5f}"
 
 
-    def _fp_append_identification_nodes(self, parent_node, partner, vat_source):
-        identification_node = ET.SubElement(parent_node, "Identificacion")
+    def _fp_append_identification_nodes(self, parent_node, partner, vat_source, party_role):
         identification_type = (partner.fp_identification_type or "02").strip()
-        ET.SubElement(identification_node, "Tipo").text = identification_type
-        ET.SubElement(identification_node, "Numero").text = self._fp_format_identification_number(
+        identification_number = self._fp_format_identification_number(
             vat_source,
             identification_type,
         )
+
+        if self.fp_document_type == "TE" and party_role == "receptor" and not identification_number:
+            return
+
+        identification_node = ET.SubElement(parent_node, "Identificacion")
+        ET.SubElement(identification_node, "Tipo").text = identification_type
+        ET.SubElement(identification_node, "Numero").text = identification_number
 
     def _fp_format_identification_number(self, value, identification_type):
         raw_value = (value or "").strip()
