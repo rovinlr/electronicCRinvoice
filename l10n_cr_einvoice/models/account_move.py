@@ -1145,7 +1145,7 @@ class AccountMove(models.Model):
             ET.SubElement(detail, "Cantidad").text = self._fp_format_decimal(quantity)
             unit_code = (line.product_uom_id.fp_unit_code or "").strip() if line.product_uom_id else ""
             ET.SubElement(detail, "UnidadMedida").text = unit_code or "Unid"
-            if line.product_uom_id and line.product_uom_id.name:
+            if self.fp_document_type == "FEE" and line.product_uom_id and line.product_uom_id.name:
                 ET.SubElement(detail, "UnidadMedidaComercial").text = line.product_uom_id.name
             ET.SubElement(detail, "Detalle").text = line.name or ""
             ET.SubElement(detail, "PrecioUnitario").text = self._fp_format_decimal(line.price_unit)
