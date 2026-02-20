@@ -542,16 +542,32 @@ class AccountMove(models.Model):
             )
             move._fp_store_hacienda_response_xml(response_data)
             status = (response_data.get("ind-estado") or "").lower()
+            detail_message = move._fp_extract_hacienda_detail_message(response_data)
             if status == "aceptado":
                 move.fp_invoice_status = "accepted"
                 move.fp_api_state = "done"
+                move.message_post(
+                    body=_("Estado consultado en Hacienda: <b>Aceptada</b>%(message)s")
+                    % {"message": f"<br/>{detail_message}" if detail_message else ""}
+                )
                 if move.company_id.fp_auto_send_email_when_accepted:
                     move._fp_send_accepted_invoice_email()
             elif status in ("rechazado", "error"):
                 move.fp_invoice_status = "rejected"
                 move.fp_api_state = "error"
+                move.message_post(
+                    body=_("Estado consultado en Hacienda: <b>Rechazada</b>%(message)s")
+                    % {"message": f"<br/>{detail_message}" if detail_message else ""}
+                )
             elif status:
                 move.fp_invoice_status = "sent"
+                move.message_post(
+                    body=_("Estado consultado en Hacienda: <b>%(status)s</b>%(message)s")
+                    % {
+                        "status": status.capitalize(),
+                        "message": f"<br/>{detail_message}" if detail_message else "",
+                    }
+                )
 
     def action_fp_open_hacienda_documents(self):
         self.ensure_one()
@@ -1664,6 +1680,52 @@ class AccountMove(models.Model):
                 message = (node.text or "").strip()
                 if message:
                     return message
+
+        for node in root.iter():
+            if node.tag.endswith("MensajeHacienda"):
+                message = (node.text or "").strip()
+                if message:
+                    return message
+        return False
+
+    def _fp_extract_hacienda_detail_message(self, response_data=None):
+        self.ensure_one()
+        response_data = response_data or {}
+
+        response_message_keys = [
+            "detalle-mensaje",
+            "detalleMensaje",
+            "mensaje-hacienda",
+            "mensajeHacienda",
+            "mensaje",
+            "message",
+        ]
+        for key in response_message_keys:
+            message = (response_data.get(key) or "").strip()
+            if message:
+                return message
+
+        xml_keys = ["respuesta-xml", "respuestaXml", "xmlRespuesta", "xml"]
+        xml_payload = next((response_data.get(key) for key in xml_keys if response_data.get(key)), None)
+        if xml_payload:
+            if xml_payload.lstrip().startswith("<"):
+                xml_text = xml_payload
+            else:
+                try:
+                    xml_text = base64.b64decode(xml_payload).decode("utf-8")
+                except Exception:
+                    xml_text = xml_payload
+            xml_message = self._fp_extract_hacienda_detail_message_from_xml(xml_text)
+            if xml_message:
+                return xml_message
+
+        attachment = self.fp_response_xml_attachment_id
+        if attachment and attachment.datas:
+            try:
+                xml_text = base64.b64decode(attachment.datas).decode("utf-8")
+            except Exception:
+                return False
+            return self._fp_extract_hacienda_detail_message_from_xml(xml_text)
         return False
 
 
