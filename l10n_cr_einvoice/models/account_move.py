@@ -211,13 +211,7 @@ class AccountMove(models.Model):
         if self.state != "posted":
             raise UserError(_("La factura debe estar publicada para enviarse por correo."))
         self._fp_validate_ready_to_send_email()
-        if self.fp_email_sent:
-            raise UserError(_("El correo de esta factura electrónica ya fue enviado."))
-
-        sent = self._fp_send_accepted_invoice_email()
-        if not sent:
-            raise UserError(_("No fue posible enviar el correo de la factura electrónica."))
-        return True
+        return self.action_invoice_sent()
 
     def _get_invoice_report_filename(self, report=None):
         self.ensure_one()
