@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 from xml.etree import ElementTree as ET
 
 import requests
+from markupsafe import Markup, escape
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.serialization import pkcs12
@@ -546,28 +547,24 @@ class AccountMove(models.Model):
             if status == "aceptado":
                 move.fp_invoice_status = "accepted"
                 move.fp_api_state = "done"
-                move.message_post(
-                    body=_("Estado consultado en Hacienda: <b>Aceptada</b>%(message)s")
-                    % {"message": f"<br/>{detail_message}" if detail_message else ""}
-                )
+                move._fp_post_hacienda_status_message(status_label=_("Aceptada"), detail_message=detail_message)
                 if move.company_id.fp_auto_send_email_when_accepted:
                     move._fp_send_accepted_invoice_email()
             elif status in ("rechazado", "error"):
                 move.fp_invoice_status = "rejected"
                 move.fp_api_state = "error"
-                move.message_post(
-                    body=_("Estado consultado en Hacienda: <b>Rechazada</b>%(message)s")
-                    % {"message": f"<br/>{detail_message}" if detail_message else ""}
-                )
+                move._fp_post_hacienda_status_message(status_label=_("Rechazada"), detail_message=detail_message)
             elif status:
                 move.fp_invoice_status = "sent"
-                move.message_post(
-                    body=_("Estado consultado en Hacienda: <b>%(status)s</b>%(message)s")
-                    % {
-                        "status": status.capitalize(),
-                        "message": f"<br/>{detail_message}" if detail_message else "",
-                    }
-                )
+                move._fp_post_hacienda_status_message(status_label=status.capitalize(), detail_message=detail_message)
+
+    def _fp_post_hacienda_status_message(self, status_label, detail_message=False):
+        self.ensure_one()
+        body = Markup("Estado consultado en Hacienda: <b>%s</b>") % escape(status_label)
+        if detail_message:
+            safe_detail_message = escape(detail_message).replace("\n", Markup("<br/>"))
+            body = Markup("%s<br/>%s") % (body, safe_detail_message)
+        self.message_post(body=body)
 
     def action_fp_open_hacienda_documents(self):
         self.ensure_one()
@@ -1676,13 +1673,15 @@ class AccountMove(models.Model):
             return False
 
         for node in root.iter():
-            if node.tag.endswith("DetalleMensaje"):
+            tag_name = node.tag.split("}")[-1].lower()
+            if tag_name in {"detallemensaje", "detalle-mensaje", "detalle_mensaje"}:
                 message = (node.text or "").strip()
                 if message:
                     return message
 
         for node in root.iter():
-            if node.tag.endswith("MensajeHacienda"):
+            tag_name = node.tag.split("}")[-1].lower()
+            if tag_name in {"mensajehacienda", "mensaje-hacienda", "mensaje_hacienda", "mensaje"}:
                 message = (node.text or "").strip()
                 if message:
                     return message
