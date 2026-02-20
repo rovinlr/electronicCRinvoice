@@ -910,6 +910,7 @@ class AccountMove(models.Model):
             return
 
         self._fp_populate_reference_from_reversed_entry(force=False)
+        self._fp_populate_reference_for_fec(force=False)
         if not self.fp_reference_document_type or not self.fp_reference_number or not self.fp_reference_issue_datetime:
             message = _(
                 "La nota electrónica requiere información de referencia. "
@@ -967,6 +968,30 @@ class AccountMove(models.Model):
 
             if force and not move.fp_reference_reason:
                 move.fp_reference_reason = _("Documento de referencia para nota electrónica")
+
+    def _fp_populate_reference_for_fec(self, force=False):
+        for move in self:
+            if move.fp_document_type != "FEC":
+                continue
+
+            should_set_type = force or not move.fp_reference_document_type
+            should_set_number = force or not move.fp_reference_number
+            should_set_date = force or not move.fp_reference_issue_datetime
+
+            if should_set_type:
+                identification_type = (move.partner_id.fp_identification_type or "").strip()
+                move.fp_reference_document_type = "16" if identification_type == "05" else "99"
+            if should_set_number:
+                move.fp_reference_number = (move.ref or "").strip()
+            if should_set_date:
+                reference_date = move.invoice_date or move.date or fields.Date.context_today(move)
+                move.fp_reference_issue_datetime = datetime.combine(
+                    reference_date,
+                    datetime.now().astimezone().timetz(),
+                ).replace(tzinfo=None)
+
+            if force and not move.fp_reference_reason:
+                move.fp_reference_reason = _("Documento de referencia para factura electrónica de compra")
 
     def _fp_get_tax_rate_from_code(self, tax_rate_code):
         iva_rate_map = {
