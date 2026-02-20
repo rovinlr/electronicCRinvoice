@@ -5,6 +5,7 @@ import random
 import uuid
 import logging
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from json import JSONDecodeError
 from urllib.parse import urlparse
 from xml.etree import ElementTree as ET
@@ -61,6 +62,7 @@ XADES_SIGNATURE_POLICY_IDENTIFIER = (
 XADES_SIGNATURE_POLICY_DESCRIPTION = "Política de firma para comprobantes electrónicos de Costa Rica"
 XADES_SIGNATURE_POLICY_HASH_ALGORITHM = "http://www.w3.org/2001/04/xmlenc#sha256"
 XADES_SIGNATURE_POLICY_HASH = "DWxin1xWOeI8OuWQXazh4VjLWAaCLAA954em7DMh0h8="
+CR_TIMEZONE = ZoneInfo("America/Costa_Rica")
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -788,7 +790,15 @@ class AccountMove(models.Model):
 
     def _fp_generate_invoice_xml(self, clave=None):
         self.ensure_one()
-        clave = clave or self._fp_build_clave()
+        issue_datetime = datetime.now(CR_TIMEZONE).replace(microsecond=0)
+        clave = clave or self._fp_build_clave(issue_datetime=issue_datetime)
+        clave_date_token = (clave or "")[3:9]
+        if len(clave_date_token) == 6 and clave_date_token.isdigit():
+            try:
+                issue_date = datetime.strptime(clave_date_token, "%d%m%y").date()
+                issue_datetime = datetime.combine(issue_date, issue_datetime.time(), tzinfo=CR_TIMEZONE)
+            except ValueError:
+                pass
         document_spec = self._fp_get_xml_document_spec()
         namespace = document_spec["namespace"]
         root = ET.Element(
@@ -829,7 +839,7 @@ class AccountMove(models.Model):
         if receptor_activity_code:
             ET.SubElement(root, "CodigoActividadReceptor").text = receptor_activity_code
         ET.SubElement(root, "NumeroConsecutivo").text = self._fp_extract_consecutive_from_clave(clave)
-        ET.SubElement(root, "FechaEmision").text = datetime.now().astimezone().isoformat(timespec="seconds")
+        ET.SubElement(root, "FechaEmision").text = issue_datetime.isoformat(timespec="seconds")
 
         emisor = ET.SubElement(root, "Emisor")
         ET.SubElement(emisor, "Nombre").text = emisor_name or ""
@@ -1658,13 +1668,14 @@ class AccountMove(models.Model):
         consecutive = self._fp_extract_consecutive_from_clave(clave_value)
         return f"{self.name or 'factura'}-{consecutive}"
 
-    def _fp_build_clave(self):
+    def _fp_build_clave(self, issue_datetime=None):
         self.ensure_one()
         if self.fp_external_id:
             return self.fp_external_id
 
         country_code = "506"
-        invoice_date = fields.Date.context_today(self)
+        issue_datetime = issue_datetime or datetime.now(CR_TIMEZONE)
+        invoice_date = issue_datetime.date()
         date_token = invoice_date.strftime("%d%m%y")
         company_vat = "".join(ch for ch in (self.company_id.vat or "") if ch.isdigit()).zfill(12)[-12:]
         consecutive = self.fp_consecutive_number or self._fp_get_company_consecutive()
