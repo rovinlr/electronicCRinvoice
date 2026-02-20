@@ -844,13 +844,13 @@ class AccountMove(models.Model):
         emisor = ET.SubElement(root, "Emisor")
         ET.SubElement(emisor, "Nombre").text = emisor_name or ""
         self._fp_append_identification_nodes(emisor, emisor_partner, emisor_vat)
-        self._fp_append_location_nodes(emisor, emisor_partner)
+        self._fp_append_location_nodes(emisor, emisor_partner, "emisor")
         self._fp_append_contact_nodes(emisor, emisor_partner)
 
         receptor = ET.SubElement(root, "Receptor")
         ET.SubElement(receptor, "Nombre").text = receptor_name or ""
         self._fp_append_identification_nodes(receptor, receptor_partner, receptor_vat)
-        self._fp_append_location_nodes(receptor, receptor_partner)
+        self._fp_append_location_nodes(receptor, receptor_partner, "receptor")
         self._fp_append_contact_nodes(receptor, receptor_partner)
 
         sale_condition = self.fp_sale_condition or "01"
@@ -1282,7 +1282,44 @@ class AccountMove(models.Model):
             "numeroIdentificacion": identification_number,
         }
 
-    def _fp_append_location_nodes(self, parent_node, partner):
+    def _fp_append_location_nodes(self, parent_node, partner, party_role):
+        if not partner:
+            return
+
+        if self.fp_document_type == "TE" and party_role == "receptor":
+            if partner.country_id.code == "CR":
+                province_source = partner.state_id.code if partner.state_id and partner.state_id.code else partner.fp_province_code
+                canton_source = partner.fp_canton_code or partner.city
+                district_source = partner.fp_district_code
+                neighborhood_source = partner.fp_neighborhood_code
+            else:
+                province_source = partner.fp_province_code or (partner.state_id.code if partner.state_id and partner.state_id.code else "")
+                canton_source = partner.fp_canton_code
+                district_source = partner.fp_district_code
+                neighborhood_source = partner.fp_neighborhood_code
+
+            province = self._fp_pad_numeric_code_if_present(province_source, 1)
+            canton = self._fp_pad_numeric_code_if_present(canton_source, 2)
+            district = self._fp_pad_numeric_code_if_present(district_source, 2)
+            neighborhood = self._fp_format_neighborhood_code(neighborhood_source) if neighborhood_source else ""
+            other_signs = (partner.street or "")[:160]
+
+            if not any((province, canton, district, neighborhood, other_signs)):
+                return
+
+            location_node = ET.SubElement(parent_node, "Ubicacion")
+            if province:
+                ET.SubElement(location_node, "Provincia").text = province
+            if canton:
+                ET.SubElement(location_node, "Canton").text = canton
+            if district:
+                ET.SubElement(location_node, "Distrito").text = district
+            if neighborhood:
+                ET.SubElement(location_node, "Barrio").text = neighborhood
+            if other_signs:
+                ET.SubElement(location_node, "OtrasSenas").text = other_signs
+            return
+
         if partner.country_id.code == "CR":
             province_source = partner.state_id.code if partner.state_id and partner.state_id.code else partner.fp_province_code
             canton_source = partner.fp_canton_code or partner.city
@@ -1330,6 +1367,12 @@ class AccountMove(models.Model):
         digits = "".join(ch for ch in (value or "") if ch.isdigit())
         if not digits:
             digits = default
+        return digits.zfill(length)[-length:]
+
+    def _fp_pad_numeric_code_if_present(self, value, length):
+        digits = "".join(ch for ch in (value or "") if ch.isdigit())
+        if not digits:
+            return ""
         return digits.zfill(length)[-length:]
 
     def _fp_format_neighborhood_code(self, value):
