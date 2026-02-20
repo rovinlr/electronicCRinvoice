@@ -26,6 +26,13 @@
                 <header>
                     <button name="action_fp_send_to_api" string="Enviar a Hacienda" type="object" class="oe_highlight" invisible="fp_api_state != 'pending'"/>
                     <button name="action_fp_consult_api_document" string="Consultar Hacienda" type="object" invisible="fp_api_state in ('done','error')"/>
+                    <button
+                        name="action_invoice_sent"
+                        string="Enviar por correo"
+                        type="object"
+                        class="btn-primary"
+                        invisible="fp_invoice_status != 'accepted'"
+                    />
                     <field name="fp_invoice_status" widget="statusbar"/>
                     <field name="fp_api_state" invisible="1"/>
                 </header>
