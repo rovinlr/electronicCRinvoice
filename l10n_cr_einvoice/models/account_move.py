@@ -393,6 +393,9 @@ class AccountMove(models.Model):
             ("06", "06 - Contrato"),
             ("07", "07 - Procedimiento"),
             ("08", "08 - Comprobante emitido en contingencia"),
+            ("16", "16 - Comprobante de Proveedor No Domiciliado"),
+            ("17", "17 - Nota de Crédito a Factura Electrónica de Compra"),
+            ("18", "18 - Nota de Débito a Factura Electrónica de Compra"),
             ("99", "99 - Otros"),
         ],
         string="Tipo de documento de referencia (FE)",
@@ -680,22 +683,29 @@ class AccountMove(models.Model):
 
         signed_xml_b64 = self._fp_get_signed_xml_payload_base64()
         clave = self._fp_build_clave()
-        partner_vat = "".join(ch for ch in (self.partner_id.vat or "") if ch.isdigit())
+
+        if self.fp_document_type == "FEC":
+            emisor_partner = self.partner_id
+            emisor_vat = self.partner_id.vat
+            receptor_partner = self.company_id.partner_id
+            receptor_vat = self.company_id.vat
+        else:
+            emisor_partner = self.company_id.partner_id
+            emisor_vat = self.company_id.vat
+            receptor_partner = self.partner_id
+            receptor_vat = self.partner_id.vat
+
+        emisor_identificacion = self._fp_get_party_identification_payload(emisor_partner, emisor_vat)
+        receptor_identificacion = self._fp_get_party_identification_payload(receptor_partner, receptor_vat)
 
         payload = {
             "clave": clave,
             "fecha": datetime.now().astimezone().isoformat(timespec="seconds"),
-            "emisor": {
-                "tipoIdentificacion": self.company_id.partner_id.fp_identification_type or "02",
-                "numeroIdentificacion": "".join(ch for ch in (self.company_id.vat or "") if ch.isdigit()),
-            },
+            "emisor": emisor_identificacion,
             "comprobanteXml": signed_xml_b64,
         }
-        if partner_vat and self.partner_id.fp_identification_type:
-            payload["receptor"] = {
-                "tipoIdentificacion": self.partner_id.fp_identification_type,
-                "numeroIdentificacion": partner_vat,
-            }
+        if receptor_identificacion:
+            payload["receptor"] = receptor_identificacion
         return payload
 
     def _fp_generate_and_sign_xml_attachment(self):
@@ -778,24 +788,44 @@ class AccountMove(models.Model):
         ET.SubElement(root, "Clave").text = clave
         if self.company_id.vat:
             ET.SubElement(root, "ProveedorSistemas").text = "".join(ch for ch in self.company_id.vat if ch.isdigit())
-        if self.fp_economic_activity_code:
-            ET.SubElement(root, "CodigoActividadEmisor").text = self.fp_economic_activity_code
-        if self.partner_id.fp_economic_activity_id and self.partner_id.fp_economic_activity_id.code:
-            ET.SubElement(root, "CodigoActividadReceptor").text = self.partner_id.fp_economic_activity_id.code
+
+        if self.fp_document_type == "FEC":
+            emisor_partner = self.partner_id
+            emisor_vat = self.partner_id.vat
+            emisor_name = self.partner_id.name
+            receptor_partner = self.company_id.partner_id
+            receptor_vat = self.company_id.vat
+            receptor_name = self.company_id.name
+            emisor_activity_code = self.partner_id.fp_economic_activity_id.code if self.partner_id.fp_economic_activity_id else ""
+            receptor_activity_code = self.fp_economic_activity_code
+        else:
+            emisor_partner = self.company_id.partner_id
+            emisor_vat = self.company_id.vat
+            emisor_name = self.company_id.name
+            receptor_partner = self.partner_id
+            receptor_vat = self.partner_id.vat
+            receptor_name = self.partner_id.name
+            emisor_activity_code = self.fp_economic_activity_code
+            receptor_activity_code = self.partner_id.fp_economic_activity_id.code if self.partner_id.fp_economic_activity_id else ""
+
+        if emisor_activity_code:
+            ET.SubElement(root, "CodigoActividadEmisor").text = emisor_activity_code
+        if receptor_activity_code:
+            ET.SubElement(root, "CodigoActividadReceptor").text = receptor_activity_code
         ET.SubElement(root, "NumeroConsecutivo").text = self._fp_extract_consecutive_from_clave(clave)
         ET.SubElement(root, "FechaEmision").text = datetime.now().astimezone().isoformat(timespec="seconds")
 
         emisor = ET.SubElement(root, "Emisor")
-        ET.SubElement(emisor, "Nombre").text = self.company_id.name or ""
-        self._fp_append_identification_nodes(emisor, self.company_id.partner_id, self.company_id.vat)
-        self._fp_append_location_nodes(emisor, self.company_id.partner_id)
-        self._fp_append_contact_nodes(emisor, self.company_id.partner_id)
+        ET.SubElement(emisor, "Nombre").text = emisor_name or ""
+        self._fp_append_identification_nodes(emisor, emisor_partner, emisor_vat)
+        self._fp_append_location_nodes(emisor, emisor_partner)
+        self._fp_append_contact_nodes(emisor, emisor_partner)
 
         receptor = ET.SubElement(root, "Receptor")
-        ET.SubElement(receptor, "Nombre").text = self.partner_id.name or ""
-        self._fp_append_identification_nodes(receptor, self.partner_id, self.partner_id.vat)
-        self._fp_append_location_nodes(receptor, self.partner_id)
-        self._fp_append_contact_nodes(receptor, self.partner_id)
+        ET.SubElement(receptor, "Nombre").text = receptor_name or ""
+        self._fp_append_identification_nodes(receptor, receptor_partner, receptor_vat)
+        self._fp_append_location_nodes(receptor, receptor_partner)
+        self._fp_append_contact_nodes(receptor, receptor_partner)
 
         sale_condition = self.fp_sale_condition or "01"
         ET.SubElement(root, "CondicionVenta").text = sale_condition
@@ -977,7 +1007,9 @@ class AccountMove(models.Model):
             impuesto_neto_linea = total_impuesto_linea
             monto_total_linea = subtotal + impuesto_neto_linea
 
-            tax = line.tax_ids[:1]
+            taxes = line.tax_ids
+            expected_tax_use = "purchase" if self.fp_document_type == "FEC" else "sale"
+            tax = (taxes.filtered(lambda t: t.type_tax_use == expected_tax_use) or taxes.filtered(lambda t: t.type_tax_use == "none") or taxes)[:1]
             tax_code = (tax.fp_tax_type or tax.fp_tax_code or "01") if tax else "01"
             tax_rate_code = (tax.fp_tax_rate_code_iva or "08") if tax else "08"
             configured_tax_rate = tax.fp_tax_rate if tax and tax.fp_tax_rate else 0.0
@@ -1160,8 +1192,30 @@ class AccountMove(models.Model):
 
     def _fp_append_identification_nodes(self, parent_node, partner, vat_source):
         identification_node = ET.SubElement(parent_node, "Identificacion")
-        ET.SubElement(identification_node, "Tipo").text = (partner.fp_identification_type or "02").strip()
-        ET.SubElement(identification_node, "Numero").text = "".join(ch for ch in (vat_source or "") if ch.isdigit())
+        identification_type = (partner.fp_identification_type or "02").strip()
+        ET.SubElement(identification_node, "Tipo").text = identification_type
+        ET.SubElement(identification_node, "Numero").text = self._fp_format_identification_number(
+            vat_source,
+            identification_type,
+        )
+
+    def _fp_format_identification_number(self, value, identification_type):
+        raw_value = (value or "").strip()
+        if self.fp_document_type == "FEC" and identification_type in ("05", "06"):
+            return raw_value[:20]
+        return "".join(ch for ch in raw_value if ch.isdigit())
+
+    def _fp_get_party_identification_payload(self, partner, vat_source):
+        identification_type = (partner.fp_identification_type or "").strip()
+        if not identification_type:
+            return {}
+        identification_number = self._fp_format_identification_number(vat_source, identification_type)
+        if not identification_number:
+            return {}
+        return {
+            "tipoIdentificacion": identification_type,
+            "numeroIdentificacion": identification_number,
+        }
 
     def _fp_append_location_nodes(self, parent_node, partner):
         if partner.country_id.code == "CR":

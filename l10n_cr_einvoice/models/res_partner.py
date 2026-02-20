@@ -114,6 +114,7 @@ class ResPartner(models.Model):
             ("03", "03 - DIMEX"),
             ("04", "04 - NITE"),
             ("05", "05 - Extranjero no domiciliado"),
+            ("06", "06 - No contribuyente"),
         ],
         string="Tipo de identificación (FE)",
         help="Catálogo de tipo de identificación para facturación electrónica.",
