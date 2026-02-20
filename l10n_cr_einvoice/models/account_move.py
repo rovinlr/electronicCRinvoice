@@ -202,6 +202,17 @@ class AccountMove(models.Model):
         action = super().action_send_and_print()
         return self._fp_add_hacienda_attachments_to_mail_action(action)
 
+    def action_fp_send_invoice_email(self):
+        self.ensure_one()
+        if not self.fp_is_electronic_invoice:
+            raise UserError(_("El documento no pertenece a facturación electrónica."))
+        if self.move_type not in ("out_invoice", "out_refund"):
+            raise UserError(_("Solo se permite el envío por correo para facturas o notas de crédito de cliente."))
+        if self.state != "posted":
+            raise UserError(_("La factura debe estar publicada para enviarse por correo."))
+        self._fp_validate_ready_to_send_email()
+        return self.action_invoice_sent()
+
     def _get_invoice_report_filename(self, report=None):
         self.ensure_one()
         filename = super()._get_invoice_report_filename(report=report)
@@ -261,7 +272,7 @@ class AccountMove(models.Model):
                         all_attachment_ids.clear()
 
         all_attachment_ids.update(attachment_ids)
-        context["default_attachment_ids"] = sorted(all_attachment_ids)
+        context["default_attachment_ids"] = [(6, 0, sorted(all_attachment_ids))]
         action["context"] = context
         return action
 
