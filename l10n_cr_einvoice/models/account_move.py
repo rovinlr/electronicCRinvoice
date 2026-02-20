@@ -1446,11 +1446,13 @@ class AccountMove(models.Model):
             ET.SubElement(parent_node, "CorreoElectronico").text = partner.email
 
     def _fp_normalize_phone_payload(self, phone, country):
-        digits = "".join(ch for ch in (phone or "") if ch.isdigit())
+        phone_text = str(phone or "")
+        digits = "".join(ch for ch in phone_text if ch.isdigit())
         if not digits:
             return "", ""
 
-        country_code = "".join(ch for ch in ((country.phone_code if country else "") or "") if ch.isdigit()) or "506"
+        country_phone_code = str((country.phone_code if country else "") or "")
+        country_code = "".join(ch for ch in country_phone_code if ch.isdigit()) or "506"
 
         normalized = digits[2:] if digits.startswith("00") else digits
         if normalized.startswith(country_code) and len(normalized) > len(country_code):
