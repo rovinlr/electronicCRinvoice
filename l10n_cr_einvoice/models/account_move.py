@@ -867,7 +867,8 @@ class AccountMove(models.Model):
         ET.SubElement(resumen, "TotalImpAsumEmisorFabrica").text = self._fp_format_decimal(
             detalle_vals["total_imp_asum_emisor_fabrica"]
         )
-        ET.SubElement(resumen, "TotalIVADevuelto").text = self._fp_format_decimal(detalle_vals["total_iva_devuelto"])
+        if self.fp_document_type != "FEC":
+            ET.SubElement(resumen, "TotalIVADevuelto").text = self._fp_format_decimal(detalle_vals["total_iva_devuelto"])
         medio_pago = ET.SubElement(resumen, "MedioPago")
         ET.SubElement(medio_pago, "TipoMedioPago").text = self.fp_payment_method or "01"
         ET.SubElement(resumen, "TotalComprobante").text = self._fp_format_decimal(detalle_vals["total_comprobante"])
