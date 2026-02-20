@@ -1375,6 +1375,9 @@ class AccountMove(models.Model):
         if not partner:
             return
 
+        if self.fp_document_type == "FEE" and party_role == "receptor" and partner.country_id.code != "CR":
+            return
+
         if self.fp_document_type == "TE" and party_role == "receptor":
             if partner.country_id.code == "CR":
                 province_source = partner.state_id.code if partner.state_id and partner.state_id.code else partner.fp_province_code
@@ -1434,23 +1437,29 @@ class AccountMove(models.Model):
             ET.SubElement(location_node, "OtrasSenas").text = partner.street[:160]
 
     def _fp_append_contact_nodes(self, parent_node, partner):
-        phone_number = self._fp_normalize_phone_number(partner.phone)
+        country_code, phone_number = self._fp_normalize_phone_payload(partner.phone, partner.country_id)
         if phone_number:
             phone_node = ET.SubElement(parent_node, "Telefono")
-            ET.SubElement(phone_node, "CodigoPais").text = "506"
+            ET.SubElement(phone_node, "CodigoPais").text = country_code
             ET.SubElement(phone_node, "NumTelefono").text = phone_number
         if partner.email:
             ET.SubElement(parent_node, "CorreoElectronico").text = partner.email
 
-    def _fp_normalize_phone_number(self, phone):
+    def _fp_normalize_phone_payload(self, phone, country):
         digits = "".join(ch for ch in (phone or "") if ch.isdigit())
         if not digits:
-            return ""
-        if digits == "506":
-            return ""
-        if digits.startswith("506") and len(digits) > 8:
-            digits = digits[3:]
-        return digits[:20]
+            return "", ""
+
+        country_code = "".join(ch for ch in ((country.phone_code if country else "") or "") if ch.isdigit()) or "506"
+
+        normalized = digits[2:] if digits.startswith("00") else digits
+        if normalized.startswith(country_code) and len(normalized) > len(country_code):
+            normalized = normalized[len(country_code):]
+
+        if not normalized:
+            return "", ""
+
+        return country_code[:3], normalized[:20]
 
     def _fp_pad_numeric_code(self, value, length, default):
         digits = "".join(ch for ch in (value or "") if ch.isdigit())
