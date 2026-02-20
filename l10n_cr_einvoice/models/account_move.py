@@ -78,31 +78,36 @@ class AccountMove(models.Model):
 
     @api.model
     def _selection_fp_document_type(self):
+        labels = {
+            "FE": "Factura Electrónica",
+            "TE": "Tiquete Electrónico",
+            "FEE": "Factura Electrónica de Exportación",
+            "NC": "Nota de Crédito Electrónica",
+            "FEC": "Factura Electrónica de Compra",
+        }
         move_type = self.env.context.get("default_move_type")
         if not move_type and self:
             move_type = self[:1].move_type
 
         if move_type == "out_refund":
-            return [("NC", "Nota de Crédito Electrónica")]
+            return [("NC", labels["NC"])]
         if move_type == "in_invoice":
-            return [("FEC", "Factura Electrónica de Compra")]
+            return [("FEC", labels["FEC"])]
         if move_type == "out_invoice":
             return [
-                ("FE", "Factura Electrónica"),
-                ("TE", "Tiquete Electrónico"),
-                ("FEE", "Factura Electrónica de Exportación"),
+                ("FE", labels["FE"]),
+                ("TE", labels["TE"]),
+                ("FEE", labels["FEE"]),
             ]
 
         # Fallback seguro para contextos sin `default_move_type`.
-        # Evita fallos del widget de selección cuando ya existe un valor
-        # (por ejemplo FEC/NC) que no esté presente en la selección dinámica.
-        return [
-            ("FE", "Factura Electrónica"),
-            ("TE", "Tiquete Electrónico"),
-            ("FEE", "Factura Electrónica de Exportación"),
-            ("NC", "Nota de Crédito Electrónica"),
-            ("FEC", "Factura Electrónica de Compra"),
-        ]
+        # Mantiene FE/TE/FEE por defecto para evitar mostrar NC/FEC en facturas
+        # de cliente cuando falta contexto. Si el registro ya tiene un valor
+        # especial (NC/FEC), se agrega para que el widget no falle.
+        selection_codes = ["FE", "TE", "FEE"]
+        existing_codes = {code for code in self.mapped("fp_document_type") if code in ("NC", "FEC")}
+        selection_codes.extend(sorted(existing_codes))
+        return [(code, labels[code]) for code in selection_codes]
 
     @api.model
     def _default_fp_document_type(self):
