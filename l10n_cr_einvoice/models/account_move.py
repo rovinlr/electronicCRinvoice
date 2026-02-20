@@ -501,14 +501,29 @@ class AccountMove(models.Model):
     def _compute_fp_hacienda_detail_message(self):
         for move in self:
             move.fp_hacienda_detail_message = False
-            attachment = move.fp_response_xml_attachment_id
-            if not attachment or not attachment.datas:
-                continue
-            try:
-                xml_text = base64.b64decode(attachment.datas).decode("utf-8")
-            except Exception:
+            xml_text = move._fp_get_attachment_xml_text(move.fp_response_xml_attachment_id)
+            if not xml_text:
                 continue
             move.fp_hacienda_detail_message = move._fp_extract_hacienda_detail_message_from_xml(xml_text)
+
+    def _fp_get_attachment_xml_text(self, attachment):
+        self.ensure_one()
+        if not attachment:
+            return False
+
+        datas = attachment.with_context(bin_size=False).datas
+        if not datas:
+            return False
+
+        if isinstance(datas, bytes):
+            base64_payload = datas
+        else:
+            base64_payload = datas.encode("utf-8")
+
+        try:
+            return base64.b64decode(base64_payload).decode("utf-8")
+        except Exception:
+            return False
 
     def action_fp_send_to_api(self):
         for move in self:
@@ -1719,10 +1734,9 @@ class AccountMove(models.Model):
                 return xml_message
 
         attachment = self.fp_response_xml_attachment_id
-        if attachment and attachment.datas:
-            try:
-                xml_text = base64.b64decode(attachment.datas).decode("utf-8")
-            except Exception:
+        if attachment:
+            xml_text = self._fp_get_attachment_xml_text(attachment)
+            if not xml_text:
                 return False
             return self._fp_extract_hacienda_detail_message_from_xml(xml_text)
         return False
