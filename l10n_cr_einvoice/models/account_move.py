@@ -1175,6 +1175,8 @@ class AccountMove(models.Model):
             exoneration_amount = 0.0
             has_exoneration = False
             if has_tax:
+                if self.fp_document_type != "FEE":
+                    ET.SubElement(detail, "BaseImponible").text = self._fp_format_decimal(subtotal)
                 impuesto = ET.SubElement(detail, "Impuesto")
                 ET.SubElement(impuesto, "Codigo").text = tax_code
                 ET.SubElement(impuesto, "CodigoTarifaIVA").text = tax_rate_code
@@ -1193,7 +1195,6 @@ class AccountMove(models.Model):
                 if self.fp_document_type != "FEE":
                     if self.fp_document_type != "FEC":
                         ET.SubElement(detail, "ImpuestoAsumidoEmisorFabrica").text = self._fp_format_decimal(0.0)
-                    ET.SubElement(detail, "BaseImponible").text = self._fp_format_decimal(subtotal)
                     ET.SubElement(detail, "ImpuestoNeto").text = self._fp_format_decimal(impuesto_neto_linea)
                 desglose_key = (tax_code, tax_rate_code)
                 totals["total_desglose_impuesto"][desglose_key] = (
