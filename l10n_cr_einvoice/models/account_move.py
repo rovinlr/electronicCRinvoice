@@ -1379,19 +1379,23 @@ class AccountMove(models.Model):
         if not partner:
             return
 
+        province_code_from_catalog = partner.fp_province_id.code if partner.fp_province_id else ""
+        canton_code_from_catalog = partner.fp_canton_id.code if partner.fp_canton_id else ""
+        district_code_from_catalog = partner.fp_district_id.code if partner.fp_district_id else ""
+
         if self.fp_document_type == "FEE" and party_role == "receptor" and partner.country_id.code != "CR":
             return
 
         if self.fp_document_type == "TE" and party_role == "receptor":
             if partner.country_id.code == "CR":
-                province_source = partner.state_id.code if partner.state_id and partner.state_id.code else partner.fp_province_code
-                canton_source = partner.fp_canton_code or partner.city
-                district_source = partner.fp_district_code
+                province_source = province_code_from_catalog or (partner.state_id.code if partner.state_id and partner.state_id.code else partner.fp_province_code)
+                canton_source = canton_code_from_catalog or partner.fp_canton_code or partner.city
+                district_source = district_code_from_catalog or partner.fp_district_code
                 neighborhood_source = partner.fp_neighborhood_code
             else:
-                province_source = partner.fp_province_code or (partner.state_id.code if partner.state_id and partner.state_id.code else "")
-                canton_source = partner.fp_canton_code
-                district_source = partner.fp_district_code
+                province_source = province_code_from_catalog or partner.fp_province_code or (partner.state_id.code if partner.state_id and partner.state_id.code else "")
+                canton_source = canton_code_from_catalog or partner.fp_canton_code
+                district_source = district_code_from_catalog or partner.fp_district_code
                 neighborhood_source = partner.fp_neighborhood_code
 
             province = self._fp_pad_numeric_code_if_present(province_source, 1)
@@ -1417,14 +1421,14 @@ class AccountMove(models.Model):
             return
 
         if partner.country_id.code == "CR":
-            province_source = partner.state_id.code if partner.state_id and partner.state_id.code else partner.fp_province_code
-            canton_source = partner.fp_canton_code or partner.city
-            district_source = partner.fp_district_code
+            province_source = province_code_from_catalog or (partner.state_id.code if partner.state_id and partner.state_id.code else partner.fp_province_code)
+            canton_source = canton_code_from_catalog or partner.fp_canton_code or partner.city
+            district_source = district_code_from_catalog or partner.fp_district_code
             neighborhood_source = partner.fp_neighborhood_code
         else:
-            province_source = partner.fp_province_code if partner.fp_province_code else (partner.state_id.code if partner.state_id and partner.state_id.code else "1")
-            canton_source = partner.fp_canton_code
-            district_source = partner.fp_district_code
+            province_source = province_code_from_catalog or (partner.fp_province_code if partner.fp_province_code else (partner.state_id.code if partner.state_id and partner.state_id.code else "1"))
+            canton_source = canton_code_from_catalog or partner.fp_canton_code
+            district_source = district_code_from_catalog or partner.fp_district_code
             neighborhood_source = partner.fp_neighborhood_code
 
         province = self._fp_pad_numeric_code(province_source, 1, "1")
@@ -1436,7 +1440,8 @@ class AccountMove(models.Model):
         ET.SubElement(location_node, "Provincia").text = self._fp_pad_numeric_code(province, 1, "1")
         ET.SubElement(location_node, "Canton").text = canton
         ET.SubElement(location_node, "Distrito").text = district
-        ET.SubElement(location_node, "Barrio").text = neighborhood
+        if neighborhood:
+            ET.SubElement(location_node, "Barrio").text = neighborhood
         if partner.street:
             ET.SubElement(location_node, "OtrasSenas").text = partner.street[:160]
 
