@@ -1974,7 +1974,7 @@ class AccountMove(models.Model):
             [
                 ("fp_is_electronic_invoice", "=", True),
                 ("fp_external_id", "!=", False),
-                ("fp_invoice_status", "in", ["sent", False]),
+                ("fp_invoice_status", "=", "sent"),
                 ("state", "=", "posted"),
             ],
             limit=200,
@@ -1986,3 +1986,21 @@ class AccountMove(models.Model):
                 _logger.exception("Error en cron FE consultando documento %s", move.name)
                 move.fp_api_state = "error"
                 move.message_post(body=_("Error en consulta automática a Hacienda: %s") % error)
+
+    def _fp_cron_send_pending_documents(self):
+        moves = self.search(
+            [
+                ("fp_is_electronic_invoice", "=", True),
+                ("fp_api_state", "=", "pending"),
+                ("state", "=", "posted"),
+                ("fp_xml_attachment_id", "!=", False),
+            ],
+            limit=200,
+        )
+        for move in moves:
+            try:
+                move._fp_send_to_hacienda()
+            except Exception as error:
+                _logger.exception("Error en cron FE enviando documento %s", move.name)
+                move.fp_api_state = "error"
+                move.message_post(body=_("Error en envío automático a Hacienda: %s") % error)
