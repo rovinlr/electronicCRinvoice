@@ -29,7 +29,7 @@
             <t t-set="fp_company_partner" t-value="o.company_id.partner_id"/>
             <t t-set="fp_receiver_partner" t-value="o.partner_id"/>
             <t t-set="fp_receiver_address" t-value="', '.join(filter(None, [fp_receiver_partner.street, fp_receiver_partner.fp_district_id.name if fp_receiver_partner.fp_district_id else False, fp_receiver_partner.fp_canton_id.name if fp_receiver_partner.fp_canton_id else False, fp_receiver_partner.fp_province_id.name if fp_receiver_partner.fp_province_id else False]))"/>
-            <t t-set="fp_receiver_phone" t-value="fp_receiver_partner.phone or fp_receiver_partner.mobile or ''"/>
+            <t t-set="fp_receiver_phone" t-value="fp_receiver_partner.phone or (fp_receiver_partner._fields.get('mobile') and fp_receiver_partner.mobile) or ''"/>
             <t t-set="fp_reference_value" t-value="o.reversed_entry_id.fp_consecutive_number if o.fp_document_type == 'NC' and o.reversed_entry_id else (o.ref or '-')"/>
             <t t-set="fp_summary_totals" t-value="o._fp_get_report_summary_totals()"/>
 
