@@ -1434,7 +1434,7 @@ class AccountMove(models.Model):
         province = self._fp_pad_numeric_code(province_source, 1, "1")
         canton = self._fp_pad_numeric_code(canton_source, 2, "01")
         district = self._fp_pad_numeric_code(district_source, 2, "01")
-        neighborhood = self._fp_format_neighborhood_code(neighborhood_source)
+        neighborhood = self._fp_format_neighborhood_code(neighborhood_source) if neighborhood_source else ""
 
         location_node = ET.SubElement(parent_node, "Ubicacion")
         ET.SubElement(location_node, "Provincia").text = self._fp_pad_numeric_code(province, 1, "1")
